@@ -105,8 +105,6 @@ export default function Dashboard() {
   ];
 
   useEffect(()=>{
-    
-    
     getoee(serialNumber,selectedDate,shiftDetailNum[selectedShift]).then((data)=>{
       if (data) {
         setShiftData(data[data.length - 1].d)
