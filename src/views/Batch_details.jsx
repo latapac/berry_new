@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { useEffect } from 'react';
 import { useLocation } from 'react-router';
 import { getoee } from '../backservice';
 
@@ -19,6 +18,7 @@ const metricsData = [
 export default function BatchDetails() {
   const [selectedBatch, setSelectedBatch] = useState(null);
   const [isPrinting, setIsPrinting] = useState(false);
+  const [selectedShift, setSelectedShift] = useState('Shift A');
 
   const getCurrentDate = () => {
     const today = new Date();
@@ -27,6 +27,8 @@ export default function BatchDetails() {
     const day = String(today.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
+
+  const [selectedDate, setSelectedDate] = useState(getCurrentDate());
 
   const handlePrint = () => {
     setIsPrinting(true);
@@ -42,15 +44,31 @@ export default function BatchDetails() {
       case 'In Progress': return '#ffa000';
       case 'Pending': return '#f44336';
       default: return '#000';
-    }
-  };
+    
+      useEffect(()=>{
+        getoee(serialNumber,selectedDate,shiftDetailNum[selectedShift]).then((data)=>{
+          if (data) {
+            setShiftData(data[data.length - 1].d)
+          }else{
+            setShiftData({shiftLengthHours: 0,
+              shortBreaksCount: 0,
+              shortBreaksMinutesEach: 0,
+              mealBreakCount: 0,
+              mealBreakMinutesEach: 0,
+              downTime: 0,
+              idealRunRate: 0,
+              totalProducts: 0,
+              rejectProducts: 0})
+          }
+        })}
+  )}};
 
   return (
     <div className="min-h-screen flex flex-col items-center p-4 bg-gray-100">
       {/* Header Section */}
       <div className="w-full mb-4 flex flex-wrap justify-between items-center no-print gap-2">
         <h1 className="text-xl sm:text-2xl font-bold text-gray-800 text-left print:text-center">
-          OEE Details
+          Batch Details
         </h1>
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-1">

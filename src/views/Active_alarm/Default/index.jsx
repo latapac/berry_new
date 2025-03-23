@@ -2,21 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { getAuditTrailData } from '../../../backservice';
 import { useLocation } from 'react-router';
 
-// Helper function to determine alarm color based on severity
-const getAlarmColor = (severity) => {
-  switch (severity) {
-    case 'emergency':
-      return 'bg-red-100'; // Red background for emergency alarms
-    case 'warning':
-      return 'bg-yellow-100'; // Yellow background for warnings
-    case 'info':
-      return 'bg-blue-100'; // Blue background for informational alarms
-    default:
-      return 'bg-white'; // Default background
-  }
-};
-
-const AlarmTable = ({ alarms, currentPage, itemsPerPage, onPageChange }) => {
+const AlarmTable = ({ alarms, currentPage, itemsPerPage }) => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedAlarms = alarms.slice(startIndex, startIndex + itemsPerPage);
 
@@ -80,7 +66,7 @@ const AlarmTable = ({ alarms, currentPage, itemsPerPage, onPageChange }) => {
 };
 
 // History component
-const AlarmHistory = ({ history, currentPage, itemsPerPage, onPageChange }) => {
+const AlarmHistory = ({ history, currentPage, itemsPerPage }) => {
   const [filter, setFilter] = useState('');
 
   const filteredHistory = history.filter(alarm =>

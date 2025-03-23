@@ -15,14 +15,14 @@ const dashboard = {
   title: 'Dashboard',
   type: 'group',
   children: [
-    
+
     {
       id: 'default',
       title: 'Dashboard',
       type: 'item',
       url: '/dashboard/default',
       icon: icons.IconDashboard,
-      breadcrumbs: false
+      breadcrumbs: false  
     },
     {
       id: 'default',

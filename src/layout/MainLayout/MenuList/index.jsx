@@ -48,22 +48,25 @@ function MenuList() {
         if (item.url && item.id !== lastItemId) {
           return (
             <List key={item.id}>
-              <NavItem item={item} level={1} isParents setSelectedID={() => setSelectedID('')} />
-              {index !== 0 && <Divider sx={{ py: 0.5 }} />}
+              {/* <NavItem item={item} level={1} isParents setSelectedID={() => setSelectedID('')} />
+              {index !== 0 && <Divider sx={{ py: 0.5 }} />} */}
             </List>
           );
         }
 
         return (
-          <NavGroup
-            key={item.id}
-            setSelectedID={setSelectedID}
-            selectedID={selectedID}
-            item={item}
-            lastItem={lastItem}
-            remItems={remItems}
-            lastItemId={lastItemId}
-          />
+          // <NavGroup
+          //   key={item.id}
+          //   setSelectedID={setSelectedID}
+          //   selectedID={selectedID}
+          //   item={item}
+          //   lastItem={lastItem}
+          //   remItems={remItems}
+          //   lastItemId={lastItemId}
+          // />
+          <>
+          
+          </>
         );
       default:
         return (
