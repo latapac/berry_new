@@ -143,7 +143,7 @@ const GoodProductionBox = ({ goodValue, rejectValue, totalValue, isLoading }) =>
   );
 };
 
-// OEE Box with donut chart
+// OEE Box with donut chart (Updated)
 const OEEBox = ({ availability, performance, quality, isLoading }) => {
   const oeeData = [
     { name: 'Availability', value: parseFloat(availability) || 0, color: '#3b82f6' },
@@ -156,10 +156,10 @@ const OEEBox = ({ availability, performance, quality, isLoading }) => {
   let startAngle = 0;
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 h-[150px]">
-      <h3 className="text-sm font-semibold text-gray-600 mb-2">OEE</h3>
+    <div className="bg-white rounded-lg shadow-sm p-4 h-[150px] flex flex-col justify-between">
+      <h3 className="text-xs font-semibold text-gray-600">OEE</h3>
       <div className="flex items-center">
-        <div className="relative w-16 h-16 sm:w-20 sm:h-20 mr-4">
+        <div className="relative w-12 h-12 sm:w-16 sm:h-16 mr-2">
           <svg className="w-full h-full" viewBox="0 0 36 36">
             {oeeData.map((item, index) => {
               const percentage = (item.value / total) * 100;
@@ -181,16 +181,23 @@ const OEEBox = ({ availability, performance, quality, isLoading }) => {
               );
             })}
             <circle cx="18" cy="18" r="12" fill="white" />
-            <text x="18" y="20" textAnchor="middle" fontSize="8" fontWeight="bold" fill="#1f2937">
+            <text
+              x="18"
+              y="20"
+              textAnchor="middle"
+              fontSize="6"
+              fontWeight="bold"
+              fill="#1f2937"
+            >
               {isLoading || totalOEE === undefined ? '-' : totalOEE.toFixed(1)}%
             </text>
           </svg>
         </div>
         <div className="flex-1">
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             {oeeData.map((item, index) => (
-              <div key={index} className="flex items-center text-sm">
-                <span className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: item.color }}></span>
+              <div key={index} className="flex items-center text-[10px] sm:text-xs">
+                <span className="w-2 h-2 rounded-full mr-1" style={{ backgroundColor: item.color }}></span>
                 <span className="text-gray-600">{item.name}: {isLoading ? '-' : item.value.toFixed(1)}%</span>
               </div>
             ))}
@@ -201,7 +208,7 @@ const OEEBox = ({ availability, performance, quality, isLoading }) => {
   );
 };
 
-// Total Production Box
+// Total Production Box (Updated)
 const TotalProductionBox = ({ value, isLoading }) => {
   const [animatedValue, setAnimatedValue] = useState(0);
 
@@ -229,18 +236,18 @@ const TotalProductionBox = ({ value, isLoading }) => {
   ];
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 h-[150px]">
-      <h3 className="text-sm font-semibold text-gray-600 mb-2">Total Production</h3>
-      <div className="text-lg font-bold text-gray-900 mb-2">
+    <div className="bg-white rounded-lg shadow-sm p-4 h-[150px] flex flex-col justify-between">
+      <h3 className="text-xs font-semibold text-gray-600">Total Production</h3>
+      <div className="text-sm font-bold text-gray-900">
         {isLoading ? '-' : animatedValue.toFixed(0)} units
       </div>
-      <div className="space-y-2">
+      <div className="space-y-0.5">
         {dummyLines.map((item, index) => (
-          <div key={index} className="flex items-center gap-2">
-            <svg className="w-16 h-5 sm:w-20 sm:h-5" viewBox="0 0 80 20">
+          <div key={index} className="flex items-center gap-1">
+            <svg className="w-12 h-3 sm:w-16 sm:h-4" viewBox="0 0 80 20">
               <path d={item.path} fill="none" stroke={item.color} strokeWidth="1" />
             </svg>
-            <span className="text-sm text-gray-500">
+            <span className="text-[10px] sm:text-xs text-gray-500">
               {index === 0 ? '60% / 370°C / 3.3 GHz' : index === 1 ? '54% / 310°C / 3.3 GHz' : '54% / 310°C / 3.3 GHz'}
             </span>
           </div>
