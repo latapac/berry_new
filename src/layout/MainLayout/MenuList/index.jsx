@@ -55,18 +55,18 @@ function MenuList() {
         }
 
         return (
-          // <NavGroup
-          //   key={item.id}
-          //   setSelectedID={setSelectedID}
-          //   selectedID={selectedID}
-          //   item={item}
-          //   lastItem={lastItem}
-          //   remItems={remItems}
-          //   lastItemId={lastItemId}
-          // />
-          <>
+          <NavGroup
+            key={item.id}
+            setSelectedID={setSelectedID}
+            selectedID={selectedID}
+            item={item}
+            lastItem={lastItem}
+            remItems={remItems}
+            lastItemId={lastItemId}
+          />
+          // <>
           
-          </>
+          // </>
         );
       default:
         return (
