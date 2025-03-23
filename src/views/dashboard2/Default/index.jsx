@@ -39,7 +39,7 @@ const SpeedBox = ({ speed, isLoading, status }) => {
   };
 
   return (
-    <div className="flex-1 bg-white rounded-lg shadow-sm p-4 h-[150px] flex flex-col justify-between">
+    <div className="bg-white rounded-lg shadow-sm p-4 h-[150px] flex flex-col justify-between">
       <div className="flex justify-between items-center mb-2">
         <h3 className="text-sm font-semibold text-gray-600">Speed</h3>
         <div className="flex items-center text-xs">
@@ -55,49 +55,25 @@ const SpeedBox = ({ speed, isLoading, status }) => {
           </span>
         </div>
       </div>
-      <div className="flex items-center justify-start">
-        <div className="relative w-20 h-20">
+      <div className="flex items-center justify-center">
+        <div className="relative w-16 h-16 sm:w-20 sm:h-20">
           <svg className="w-full h-full" viewBox="0 0 36 36">
-            {/* Background circle (unfilled portion) */}
+            <circle cx="18" cy="18" r="16" fill="none" stroke="#e5e7eb" strokeWidth="4" />
             <circle
               cx="18"
               cy="18"
               r="16"
               fill="none"
-              stroke="#e5e7eb"
+              stroke="#00bcd4"
               strokeWidth="4"
+              strokeDasharray={`${percentage * 1.005}, 100.53`}
+              transform="rotate(-90 18 18)"
             />
-            {/* Filled portion of the circle */}
-            <circle
-              cx="18"
-              cy="18"
-              r="16"
-              fill="none"
-              stroke="#00bcd4" // Teal color from the image
-              strokeWidth="4"
-              strokeDasharray={`${percentage * 1.005}, 100.53`} // 100.53 is the circumference of the circle (2 * π * 16)
-              transform="rotate(-90 18 18)" // Start from the top
-            />
-            {/* Inner white circle to create the donut effect */}
             <circle cx="18" cy="18" r="12" fill="white" />
-            {/* Speed value in the center */}
-            <text
-              x="18"
-              y="20"
-              textAnchor="middle"
-              fontSize="8"
-              fontWeight="bold"
-              fill="#1f2937"
-            >
+            <text x="18" y="20" textAnchor="middle" fontSize="8" fontWeight="bold" fill="#1f2937">
               {isLoading ? '-' : animatedSpeed.toFixed(0)}
             </text>
-            <text
-              x="18"
-              y="25"
-              textAnchor="middle"
-              fontSize="4"
-              fill="#6b7280"
-            >
+            <text x="18" y="25" textAnchor="middle" fontSize="4" fill="#6b7280">
               ppm
             </text>
           </svg>
@@ -107,7 +83,7 @@ const SpeedBox = ({ speed, isLoading, status }) => {
   );
 };
 
-// Good Production Box 
+// Good Production Box
 const GoodProductionBox = ({ goodValue, rejectValue, totalValue, isLoading }) => {
   const productionData = [
     { name: 'Good', value: parseFloat(goodValue) || 0, color: '#22c55e' },
@@ -117,11 +93,10 @@ const GoodProductionBox = ({ goodValue, rejectValue, totalValue, isLoading }) =>
   const total = parseFloat(totalValue) || 1;
   let startAngle = 0;
 
-  // Function to calculate the path for each pie slice
   const getPieSlicePath = (value, total, startAngle) => {
-    const radius = 18; // Half of the viewBox size (36 / 2)
+    const radius = 18;
     const percentage = (value / total) * 100;
-    const angle = (percentage / 100) * 360; // Convert percentage to degrees
+    const angle = (percentage / 100) * 360;
     const endAngle = startAngle + angle;
 
     const startX = radius + radius * Math.cos((Math.PI * startAngle) / 180);
@@ -131,37 +106,24 @@ const GoodProductionBox = ({ goodValue, rejectValue, totalValue, isLoading }) =>
 
     const largeArcFlag = angle > 180 ? 1 : 0;
 
-    // If the value is 0, return an empty path to avoid rendering
     if (value === 0) return '';
-
-    // If the value is equal to total, draw a full circle
     if (value === total) {
       return `M ${radius},${radius} m -${radius},0 a ${radius},${radius} 0 1,0 ${radius * 2},0 a ${radius},${radius} 0 1,0 -${radius * 2},0`;
     }
-
-    // Path for a pie slice
     return `M ${radius},${radius} L ${startX},${startY} A ${radius},${radius} 0 ${largeArcFlag},1 ${endX},${endY} Z`;
   };
 
   return (
-    <div className="flex-1 bg-white rounded-lg shadow-sm p-4 h-[150px] relative">
+    <div className="bg-white rounded-lg shadow-sm p-4 h-[150px] relative">
       <h3 className="text-sm font-semibold text-gray-600 mb-2">Production</h3>
-      <div className="absolute top-4 right-4 text-lg font-bold text-gray-900">
-        {/* {isLoading || totalValue === undefined ? '-' : parseFloat(totalValue).toFixed(0)} units */}
-      </div>
       <div className="flex items-center mt-4">
-        <div className="relative w-20 h-20 mr-4">
+        <div className="relative w-16 h-16 sm:w-20 sm:h-20 mr-4">
           <svg className="w-full h-full" viewBox="0 0 36 36">
             {productionData.map((item, index) => {
               const path = getPieSlicePath(item.value, total, startAngle);
-              startAngle += (item.value / total) * 360; // Update startAngle for the next slice
+              startAngle += (item.value / total) * 360;
               return (
-                <path
-                  key={index}
-                  d={path}
-                  fill={item.color}
-                  stroke="none"
-                />
+                <path key={index} d={path} fill={item.color} stroke="none" />
               );
             })}
           </svg>
@@ -181,23 +143,23 @@ const GoodProductionBox = ({ goodValue, rejectValue, totalValue, isLoading }) =>
   );
 };
 
-// New OEE Box with donut chart
+// OEE Box with donut chart
 const OEEBox = ({ availability, performance, quality, isLoading }) => {
   const oeeData = [
-    { name: 'Availability', value: parseFloat(availability) || 0, color: '#3b82f6' }, // Blue
-    { name: 'Performance', value: parseFloat(performance) || 0, color: '#10b981' }, // Green
-    { name: 'Quality', value: parseFloat(quality) || 0, color: '#f59e0b' },       // Yellow
+    { name: 'Availability', value: parseFloat(availability) || 0, color: '#3b82f6' },
+    { name: 'Performance', value: parseFloat(performance) || 0, color: '#10b981' },
+    { name: 'Quality', value: parseFloat(quality) || 0, color: '#f59e0b' },
   ];
 
-  const totalOEE = (oeeData[0].value * oeeData[1].value * oeeData[2].value) / 10000; // OEE = A * P * Q (in percentage)
-  const total = 100; // Total for percentage-based donut chart
+  const totalOEE = (oeeData[0].value * oeeData[1].value * oeeData[2].value) / 10000;
+  const total = 100;
   let startAngle = 0;
 
   return (
-    <div className="flex-1 bg-white rounded-lg shadow-sm p-4 h-[150px]">
+    <div className="bg-white rounded-lg shadow-sm p-4 h-[150px]">
       <h3 className="text-sm font-semibold text-gray-600 mb-2">OEE</h3>
       <div className="flex items-center">
-        <div className="relative w-20 h-20 mr-4">
+        <div className="relative w-16 h-16 sm:w-20 sm:h-20 mr-4">
           <svg className="w-full h-full" viewBox="0 0 36 36">
             {oeeData.map((item, index) => {
               const percentage = (item.value / total) * 100;
@@ -219,14 +181,7 @@ const OEEBox = ({ availability, performance, quality, isLoading }) => {
               );
             })}
             <circle cx="18" cy="18" r="12" fill="white" />
-            <text
-              x="18"
-              y="20"
-              textAnchor="middle"
-              fontSize="8"
-              fontWeight="bold"
-              fill="#1f2937"
-            >
+            <text x="18" y="20" textAnchor="middle" fontSize="8" fontWeight="bold" fill="#1f2937">
               {isLoading || totalOEE === undefined ? '-' : totalOEE.toFixed(1)}%
             </text>
           </svg>
@@ -274,7 +229,7 @@ const TotalProductionBox = ({ value, isLoading }) => {
   ];
 
   return (
-    <div className="flex-1 bg-white rounded-lg shadow-sm p-4 h-[150px]">
+    <div className="bg-white rounded-lg shadow-sm p-4 h-[150px]">
       <h3 className="text-sm font-semibold text-gray-600 mb-2">Total Production</h3>
       <div className="text-lg font-bold text-gray-900 mb-2">
         {isLoading ? '-' : animatedValue.toFixed(0)} units
@@ -282,7 +237,7 @@ const TotalProductionBox = ({ value, isLoading }) => {
       <div className="space-y-2">
         {dummyLines.map((item, index) => (
           <div key={index} className="flex items-center gap-2">
-            <svg className="w-20 h-5" viewBox="0 0 80 20">
+            <svg className="w-16 h-5 sm:w-20 sm:h-5" viewBox="0 0 80 20">
               <path d={item.path} fill="none" stroke={item.color} strokeWidth="1" />
             </svg>
             <span className="text-sm text-gray-500">
@@ -295,47 +250,42 @@ const TotalProductionBox = ({ value, isLoading }) => {
   );
 };
 
-// Machine Speed Graph with minimal points and improved clarity
+// Machine Speed Graph
 const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) => {
   const [dataPoints, setDataPoints] = useState([]);
 
-  // Generate data points based on the selected time range
   useEffect(() => {
     if (!isLoading) {
       const points = [];
-      const maxSpeed = 300; // Same as in SpeedBox
-      const intervalMinutes = 15; // One point every 15 minutes (reduced points)
-      const totalMinutes = timeRange * 60; // Total minutes in the selected time range
-      const timePoints = Math.floor(totalMinutes / intervalMinutes); // Number of points
+      const maxSpeed = 300;
+      const intervalMinutes = 15;
+      const totalMinutes = timeRange * 60;
+      const timePoints = Math.floor(totalMinutes / intervalMinutes);
       const startTime = new Date();
-      startTime.setHours(8, 0, 0, 0); // Start at 8:00 AM
+      startTime.setHours(8, 0, 0, 0);
 
-      // If speedData is a single value, simulate fluctuation over time
       const baseSpeed = parseFloat(speedData) || 0;
       for (let i = 0; i <= timePoints; i++) {
-        const time = new Date(startTime.getTime() + i * intervalMinutes * 60 * 1000); // Add interval minutes per point
-        const fluctuation = Math.sin(i / 10) * 50 + (Math.random() * 20 - 10); // Smoother sinusoidal pattern with noise
-        const speed = Math.max(0, Math.min(maxSpeed, baseSpeed + fluctuation)); // Keep within 0 to maxSpeed
+        const time = new Date(startTime.getTime() + i * intervalMinutes * 60 * 1000);
+        const fluctuation = Math.sin(i / 10) * 50 + (Math.random() * 20 - 10);
+        const speed = Math.max(0, Math.min(maxSpeed, baseSpeed + fluctuation));
         points.push({ time, speed });
       }
       setDataPoints(points);
     }
   }, [speedData, isLoading, timeRange]);
 
-  // Format time for x-axis labels
   const formatTime = (date) => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  // SVG dimensions and scaling
-  const width = 600; // Width for half-page display
-  const height = 200; // Reduced height
+  const width = 600;
+  const height = 200;
   const padding = 15;
-  const maxSpeed = 300; // Same as in SpeedBox
-  const xScale = (width - 2 * padding) / (dataPoints.length - 1 || 1); // Avoid division by zero
+  const maxSpeed = 300;
+  const xScale = (width - 2 * padding) / (dataPoints.length - 1 || 1);
   const yScale = (height - 2 * padding) / maxSpeed;
 
-  // Generate path for the line
   const linePath = dataPoints
     .map((point, index) => {
       const x = padding + index * xScale;
@@ -344,16 +294,14 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
     })
     .join(' ');
 
-  // X-axis time labels (dynamic based on time range)
-  const labelInterval = Math.max(1, Math.floor(dataPoints.length / 5)); // Show ~5 labels
+  const labelInterval = Math.max(1, Math.floor(dataPoints.length / 5));
   const timeLabels = dataPoints.filter((_, index) => index % labelInterval === 0);
 
-  // Vertical grid lines at hourly intervals
-  const hourInterval = Math.floor(60 / 15); // Points per hour (60 minutes / 15 minutes per point)
+  const hourInterval = Math.floor(60 / 15);
   const verticalLines = dataPoints.filter((_, index) => index % hourInterval === 0);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 mb-6 w-full md:w-1/2">
+    <div className="bg-white rounded-lg shadow-sm p-4 mb-6 w-full">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-sm font-semibold text-gray-600">Machine Speed</h3>
         <div>
@@ -443,54 +391,49 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
   );
 };
 
-// OEE Graph with minimal points and improved clarity
+// OEE Graph
 const OEEGraph = ({ availability, performance, quality, isLoading, timeRange }) => {
   const [dataPoints, setDataPoints] = useState([]);
 
-  // Generate data points based on the selected time range
   useEffect(() => {
     if (!isLoading) {
       const points = [];
-      const maxOEE = 100; // OEE is a percentage (0 to 100)
-      const intervalMinutes = 15; // One point every 15 minutes (reduced points)
-      const totalMinutes = timeRange * 60; // Total minutes in the selected time range
-      const timePoints = Math.floor(totalMinutes / intervalMinutes); // Number of points
+      const maxOEE = 100;
+      const intervalMinutes = 15;
+      const totalMinutes = timeRange * 60;
+      const timePoints = Math.floor(totalMinutes / intervalMinutes);
       const startTime = new Date();
-      startTime.setHours(8, 0, 0, 0); // Start at 8:00 AM
+      startTime.setHours(8, 0, 0, 0);
 
-      // Simulate OEE data over time
       const baseAvailability = parseFloat(availability) || 0;
       const basePerformance = parseFloat(performance) || 0;
       const baseQuality = parseFloat(quality) || 0;
       for (let i = 0; i <= timePoints; i++) {
-        const time = new Date(startTime.getTime() + i * intervalMinutes * 60 * 1000); // Add interval minutes per point
-        const fluctuationA = Math.sin(i / 10) * 10 + (Math.random() * 5 - 2.5); // Fluctuation for availability
-        const fluctuationP = Math.sin(i / 10 + 1) * 10 + (Math.random() * 5 - 2.5); // Fluctuation for performance
-        const fluctuationQ = Math.sin(i / 10 + 2) * 10 + (Math.random() * 5 - 2.5); // Fluctuation for quality
+        const time = new Date(startTime.getTime() + i * intervalMinutes * 60 * 1000);
+        const fluctuationA = Math.sin(i / 10) * 10 + (Math.random() * 5 - 2.5);
+        const fluctuationP = Math.sin(i / 10 + 1) * 10 + (Math.random() * 5 - 2.5);
+        const fluctuationQ = Math.sin(i / 10 + 2) * 10 + (Math.random() * 5 - 2.5);
         const simulatedAvailability = Math.max(0, Math.min(100, baseAvailability + fluctuationA));
         const simulatedPerformance = Math.max(0, Math.min(100, basePerformance + fluctuationP));
         const simulatedQuality = Math.max(0, Math.min(100, baseQuality + fluctuationQ));
-        const oee = (simulatedAvailability * simulatedPerformance * simulatedQuality) / 10000; // OEE = A * P * Q (in percentage)
+        const oee = (simulatedAvailability * simulatedPerformance * simulatedQuality) / 10000;
         points.push({ time, oee });
       }
       setDataPoints(points);
     }
   }, [availability, performance, quality, isLoading, timeRange]);
 
-  // Format time for x-axis labels
   const formatTime = (date) => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  // SVG dimensions and scaling
-  const width = 600; // Width for half-page display
-  const height = 120; // Reduced height (same as MachineSpeedGraph)
+  const width = 600;
+  const height = 120;
   const padding = 40;
-  const maxOEE = 100; // OEE ranges from 0 to 100%
-  const xScale = (width - 2 * padding) / (dataPoints.length - 1 || 1); // Avoid division by zero
+  const maxOEE = 100;
+  const xScale = (width - 2 * padding) / (dataPoints.length - 1 || 1);
   const yScale = (height - 2 * padding) / maxOEE;
 
-  // Generate path for the line
   const linePath = dataPoints
     .map((point, index) => {
       const x = padding + index * xScale;
@@ -499,16 +442,14 @@ const OEEGraph = ({ availability, performance, quality, isLoading, timeRange }) 
     })
     .join(' ');
 
-  // X-axis time labels (dynamic based on time range)
-  const labelInterval = Math.max(1, Math.floor(dataPoints.length / 5)); // Show ~5 labels
+  const labelInterval = Math.max(1, Math.floor(dataPoints.length / 5));
   const timeLabels = dataPoints.filter((_, index) => index % labelInterval === 0);
 
-  // Vertical grid lines at hourly intervals
-  const hourInterval = Math.floor(60 / 15); // Points per hour (60 minutes / 15 minutes per point)
+  const hourInterval = Math.floor(60 / 15);
   const verticalLines = dataPoints.filter((_, index) => index % hourInterval === 0);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 mb-6 w-full md:w-1/2">
+    <div className="bg-white rounded-lg shadow-sm p-4 mb-6 w-full">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-sm font-semibold text-gray-600">OEE</h3>
       </div>
@@ -560,7 +501,7 @@ const OEEGraph = ({ availability, performance, quality, isLoading, timeRange }) 
         <path
           d={linePath}
           fill="none"
-          stroke="#10b981" // Green color for OEE line
+          stroke="#10b981"
           strokeWidth="2"
         />
 
@@ -588,7 +529,7 @@ const OEEGraph = ({ availability, performance, quality, isLoading, timeRange }) 
 export default function Dashboard() {
   const [isLoading, setLoading] = useState(true);
   const [machineData, setMachineData] = useState({});
-  const [timeRange, setTimeRange] = useState(8); // Shared time range state
+  const [timeRange, setTimeRange] = useState(8);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const serialNumber = queryParams.get('serial_number');
@@ -620,7 +561,6 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, [serialNumber]);
 
-  // Derive status from speed (if status is not provided by the backend)
   const status = machineData?.d?.current_speed[0] > 0 ? 'running' : 'not running';
 
   return (
@@ -628,25 +568,25 @@ export default function Dashboard() {
       <h1 className="text-2xl font-bold text-gray-900 mb-4">Analytics</h1>
 
       <div className="mb-8">
-        <button 
+        <button
           className="text-sm text-gray-700 bg-white border border-gray-200 rounded-md px-3 py-1 mr-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
           onClick={() => navigate("/oee?serial_number=" + serialNumber)}
         >
           OEE
         </button>
-        <button 
+        <button
           className="text-sm text-gray-700 bg-white border border-gray-200 rounded-md px-3 py-1 mr-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
           onClick={() => navigate("/production?serial_number=" + serialNumber)}
         >
           Production
         </button>
-        <button 
+        <button
           className="text-sm text-gray-700 bg-white border border-gray-200 rounded-md px-3 py-1 mr-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
           onClick={() => navigate("/batch?serial_number=" + serialNumber)}
         >
           Batch
         </button>
-        <button 
+        <button
           className="text-sm text-gray-700 bg-white border border-gray-200 rounded-md px-3 py-1 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
           onClick={() => navigate("/oee?serial_number=" + serialNumber)}
         >
@@ -654,32 +594,31 @@ export default function Dashboard() {
         </button>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
-        <SpeedBox 
-          speed={machineData?.d?.current_speed[0]} 
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <SpeedBox
+          speed={machineData?.d?.current_speed[0]}
           isLoading={isLoading}
-          status={status} // Pass the derived or fetched status
+          status={status}
         />
-        <GoodProductionBox 
+        <GoodProductionBox
           goodValue={machineData?.d?.Good_Count[0]}
           rejectValue={machineData?.d?.Reject_Counters[0]}
           totalValue={machineData?.d?.Total_Production[0]}
           isLoading={isLoading}
         />
-        <OEEBox 
-          availability={machineData?.d?.Availability?.[0]} // Adjust based on your data structure
-          performance={machineData?.d?.Performance?.[0]}   // Adjust based on your data structure
-          quality={machineData?.d?.Quality?.[0]}           // Adjust based on your data structure
+        <OEEBox
+          availability={machineData?.d?.Availability?.[0]}
+          performance={machineData?.d?.Performance?.[0]}
+          quality={machineData?.d?.Quality?.[0]}
           isLoading={isLoading}
         />
-        <TotalProductionBox 
+        <TotalProductionBox
           value={machineData?.d?.Total_Production[0]}
           isLoading={isLoading}
         />
       </div>
 
-      {/* Flex container for MachineSpeedGraph and OEEGraph */}
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
         <MachineSpeedGraph
           speedData={machineData?.d?.current_speed[0]}
           isLoading={isLoading}
@@ -697,33 +636,33 @@ export default function Dashboard() {
 
       <Grid container spacing={gridSpacing}>
         <Grid item lg={2.65} md={6} sm={6} xs={12}>
-          <TotalOrderLineChartCard 
-            isLoading={isLoading} 
-            Count={machineData?.d?.Good_Count[0] || '-'} 
-            name="Good Production" 
+          <TotalOrderLineChartCard
+            isLoading={isLoading}
+            Count={machineData?.d?.Good_Count[0] || '-'}
+            name="Good Production"
           />
         </Grid>
         <Grid item lg={2.65} md={6} sm={6} xs={12}>
-          <TotalOrderLineChartCard 
-            isLoading={isLoading} 
-            Count={machineData?.d?.Reject_Counters[0] || '-'} 
-            name="Bad Production" 
+          <TotalOrderLineChartCard
+            isLoading={isLoading}
+            Count={machineData?.d?.Reject_Counters[0] || '-'}
+            name="Bad Production"
           />
         </Grid>
         <Grid item lg={2.65} md={6} sm={6} xs={12}>
-          <TotalOrderLineChartCard 
-            isLoading={isLoading} 
-            Count={machineData?.d?.Total_Production[0] || '-'} 
-            name="Total Production" 
+          <TotalOrderLineChartCard
+            isLoading={isLoading}
+            Count={machineData?.d?.Total_Production[0] || '-'}
+            name="Total Production"
           />
         </Grid>
         <Grid item lg={4} md={12} sm={12} xs={12}>
           <Grid container spacing={gridSpacing}>
             <Grid item sm={6} xs={12} md={6} lg={12}>
-              <TotalIncomeDarkCard 
-                isLoading={isLoading} 
-                data={serialNumber} 
-                Speed={machineData?.d?.current_speed[0]} 
+              <TotalIncomeDarkCard
+                isLoading={isLoading}
+                data={serialNumber}
+                Speed={machineData?.d?.current_speed[0]}
               />
             </Grid>
             <Grid item sm={6} xs={12} md={6} lg={12}>
