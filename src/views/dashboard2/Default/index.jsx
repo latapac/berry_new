@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import Grid from '@mui/material/Grid2';
+import Grid from '@mui/material/Grid';
 import TotalOrderLineChartCard from './TotalOrderLineChartCard';
 import TotalIncomeDarkCard from '../../../ui-component/cards/TotalIncomeDarkCard';
 import { getMachineData } from "../../../backservice";
@@ -8,7 +8,7 @@ import { useLocation } from 'react-router';
 import { useNavigate } from 'react-router';
 
 // Speed Box with a circular dial
-const SpeedBox = ({ speed, isLoading }) => {
+const SpeedBox = ({ speed, isLoading, status }) => {
   const [animatedSpeed, setAnimatedSpeed] = useState(0);
   const MAX_SPEED = 300;
 
@@ -31,10 +31,11 @@ const SpeedBox = ({ speed, isLoading }) => {
 
   const percentage = (animatedSpeed / MAX_SPEED) * 100;
 
+  // Dynamic machine status based on the `status` prop
   const machineStatus = {
-    name: 'Running',
-    active: true,
-    color: true ? '#22c55e' : '#ef4444',
+    name: status === 'running' ? 'Running' : 'Not Running',
+    active: status === 'running',
+    color: status === 'running' ? '#22c55e' : '#ef4444',
   };
 
   return (
@@ -50,7 +51,7 @@ const SpeedBox = ({ speed, isLoading }) => {
             className={`text-xs font-semibold`}
             style={{ color: machineStatus.color }}
           >
-            {machineStatus.active ? 'Running' : 'Not Running'}
+            {machineStatus.name}
           </span>
         </div>
       </div>
@@ -352,7 +353,7 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
   const verticalLines = dataPoints.filter((_, index) => index % hourInterval === 0);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 mb-6 w-1/2">
+    <div className="bg-white rounded-lg shadow-sm p-4 mb-6 w-full md:w-1/2">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-sm font-semibold text-gray-600">Machine Speed</h3>
         <div>
@@ -507,7 +508,7 @@ const OEEGraph = ({ availability, performance, quality, isLoading, timeRange }) 
   const verticalLines = dataPoints.filter((_, index) => index % hourInterval === 0);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 mb-6 w-1/2">
+    <div className="bg-white rounded-lg shadow-sm p-4 mb-6 w-full md:w-1/2">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-sm font-semibold text-gray-600">OEE</h3>
       </div>
@@ -619,6 +620,9 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, [serialNumber]);
 
+  // Derive status from speed (if status is not provided by the backend)
+  const status = machineData?.d?.current_speed[0] > 0 ? 'running' : 'not running';
+
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <h1 className="text-2xl font-bold text-gray-900 mb-4">Analytics</h1>
@@ -650,10 +654,11 @@ export default function Dashboard() {
         </button>
       </div>
 
-      <div className="flex gap-4 mb-6">
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
         <SpeedBox 
           speed={machineData?.d?.current_speed[0]} 
           isLoading={isLoading}
+          status={status} // Pass the derived or fetched status
         />
         <GoodProductionBox 
           goodValue={machineData?.d?.Good_Count[0]}
@@ -674,7 +679,7 @@ export default function Dashboard() {
       </div>
 
       {/* Flex container for MachineSpeedGraph and OEEGraph */}
-      <div className="flex gap-4 mb-6">
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
         <MachineSpeedGraph
           speedData={machineData?.d?.current_speed[0]}
           isLoading={isLoading}
@@ -691,37 +696,37 @@ export default function Dashboard() {
       </div>
 
       <Grid container spacing={gridSpacing}>
-        <Grid size={{ lg: 2.65, md: 6, sm: 6, xs: 12 }}>
+        <Grid item lg={2.65} md={6} sm={6} xs={12}>
           <TotalOrderLineChartCard 
             isLoading={isLoading} 
             Count={machineData?.d?.Good_Count[0] || '-'} 
             name="Good Production" 
           />
         </Grid>
-        <Grid size={{ lg: 2.65, md: 6, sm: 6, xs: 12 }}>
+        <Grid item lg={2.65} md={6} sm={6} xs={12}>
           <TotalOrderLineChartCard 
             isLoading={isLoading} 
             Count={machineData?.d?.Reject_Counters[0] || '-'} 
             name="Bad Production" 
           />
         </Grid>
-        <Grid size={{ lg: 2.65, md: 6, sm: 6, xs: 12 }}>
+        <Grid item lg={2.65} md={6} sm={6} xs={12}>
           <TotalOrderLineChartCard 
             isLoading={isLoading} 
             Count={machineData?.d?.Total_Production[0] || '-'} 
             name="Total Production" 
           />
         </Grid>
-        <Grid size={{ lg: 4, md: 12, sm: 12, xs: 12 }}>
+        <Grid item lg={4} md={12} sm={12} xs={12}>
           <Grid container spacing={gridSpacing}>
-            <Grid size={{ sm: 6, xs: 12, md: 6, lg: 12 }}>
+            <Grid item sm={6} xs={12} md={6} lg={12}>
               <TotalIncomeDarkCard 
                 isLoading={isLoading} 
                 data={serialNumber} 
                 Speed={machineData?.d?.current_speed[0]} 
               />
             </Grid>
-            <Grid size={{ sm: 6, xs: 12, md: 6, lg: 12 }}>
+            <Grid item sm={6} xs={12} md={6} lg={12}>
             </Grid>
           </Grid>
         </Grid>
