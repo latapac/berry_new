@@ -599,6 +599,12 @@ export default function Dashboard() {
         >
           Report
         </button>
+        <button
+          className="text-sm text-gray-700 bg-white border border-gray-200 rounded-md px-3 py-1 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          onClick={() => navigate("/audit?serial_number=" + serialNumber)}
+        >
+          Audit
+        </button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
