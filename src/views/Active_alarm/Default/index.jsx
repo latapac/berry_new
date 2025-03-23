@@ -78,24 +78,24 @@ const AlarmTable = ({ alarms, currentPage, itemsPerPage, onPageChange }) => {
         </div>
       </div>
 
-      {/* Pagination Controls for Active Alarms Overview */}
-      <div className="flex justify-center mt-4">
-        <button
-          onClick={() => onPageChange(currentPage - 1, 'active')}
-          disabled={currentPage === 1}
-          className="px-4 py-2 mx-1 bg-blue-500 text-white rounded-lg disabled:bg-gray-300"
-        >
-          Previous
-        </button>
-        <button
-          onClick={() => onPageChange(currentPage + 1, 'active')}
-          disabled={currentPage === Math.ceil(alarms.length / itemsPerPage)}
-          className="px-4 py-2 mx-1 bg-blue-500 text-white rounded-lg disabled:bg-gray-300"
-        >
-          Next
-        </button>
-      </div>
-    </div>
+      // {/* Pagination Controls for Active Alarms Overview */}
+      // <div className="flex justify-center mt-4">
+      //   <button
+      //     onClick={() => onPageChange(currentPage - 1, 'active')}
+      //     disabled={currentPage === 1}
+      //     className="px-4 py-2 mx-1 bg-blue-500 text-white rounded-lg disabled:bg-gray-300"
+      //   >
+      //     Previous
+      //   </button>
+      //   <button
+      //     onClick={() => onPageChange(currentPage + 1, 'active')}
+      //     disabled={currentPage === Math.ceil(alarms.length / itemsPerPage)}
+      //     className="px-4 py-2 mx-1 bg-blue-500 text-white rounded-lg disabled:bg-gray-300"
+      //   >
+      //     Next
+      //   </button>
+      // </div>
+    
   );
 };
 
@@ -178,24 +178,24 @@ const AlarmHistory = ({ history, currentPage, itemsPerPage, onPageChange }) => {
         </div>
       </div>
 
-      {/* Pagination Controls for Alarm History */}
-      <div className="flex justify-center mt-4">
-        <button
-          onClick={() => onPageChange(currentPage - 1, 'history')}
-          disabled={currentPage === 1}
-          className="px-4 py-2 mx-1 bg-blue-500 text-white rounded-lg disabled:bg-gray-300"
-        >
-          Previous
-        </button>
-        <button
-          onClick={() => onPageChange(currentPage + 1, 'history')}
-          disabled={currentPage === Math.ceil(filteredHistory.length / itemsPerPage)}
-          className="px-4 py-2 mx-1 bg-blue-500 text-white rounded-lg disabled:bg-gray-300"
-        >
-          Next
-        </button>
-      </div>
-    </div>
+    //   {/* Pagination Controls for Alarm History */}
+    //   <div className="flex justify-center mt-4">
+    //     <button
+    //       onClick={() => onPageChange(currentPage - 1, 'history')}
+    //       disabled={currentPage === 1}
+    //       className="px-4 py-2 mx-1 bg-blue-500 text-white rounded-lg disabled:bg-gray-300"
+    //     >
+    //       Previous
+    //     </button>
+    //     <button
+    //       onClick={() => onPageChange(currentPage + 1, 'history')}
+    //       disabled={currentPage === Math.ceil(filteredHistory.length / itemsPerPage)}
+    //       className="px-4 py-2 mx-1 bg-blue-500 text-white rounded-lg disabled:bg-gray-300"
+    //     >
+    //       Next
+    //     </button>
+    //   </div>
+    // </div>
   );
 };
 
