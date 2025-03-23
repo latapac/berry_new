@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useEffect } from 'react';
+import { useLocation } from 'react-router';
+import { getoee } from '../backservice';
 
 const batchData = [
   { batchId: 1, startTime: '2023-10-01 08:00', endTime: '2023-10-01 16:00', machineLineNo: 'Line 1', status: 'Completed', unitsProduced: 500 },
@@ -16,6 +19,14 @@ const metricsData = [
 export default function BatchDetails() {
   const [selectedBatch, setSelectedBatch] = useState(null);
   const [isPrinting, setIsPrinting] = useState(false);
+
+  const getCurrentDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
 
   const handlePrint = () => {
     setIsPrinting(true);
@@ -39,27 +50,53 @@ export default function BatchDetails() {
       {/* Header Section */}
       <div className="w-full mb-4 flex flex-wrap justify-between items-center no-print gap-2">
         <h1 className="text-xl sm:text-2xl font-bold text-gray-800 text-left print:text-center">
-          Batch Overview
+          OEE Details
         </h1>
-        <button
-          onClick={handlePrint}
-          className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
-        >
-          Print
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-1">
+            <label htmlFor="select-date" className="text-xs font-medium text-gray-700">Date:</label>
+            <input
+              id="select-date"
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="p-0.5 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-24"
+            />
+          </div>
+          <div className="flex items-center gap-1">
+            <label htmlFor="select-shift" className="text-xs font-medium text-gray-700">Shift:</label>
+            <select
+              id="select-shift"
+              value={selectedShift}
+              onChange={(e) => setSelectedShift(e.target.value)}
+              className="p-0.5 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20"
+            >
+              <option value="Shift A">Shift A</option>
+              <option value="Shift B">Shift B</option>
+              <option value="Shift C">Shift C</option>
+            </select>
+          </div>
+          <button
+            onClick={handlePrint}
+            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
+          >
+            Print
+          </button>
+        </div>
       </div>
+
 
       {/* Main Content */}
       <div className="w-full print-area space-y-4">
         {/* Equipment ID and Other Details */}
         <div className="header-area text-sm text-gray-800">
-          <div className="header-columns flex flex-col md:flex-row gap-4">
-            <div className="column-left flex-1 gap-48">
+          <div className="header-columns flex flex-col md:flex-row gap-64">
+            <div className="flex flex-col gap-1">
               <p className="header-line"><strong>Equipment ID:</strong> {'serialNumber' || 'PAC24250046'}</p>
               <p className="header-line"><strong>Report Date:</strong> {'selectedDate'}</p>
               <p className="header-line"><strong>Time Range:</strong> {'timeRange'}</p>
             </div>
-            <div className="column-right flex-1">
+            <div className="flex flex-col gap-1 ">
               <p className="header-line"><strong>Production Line:</strong> {'productionLine'}</p>
               <p className="header-line"><strong>Shift Details:</strong> {'shiftDetails'}</p>
               <p className="header-line"><strong>Target vs. Actual Production:</strong> {'targetVsActual'}</p>
