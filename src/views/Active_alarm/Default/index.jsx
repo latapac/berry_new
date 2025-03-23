@@ -2,7 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { getAuditTrailData } from '../../../backservice';
 import { useLocation } from 'react-router';
 
-const AlarmTable = ({ alarms }) => {
+const AlarmTable = ({ alarms, currentPage, itemsPerPage }) => {
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedAlarms = alarms.slice(startIndex, startIndex + itemsPerPage);
+
   return (
     <div className="bg-gray-200 rounded-lg shadow-lg p-6 mb-8 transition-shadow hover:shadow-xl">
       <h2 className="text-xl md:text-2xl font-semibold text-gray-800 mb-4 relative inline-block">
@@ -21,7 +24,7 @@ const AlarmTable = ({ alarms }) => {
             </tr>
           </thead>
           <tbody>
-            {alarms.map((alarm) => (
+            {paginatedAlarms.map((alarm) => (
               <tr key={alarm._id} className="bg-white text-gray-800 transition-transform hover:-translate-y-0.5">
                 <td className="px-2 py-3 text-sm">{alarm._id}</td>
                 <td className="px-2 py-3 text-sm">{alarm.d?.machineLine || 'N/A'}</td>
@@ -34,7 +37,7 @@ const AlarmTable = ({ alarms }) => {
 
         {/* Mobile Table */}
         <div className="md:hidden">
-          {alarms.map((alarm) => (
+          {paginatedAlarms.map((alarm) => (
             <div key={alarm._id} className="bg-white text-gray-800 p-4 mb-4 rounded-lg shadow-sm">
               <div className="grid grid-cols-2 gap-2">
                 <div className="font-medium">Alarm ID:</div>
@@ -55,13 +58,16 @@ const AlarmTable = ({ alarms }) => {
 };
 
 // History component
-const AlarmHistory = ({ history }) => {
+const AlarmHistory = ({ history, currentPage, itemsPerPage }) => {
   const [filter, setFilter] = useState('');
 
   const filteredHistory = history.filter(alarm =>
     alarm.d?.message?.toLowerCase().includes(filter.toLowerCase()) ||
     alarm.d?.status?.toLowerCase().includes(filter.toLowerCase())
   );
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedHistory = filteredHistory.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <div className="bg-gray-200 rounded-lg shadow-lg p-6 mb-8 transition-shadow hover:shadow-xl">
@@ -90,7 +96,7 @@ const AlarmHistory = ({ history }) => {
             </tr>
           </thead>
           <tbody>
-            {filteredHistory.map((alarm) => (
+            {paginatedHistory.map((alarm) => (
               <tr key={alarm._id} className="hover:bg-gray-100 transition-colors">
                 <td className="px-2 py-3 text-sm">{alarm._id}</td>
                 <td className="px-2 py-3 text-sm">{new Date(alarm.d?.trigger_time).toLocaleString()}</td>
@@ -103,7 +109,7 @@ const AlarmHistory = ({ history }) => {
 
         {/* Mobile Table */}
         <div className="md:hidden">
-          {filteredHistory.map((alarm) => (
+          {paginatedHistory.map((alarm) => (
             <div key={alarm._id} className="bg-white text-gray-800 p-4 mb-4 rounded-lg shadow-sm">
               <div className="grid grid-cols-2 gap-2">
                 <div className="font-medium">ID:</div>
@@ -129,6 +135,8 @@ function App() {
   const [alarmHistory, setAlarmHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8; // Number of items to display per page
   const lastFetchTime = useRef(new Date().toISOString());
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -179,6 +187,10 @@ function App() {
     return () => clearInterval(intervalId);
   }, []);
 
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-300 p-4 md:p-8 flex items-center justify-center">
@@ -198,8 +210,29 @@ function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-300 p-4 md:p-8">
       <h1 className="text-2xl md:text-3xl font-bold text-gray-800 text-left mb-5">Alarm Monitoring System</h1>
-      <AlarmTable alarms={activeAlarms} />
-      <AlarmHistory history={alarmHistory} />
+      <AlarmTable alarms={activeAlarms} currentPage={currentPage} itemsPerPage={itemsPerPage} />
+      <AlarmHistory history={alarmHistory} currentPage={currentPage} itemsPerPage={itemsPerPage} />
+
+      {/* Pagination Controls */}
+      <div className="flex justify-center mt-4">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-4 py-2 mx-1 bg-blue-500 text-white rounded-lg disabled:bg-gray-300"
+        >
+          Previous
+        </button>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={
+            currentPage === Math.ceil(activeAlarms.length / itemsPerPage) ||
+            currentPage === Math.ceil(alarmHistory.length / itemsPerPage)
+          }
+          className="px-4 py-2 mx-1 bg-blue-500 text-white rounded-lg disabled:bg-gray-300"
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }
