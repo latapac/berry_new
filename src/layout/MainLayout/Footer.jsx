@@ -22,28 +22,6 @@ export default function Footer() {
           Pacmac
         </Typography>
       </Typography>
-      <Stack direction="row" sx={{ gap: 1.5, alignItems: 'center', justifyContent: 'space-between' }}>
-        <Link
-          component={RouterLink}
-          to=" "
-          underline="hover"
-          target="_blank"
-          variant="caption"
-          color="text.primary"
-        >
-          Twitter
-        </Link>
-        <Link
-          component={RouterLink}
-          to=" "
-          underline="hover"
-          target="_blank"
-          variant="caption"
-          color="text.primary"
-        >
-          Linkedin
-        </Link>
-      </Stack>
     </Stack>
   );
 }
