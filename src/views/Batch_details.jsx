@@ -13,261 +13,234 @@ const metricsData = [
   { batchId: 3, targetProduction: 600, actualProduction: 0, qualityMetrics: 'N/A' },
 ];
 
-function BatchDetails() {
+export default function BatchDetails() {
   const [selectedBatch, setSelectedBatch] = useState(null);
+  const [isPrinting, setIsPrinting] = useState(false);
 
-  const handleBatchClick = (batchId) => {
-    setSelectedBatch(batchId);
+  const handlePrint = () => {
+    setIsPrinting(true);
+    setTimeout(() => {
+      window.print();
+      setIsPrinting(false);
+    }, 100);
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Completed': return '#4caf50';
+      case 'In Progress': return '#ffa000';
+      case 'Pending': return '#f44336';
+      default: return '#000';
+    }
   };
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.header}>Batch Overview</h1>
+    <div className="min-h-screen flex flex-col items-center p-4 bg-gray-100">
+      {/* Header Section */}
+      <div className="w-full mb-4 flex flex-wrap justify-between items-center no-print gap-2">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-800 text-left print:text-center">
+          Batch Overview
+        </h1>
+        <button
+          onClick={handlePrint}
+          className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
+        >
+          Print
+        </button>
+      </div>
 
-      {/* Batch Table */}
-      <div style={styles.tableContainer}>
-        {/* Desktop Table */}
-        <table style={{ ...styles.table, display: window.innerWidth > 768 ? 'table' : 'none' }}>
-          <thead>
-            <tr style={styles.tableHeaderRow}>
-              <th style={styles.tableHeader}>Batch ID</th>
-              <th style={styles.tableHeader}>Start Time</th>
-              <th style={styles.tableHeader}>End Time</th>
-              <th style={styles.tableHeader}>Machine Line No.</th>
-              <th style={styles.tableHeader}>Status</th>
-              <th style={styles.tableHeader}>Units Produced</th>
-            </tr>
-          </thead>
-          <tbody>
-            {batchData.map((batch) => (
-              <tr
-                key={batch.batchId}
-                onClick={() => handleBatchClick(batch.batchId)}
-                style={{
-                  ...styles.tableRow,
-                  backgroundColor: selectedBatch === batch.batchId ? '#e3f2fd' : 'white',
-                }}
-              >
-                <td style={styles.tableCell}>{batch.batchId}</td>
-                <td style={styles.tableCell}>{batch.startTime}</td>
-                <td style={styles.tableCell}>{batch.endTime}</td>
-                <td style={styles.tableCell}>{batch.machineLineNo}</td>
-                <td style={{ ...styles.tableCell, color: getStatusColor(batch.status) }}>{batch.status}</td>
-                <td style={styles.tableCell}>{batch.unitsProduced}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {/* Mobile Table */}
-        <div style={{ display: window.innerWidth <= 768 ? 'block' : 'none' }}>
-          {batchData.map((batch) => (
-            <div
-              key={batch.batchId}
-              onClick={() => handleBatchClick(batch.batchId)}
-              style={{
-                ...styles.mobileTableRow,
-                backgroundColor: selectedBatch === batch.batchId ? '#e3f2fd' : 'white',
-              }}
-            >
-              <div style={styles.mobileTableCell}>
-                <strong>Batch ID:</strong> {batch.batchId}
-              </div>
-              <div style={styles.mobileTableCell}>
-                <strong>Start Time:</strong> {batch.startTime}
-              </div>
-              <div style={styles.mobileTableCell}>
-                <strong>End Time:</strong> {batch.endTime}
-              </div>
-              <div style={styles.mobileTableCell}>
-                <strong>Machine Line No.:</strong> {batch.machineLineNo}
-              </div>
-              <div style={{ ...styles.mobileTableCell, color: getStatusColor(batch.status) }}>
-                <strong>Status:</strong> {batch.status}
-              </div>
-              <div style={styles.mobileTableCell}>
-                <strong>Units Produced:</strong> {batch.unitsProduced}
-              </div>
+      {/* Main Content */}
+      <div className="w-full print-area space-y-4">
+        {/* Equipment ID and Other Details */}
+        <div className="header-area text-sm text-gray-800">
+          <div className="header-columns flex flex-col md:flex-row gap-4">
+            <div className="column-left flex-1 gap-48">
+              <p className="header-line"><strong>Equipment ID:</strong> {'serialNumber' || 'PAC24250046'}</p>
+              <p className="header-line"><strong>Report Date:</strong> {'selectedDate'}</p>
+              <p className="header-line"><strong>Time Range:</strong> {'timeRange'}</p>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Batch Metrics */}
-      <h2 style={styles.subHeader}>Batch Metrics</h2>
-      <div style={styles.metricsContainer}>
-        {metricsData.map((metric) => (
-          <div
-            key={metric.batchId}
-            style={{
-              ...styles.metricCard,
-              background: getMetricCardBackground(metric.actualProduction, metric.targetProduction),
-            }}
-          >
-            <h3 style={styles.metricHeader}>Batch {metric.batchId}</h3>
-            <p><strong>Target Production:</strong> {metric.targetProduction}</p>
-            <p><strong>Actual Production:</strong> {metric.actualProduction}</p>
-            <p><strong>Quality Metrics:</strong> {metric.qualityMetrics}</p>
+            <div className="column-right flex-1">
+              <p className="header-line"><strong>Production Line:</strong> {'productionLine'}</p>
+              <p className="header-line"><strong>Shift Details:</strong> {'shiftDetails'}</p>
+              <p className="header-line"><strong>Target vs. Actual Production:</strong> {'targetVsActual'}</p>
+            </div>
           </div>
-        ))}
-      </div>
-
-      {/* Batch Performance Chart */}
-      <h2 style={styles.subHeader}>Batch Performance Across Machines</h2>
-      <div style={styles.chartContainer}>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={batchData}>
-            <XAxis dataKey="machineLineNo" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="unitsProduced" fill="#82ca9d" />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Detailed Logs */}
-      {selectedBatch && (
-        <div style={styles.detailsContainer}>
-          <h2 style={styles.subHeader}>Detailed Logs for Batch {selectedBatch}</h2>
-          <p>Here you can display detailed logs for the selected batch.</p>
         </div>
-      )}
+
+        {/* Batch Table */}
+        <div className="flex flex-col gap-4">
+          <div className="bg-white rounded shadow-md overflow-hidden">
+            <table className="w-full border-collapse border-l border-r border-t border-gray-300">
+              <thead>
+                <tr>
+                  <th colSpan="6" className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b border-t border-gray-300 bg-gray-200 text-center">
+                    Batch Details
+                  </th>
+                </tr>
+                <tr>
+                  <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b border-r border-gray-300 text-center">Batch ID</th>
+                  <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b border-r border-gray-300 text-center">Start Time</th>
+                  <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b border-r border-gray-300 text-center">End Time</th>
+                  <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b border-r border-gray-300 text-center">Machine Line</th>
+                  <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b border-r border-gray-300 text-center">Status</th>
+                  <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b border-gray-300 text-center">Units Produced</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {batchData.map((batch) => (
+                  <tr
+                    key={batch.batchId}
+                    onClick={() => setSelectedBatch(batch.batchId)}
+                    className={`hover:bg-gray-50 transition-colors cursor-pointer ${selectedBatch === batch.batchId ? 'bg-blue-50' : ''}`}
+                  >
+                    <td className="px-2 py-1 text-xs border-b border-r border-gray-300 text-center">{batch.batchId}</td>
+                    <td className="px-2 py-1 text-xs border-b border-r border-gray-300 text-center">{batch.startTime}</td>
+                    <td className="px-2 py-1 text-xs border-b border-r border-gray-300 text-center">{batch.endTime}</td>
+                    <td className="px-2 py-1 text-xs border-b border-r border-gray-300 text-center">{batch.machineLineNo}</td>
+                    <td className="px-2 py-1 text-xs border-b border-r border-gray-300 text-center" style={{ color: getStatusColor(batch.status) }}>
+                      {batch.status}
+                    </td>
+                    <td className="px-2 py-1 text-xs border-b border-gray-300 text-center">{batch.unitsProduced}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Metrics Section */}
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1 bg-white rounded shadow-md overflow-hidden">
+            <table className="w-full border-collapse border-l border-r border-t border-gray-300">
+              <thead>
+                <tr>
+                  <th colSpan="3" className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b border-t border-gray-300 bg-gray-200 text-center">
+                    Production Metrics
+                  </th>
+                </tr>
+                <tr>
+                  <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b border-r border-gray-300 text-center">Batch ID</th>
+                  <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b border-r border-gray-300 text-center">Target vs Actual</th>
+                  <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b border-gray-300 text-center">Quality</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {metricsData.map((metric) => (
+                  <tr key={metric.batchId} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-2 py-1 text-xs border-b border-r border-gray-300 text-center">{metric.batchId}</td>
+                    <td className="px-2 py-1 text-xs border-b border-r border-gray-300 text-center">
+                      {metric.targetProduction} vs {metric.actualProduction}
+                    </td>
+                    <td className="px-2 py-1 text-xs border-b border-gray-300 text-center">{metric.qualityMetrics}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Visualizations */}
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1 bg-white rounded shadow-md overflow-hidden p-4">
+            <h2 className="text-xs font-medium uppercase tracking-wider mb-4">Batch Performance Across Machines</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={batchData}>
+                <XAxis dataKey="machineLineNo" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="unitsProduced" fill="#82ca9d" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Timeline */}
+        {selectedBatch && (
+          <div className="bg-white rounded shadow-md overflow-hidden p-4">
+            <h2 className="text-xs font-medium uppercase tracking-wider mb-4">Batch Progress Timeline</h2>
+            <div className="flex flex-col space-y-4">
+              {batchData
+                .filter(b => b.batchId === selectedBatch)
+                .map(batch => (
+                  <div key={batch.batchId} className="border-l-4 border-blue-500 pl-4">
+                    <div className="text-sm font-medium">Batch {batch.batchId}</div>
+                    <div className="text-xs text-gray-500">Start: {batch.startTime}</div>
+                    <div className="text-xs text-gray-500">End: {batch.endTime}</div>
+                    <div className="text-xs mt-2">
+                      Status: <span style={{ color: getStatusColor(batch.status) }}>{batch.status}</span>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
+
+        {/* Detailed Logs */}
+        {selectedBatch && (
+          <div className="bg-white rounded shadow-md overflow-hidden">
+            <table className="w-full border-collapse border-l border-r border-t border-gray-300">
+              <thead>
+                <tr>
+                  <th colSpan="3" className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b border-t border-gray-300 bg-gray-200 text-center">
+                    Detailed Logs for Batch {selectedBatch}
+                  </th>
+                </tr>
+                <tr>
+                  <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b border-r border-gray-300 text-center">Timestamp</th>
+                  <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b border-r border-gray-300 text-center">Event</th>
+                  <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b border-gray-300 text-center">Details</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                <tr className="hover:bg-gray-50 transition-colors">
+                  <td className="px-2 py-1 text-xs border-b border-r border-gray-300 text-center">2023-10-01 08:00</td>
+                  <td className="px-2 py-1 text-xs border-b border-r border-gray-300 text-center">Batch Started</td>
+                  <td className="px-2 py-1 text-xs border-b border-gray-300 text-center">Machine Line 1 initialized</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      <style jsx global>{`
+        @media print {
+          body * {
+            visibility: hidden;
+          }
+          .print-area, .print-area * {
+            visibility: visible;
+          }
+          .print-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+          }
+          table {
+            width: 100%;
+            font-size: 9pt;
+            border-collapse: collapse;
+          }
+          th, td {
+            border: 1px solid #ddd;
+            padding: 4px;
+          }
+          th {
+            background-color: #f8fafc;
+          }
+          .flex {
+            display: block !important;
+          }
+          .flex-1 {
+            width: 100% !important;
+            margin-bottom: 1rem;
+          }
+        }
+      `}</style>
     </div>
   );
 }
-
-// Helper functions for dynamic styling
-const getStatusColor = (status) => {
-  switch (status) {
-    case 'Completed':
-      return '#4caf50'; // Green
-    case 'In Progress':
-      return '#ffa000'; // Amber
-    case 'Pending':
-      return '#f44336'; // Red
-    default:
-      return '#000';
-  }
-};
-
-const getMetricCardBackground = (actual, target) => {
-  const percentage = (actual / target) * 100;
-  if (percentage >= 90) return 'linear-gradient(135deg, #4caf50, #81c784)'; // Green gradient
-  if (percentage >= 50) return 'linear-gradient(135deg, #ffa000, #ffca28)'; // Amber gradient
-  return 'linear-gradient(135deg, #f44336, #e57373)'; // Red gradient
-};
-
-// Styles
-const styles = {
-  container: {
-    padding: '20px',
-    fontFamily: 'Arial, sans-serif',
-    width: '100%', // Adjusted for smaller screens
-    maxWidth: '1200px', // Max width for larger screens
-    margin: '0 auto',
-    backgroundColor: '#f5f5f5',
-    borderRadius: '8px',
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-  },
-  header: {
-    marginBottom: '20px',
-    color: '#333',
-    fontSize: '24px',
-    fontWeight: 'bold',
-    textAlign: 'start'
-  },
-  subHeader: {
-    marginBottom: '20px',
-    color: '#555',
-    fontSize: '20px',
-    fontWeight: '600',
-    borderBottom: '2px solid #82ca9d',
-    paddingBottom: '8px',
-  },
-  tableContainer: {
-    marginBottom: '20px',
-  },
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse',
-    backgroundColor: 'white',
-    borderRadius: '8px',
-    overflow: 'hidden',
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-  },
-  tableHeaderRow: {
-    backgroundColor: '#82ca9d',
-  },
-  tableHeader: {
-    border: '1px solid #ddd',
-    padding: '12px',
-    textAlign: 'left',
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  tableRow: {
-    border: '1px solid #ddd',
-    cursor: 'pointer',
-    transition: 'background-color 0.3s ease',
-  },
-  tableCell: {
-    border: '1px solid #ddd',
-    padding: '12px',
-    color: '#555',
-  },
-  mobileTableRow: {
-    border: '1px solid #ddd',
-    borderRadius: '8px',
-    marginBottom: '10px',
-    padding: '12px',
-    backgroundColor: 'white',
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-    cursor: 'pointer',
-    transition: 'background-color 0.3s ease',
-  },
-  mobileTableCell: {
-    marginBottom: '8px',
-    color: '#555',
-  },
-  metricsContainer: {
-    display: 'flex',
-    flexWrap: 'wrap', // Allow wrapping on small screens
-    justifyContent: 'space-around',
-    marginBottom: '20px',
-    gap: '20px',
-  },
-  metricCard: {
-    border: '1px solid #ddd',
-    padding: '20px',
-    width: '100%', // Full width on small screens
-    maxWidth: '300px', // Max width for larger screens
-    borderRadius: '8px',
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-    color: 'white',
-    textAlign: 'center',
-  },
-  metricHeader: {
-    marginBottom: '10px',
-    fontSize: '18px',
-    fontWeight: '600',
-  },
-  chartContainer: {
-    width: '100%',
-    height: '300px',
-    marginBottom: '20px',
-    backgroundColor: 'white',
-    borderRadius: '8px',
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-    padding: '20px',
-  },
-  detailsContainer: {
-    border: '1px solid #ddd',
-    padding: '20px',
-    borderRadius: '8px',
-    backgroundColor: 'white',
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-  },
-};
-
-export default BatchDetails;

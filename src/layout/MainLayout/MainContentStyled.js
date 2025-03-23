@@ -1,10 +1,5 @@
-// material-ui
 import { styled } from '@mui/material/styles';
-
-// project imports
 import { drawerWidth } from 'store/constant';
-
-// ==============================|| MAIN LAYOUT - STYLED ||============================== //
 
 const MainContentStyled = styled('main', {
   shouldForwardProp: (prop) => prop !== 'open' && prop !== 'borderRadius'
