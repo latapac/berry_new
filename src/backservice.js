@@ -101,8 +101,8 @@ export async function getAuditTrailData(mid) {
 
 
 
-export async function getoee(mid,date,shifttime) {
-    console.log(date,shifttime);
+export async function getoee(mid,date,RunningShift) {
+   
     
     try {
         console.log('http://'+server+':3000/getoee/'+mid);
@@ -112,7 +112,7 @@ export async function getoee(mid,date,shifttime) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                date:date,
-               shifttime:shifttime
+               RunningShift:RunningShift
             })
       })
         
