@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 import Grid from '@mui/material/Grid2';
-import PopularCard from './PopularCard';
 import TotalOrderLineChartCard from './TotalOrderLineChartCard';
 import TotalIncomeDarkCard from '../../../ui-component/cards/TotalIncomeDarkCard';
-import TotalGrowthBarChart from './TotalGrowthBarChart';
 import { getMachineData } from "../../../backservice";
 import { gridSpacing } from 'store/constant';
 import { useLocation } from 'react-router';
