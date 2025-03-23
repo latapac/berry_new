@@ -17,11 +17,11 @@ ChartJS.register(
 
 const DefectiveProductsPieChart = ({ isLoading, data }) => {
   const chartData = {
-    labels: ['Defective', 'Non-Defective'],
+    labels: ['Good Production', 'Rejected Production'],
     datasets: [
       {
-        label: 'Defective Products',
-        data: [13 || 0, 77|| 0],
+        
+        data: [data?.Good_Count[0] || data?.Reject_Counters[0]|| 0],
         backgroundColor: [
           'rgba(255, 99, 132, 0.6)',
           'rgba(75, 192, 192, 0.6)',
@@ -52,7 +52,7 @@ const DefectiveProductsPieChart = ({ isLoading, data }) => {
       },
       title: {
         display: true,
-        text: 'Defective Products',
+        
         font: {
           size: 18,
           weight: 'bold',
@@ -101,8 +101,7 @@ const DefectiveProductsPieChart = ({ isLoading, data }) => {
                 textAlign: 'center',
                 fontFamily: "'Roboto', sans-serif",
               }}
-            >
-              Defective Products
+            >Good vs Bad Production
             </Typography>
             <Box sx={{ height: '200px', position: 'relative' }}>
               <Pie data={chartData} options={chartOptions} />

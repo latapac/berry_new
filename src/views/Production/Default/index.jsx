@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';  // Importing React hooks for state and side effects
 import Grid from '@mui/material/Grid';  // Importing Grid component from MUI for layout management
 import TotalOrderLineChartCard from './TotalOrderLineChartCard';  // Card with line chart for orders
-import DefectiveProductsPieChart from '../DefectiveProductsPieChart';  // New component for pie chart
+import DefectiveProductsPieChart from './DefectiveProductsPieChart';  // New component for pie chart
 import { getMachineData } from "../../../backservice";  // Function to fetch machine data from backend
 import { gridSpacing } from 'store/constant';  // Constant for consistent grid spacing
 import { useLocation } from 'react-router';

@@ -37,8 +37,8 @@ function Sidebar() {
       </>
     );
 
-    let drawerSX = { paddingLeft: '0px', paddingRight: '0px', marginTop: '20px' };
-    if (drawerOpen) drawerSX = { paddingLeft: '16px', paddingRight: '16px', marginTop: '0px' };
+    let drawerSX = { paddingLeft: '0px', paddingRight: '0px', marginTop: '13vh' };
+    if (drawerOpen) drawerSX = { paddingLeft: '16px', paddingRight: '16px', marginTop: '10vh' };
 
     return (
       <>

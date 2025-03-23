@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, Typography, Skeleton, Box, Grid } from '@mui/material';
-import { Bar, Pie } from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
 
 
 import {
@@ -31,17 +31,17 @@ const TotalOrderBarChartCard = ({ isLoading, data }) => {
     datasets: [
       {
         label: 'Actual Production',
-        data: [], // Y-axis data for Actual Production
+        data: [], // Actual Production
         backgroundColor: 'rgba(75, 192, 10,0.75)',
         borderColor: 'rgba(75, 192, 10,3 )',
-        borderWidth: 1,
+        borderWidth: 3,
       },
       {
         label: 'Target Production',
-        data: [], // Y-axis data for Target Production
+        data: [], // Target Production
         backgroundColor: 'rgba(255, 99, 132, 0.6)',
         borderColor: 'rgba(255, 99, 132, 1)',
-        borderWidth: 1,
+        borderWidth: 3,
       },
     ],
   });
@@ -67,11 +67,11 @@ const TotalOrderBarChartCard = ({ isLoading, data }) => {
           datasets: [
             {
               ...prevData.datasets[0],
-              data: [...prevData.datasets[0].data, 700], // Actual Production
+              data:  [data?.Total_Production[0]], // Actual Production
             },
             {
               ...prevData.datasets[1],
-              data: [...prevData.datasets[1].data, 130], // Target Production
+              data: [67], // Target Production
             },
           ],
         }));
@@ -236,7 +236,7 @@ const TotalOrderBarChartCard = ({ isLoading, data }) => {
                     Total Production
                   </Typography>
                   <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                    990
+                    {data?.Total_Production[0]}
                   </Typography>
                 </Box>
               </Grid>
@@ -254,7 +254,7 @@ const TotalOrderBarChartCard = ({ isLoading, data }) => {
                     Good Production
                   </Typography>
                   <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                    900
+                  {data?.Good_Count[0]}
                   </Typography>
                 </Box>
               </Grid>
@@ -272,7 +272,7 @@ const TotalOrderBarChartCard = ({ isLoading, data }) => {
                     Rejected Production
                   </Typography>
                   <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                    90
+                  {data?.Reject_Counters[0]}
                   </Typography>
                 </Box>
               </Grid>
