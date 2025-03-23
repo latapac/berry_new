@@ -6,7 +6,6 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import CircleIcon from '@mui/icons-material/Circle';
 import MainCard from 'ui-component/cards/MainCard';
-import SkeletonEarningCard from 'ui-component/cards/Skeleton/EarningCard';
 import { getMachineData } from '../../../backservice';
 import { useNavigate } from 'react-router';
 import { mstatus, getMstatusBGColor } from '../../../constants';
@@ -160,7 +159,7 @@ export default function EarningCard({ isLoading, data }) {
 
           <Grid item xs={12}>
             <SpeedGauge 
-              value={90 || 0} 
+              value={machineData?.d?.current_speed[0]} 
               max={300}  // Set your machine's max RPM here
               size={120}
             />

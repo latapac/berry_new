@@ -80,7 +80,7 @@ const DefectiveProductsPieChart = ({ isLoading, data }) => {
         background: 'linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%)',
         width: '80%',
         height: '48vh',
-        marginLeft: '35vh',
+        marginLeft: '26vh',
         marginTop: '20vh',
       }}
     >
