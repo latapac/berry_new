@@ -41,7 +41,6 @@ const AlarmTable = ({ alarms, currentPage, itemsPerPage, onPageChange }) => {
             {paginatedAlarms.map((alarm) => (
               <tr
                 key={alarm._id}
-<<<<<<< HEAD
                 className={`${getAlarmColor(alarm.d?.severity)} text-gray-800 transition-transform hover:-translate-y-0.5`}
               >
                 <td className="px-2 py-3 text-sm">{alarm._id}</td>
@@ -49,21 +48,12 @@ const AlarmTable = ({ alarms, currentPage, itemsPerPage, onPageChange }) => {
                 <td className="px-2 py-3 text-sm">{new Date(alarm.d?.trigger_time).toLocaleString()}</td>
                 <td className="px-2 py-3 text-sm">{alarm.d?.message || 'N/A'}</td>
                 <td className="px-2 py-3 text-sm">{alarm.d?.severity || 'N/A'}</td>
-=======
-                className={`${getAlarmColor(alarm.d?.severity)} text-gray-800 hover:bg-gray-50 transition-colors`}
-              >
-                <td className="px-2 py-2 text-xs border-b">{alarm._id}</td>
-                <td className="px-2 py-2 text-xs border-b">{alarm.d?.machineLine || 'N/A'}</td>
-                <td className="px-2 py-2 text-xs border-b">{new Date(alarm.d?.trigger_time).toLocaleString()}</td>
-                <td className="px-2 py-2 text-xs border-b">{alarm.d?.message || 'N/A'}</td>
->>>>>>> 59103570c42f453b3d70ee688d96fe91c16e0158
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-<<<<<<< HEAD
         {/* Mobile Table */}
         <div className="md:hidden">
           {paginatedAlarms.map((alarm) => (
@@ -85,29 +75,6 @@ const AlarmTable = ({ alarms, currentPage, itemsPerPage, onPageChange }) => {
               </div>
             </div>
           ))}
-=======
-      {/* Pagination Controls */}
-      <div className="flex justify-between items-center mt-4 text-sm text-gray-700">
-        <div>
-          Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, alarms.length)} of {alarms.length} entries
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => onPageChange(currentPage - 1, 'active')}
-            disabled={currentPage === 1}
-            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-10 h-6 disabled:opacity-50"
-          >
-            ←
-          </button>
-          <span>Page {currentPage} of {Math.ceil(alarms.length / itemsPerPage)}</span>
-          <button
-            onClick={() => onPageChange(currentPage + 1, 'active')}
-            disabled={currentPage === Math.ceil(alarms.length / itemsPerPage)}
-            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-10 h-6 disabled:opacity-50"
-          >
-            →
-          </button>
->>>>>>> 59103570c42f453b3d70ee688d96fe91c16e0158
         </div>
       </div>
 
@@ -159,7 +126,6 @@ const AlarmHistory = ({ history, currentPage, itemsPerPage, onPageChange }) => {
       />
 
       <div className="overflow-x-auto">
-<<<<<<< HEAD
         {/* Desktop Table */}
         <table className="w-full mt-4 hidden md:table">
           <thead>
@@ -169,22 +135,12 @@ const AlarmHistory = ({ history, currentPage, itemsPerPage, onPageChange }) => {
               <th className="px-2 py-3">Description</th>
               <th className="px-2 py-3">Resolution Status</th>
               <th className="px-2 py-3">Severity</th>
-=======
-        <table className="w-full border-collapse">
-          <thead className="bg-gray-200 text-gray-700">
-            <tr>
-              <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b">ID</th>
-              <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b">Timestamp</th>
-              <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b">Description</th>
-              <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b">Resolution Status</th>
->>>>>>> 59103570c42f453b3d70ee688d96fe91c16e0158
             </tr>
           </thead>
           <tbody>
             {paginatedHistory.map((alarm) => (
               <tr
                 key={alarm._id}
-<<<<<<< HEAD
                 className={`${getAlarmColor(alarm.d?.severity)} hover:bg-gray-100 transition-colors`}
               >
                 <td className="px-2 py-3 text-sm">{alarm._id}</td>
@@ -192,21 +148,12 @@ const AlarmHistory = ({ history, currentPage, itemsPerPage, onPageChange }) => {
                 <td className="px-2 py-3 text-sm">{alarm.d?.message || 'N/A'}</td>
                 <td className="px-2 py-3 text-sm">{alarm.d?.status || 'N/A'}</td>
                 <td className="px-2 py-3 text-sm">{alarm.d?.severity || 'N/A'}</td>
-=======
-                className={`${getAlarmColor(alarm.d?.severity)} text-gray-800 hover:bg-gray-50 transition-colors`}
-              >
-                <td className="px-2 py-2 text-xs border-b">{alarm._id}</td>
-                <td className="px-2 py-2 text-xs border-b">{new Date(alarm.d?.trigger_time).toLocaleString()}</td>
-                <td className="px-2 py-2 text-xs border-b">{alarm.d?.message || 'N/A'}</td>
-                <td className="px-2 py-2 text-xs border-b">{alarm.d?.status || 'N/A'}</td>
->>>>>>> 59103570c42f453b3d70ee688d96fe91c16e0158
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-<<<<<<< HEAD
         {/* Mobile Table */}
         <div className="md:hidden">
           {paginatedHistory.map((alarm) => (
@@ -228,29 +175,6 @@ const AlarmHistory = ({ history, currentPage, itemsPerPage, onPageChange }) => {
               </div>
             </div>
           ))}
-=======
-      {/* Pagination Controls */}
-      <div className="flex justify-between items-center mt-4 text-sm text-gray-700">
-        <div>
-          Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredHistory.length)} of {filteredHistory.length} entries
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => onPageChange(currentPage - 1, 'history')}
-            disabled={currentPage === 1}
-            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-10 h-6 disabled:opacity-50"
-          >
-            ←
-          </button>
-          <span>Page {currentPage} of {Math.ceil(filteredHistory.length / itemsPerPage)}</span>
-          <button
-            onClick={() => onPageChange(currentPage + 1, 'history')}
-            disabled={currentPage === Math.ceil(filteredHistory.length / itemsPerPage)}
-            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-10 h-6 disabled:opacity-50"
-          >
-            →
-          </button>
->>>>>>> 59103570c42f453b3d70ee688d96fe91c16e0158
         </div>
       </div>
 
@@ -283,12 +207,7 @@ function App() {
   const [error, setError] = useState(null);
   const [activeAlarmsPage, setActiveAlarmsPage] = useState(1); // Pagination for Active Alarms
   const [alarmHistoryPage, setAlarmHistoryPage] = useState(1); // Pagination for Alarm History
-<<<<<<< HEAD
   const itemsPerPage = 8; // Number of items to display per page
-=======
-  const [activeTab, setActiveTab] = useState('active'); // Tracks the active tab
-  const itemsPerPage = 20; // Number of items to display per page
->>>>>>> 59103570c42f453b3d70ee688d96fe91c16e0158
   const lastFetchTime = useRef(new Date().toISOString());
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -359,14 +278,6 @@ function App() {
     } else if (tableType === 'history') {
       setAlarmHistoryPage(newPage);
     }
-<<<<<<< HEAD
-=======
-  };
-
-  // Handle tab change
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
->>>>>>> 59103570c42f453b3d70ee688d96fe91c16e0158
   };
 
   if (loading) {
@@ -386,7 +297,6 @@ function App() {
   }
 
   return (
-<<<<<<< HEAD
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-300 p-4 md:p-8">
       <h1 className="text-2xl md:text-3xl font-bold text-gray-800 text-left mb-5">Alarm Monitoring System</h1>
       <AlarmTable
@@ -401,52 +311,6 @@ function App() {
         itemsPerPage={itemsPerPage}
         onPageChange={handlePageChange}
       />
-=======
-    <div className="min-h-screen bg-gray-100 p-4">
-      <h1 className="text-2xl font-bold text-gray-800 mb-5">Alarm Monitoring System</h1>
-
-      {/* Tab Navigation */}
-      <div className="flex gap-4 mb-4">
-        <button
-          onClick={() => handleTabChange('active')}
-          className={`px-4 py-2 text-sm font-medium rounded-lg ${
-            activeTab === 'active'
-              ? 'bg-blue-500 text-white'
-              : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
-          }`}
-        >
-          Active Alarms
-        </button>
-        <button
-          onClick={() => handleTabChange('history')}
-          className={`px-4 py-2 text-sm font-medium rounded-lg ${
-            activeTab === 'history'
-              ? 'bg-blue-500 text-white'
-              : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
-          }`}
-        >
-          Alarm History
-        </button>
-      </div>
-
-      {/* Render Active Alarms or Alarm History based on the active tab */}
-      {activeTab === 'active' && (
-        <AlarmTable
-          alarms={activeAlarms}
-          currentPage={activeAlarmsPage}
-          itemsPerPage={itemsPerPage}
-          onPageChange={handlePageChange}
-        />
-      )}
-      {activeTab === 'history' && (
-        <AlarmHistory
-          history={alarmHistory}
-          currentPage={alarmHistoryPage}
-          itemsPerPage={itemsPerPage}
-          onPageChange={handlePageChange}
-        />
-      )}
->>>>>>> 59103570c42f453b3d70ee688d96fe91c16e0158
     </div>
   );
 }
