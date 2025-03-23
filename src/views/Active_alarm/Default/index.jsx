@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { getAuditTrailData } from '../../../backservice';// Import your API function
+import { getAuditTrailData } from '../../../backservice';
+import { useLocation } from 'react-router';
 
-// Alarm component
 const AlarmTable = ({ alarms }) => {
   return (
     <div className="bg-gray-200 rounded-lg shadow-lg p-6 mb-8 transition-shadow hover:shadow-xl">
@@ -10,9 +10,7 @@ const AlarmTable = ({ alarms }) => {
         <span className="absolute bottom-0 left-0 w-1/2 h-1 bg-blue-500 rounded"></span>
       </h2>
 
-      {/* Responsive Table */}
       <div className="overflow-x-auto">
-        {/* Desktop Table */}
         <table className="w-full mt-4 hidden md:table">
           <thead>
             <tr className="bg-gray-200 text-gray-700">
@@ -132,13 +130,16 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const lastFetchTime = useRef(new Date().toISOString());
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const serialNumber = queryParams.get('serial_number');
 
   // Fetch live data from the API
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Fetch audit trail data using your API function
-        const data = await getAuditTrailData('YOUR_MACHINE_ID'); // Replace with your machine ID
+        const data = await getAuditTrailData(serialNumber); // Replace with your machine ID
         if (!data) {
           throw new Error('No data returned from the API');
         }

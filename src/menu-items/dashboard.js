@@ -27,7 +27,7 @@ const dashboard = {
       id: 'default',
       title: 'Active_alarm',
       type: 'item',
-      url: '/Active_alarm',
+      url: '/Active_alarm?serial_number=PAC24250046',
       icon: iconb.IconAlarm,
       breadcrumbs: false
     },

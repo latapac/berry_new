@@ -37,9 +37,9 @@ export default function Dashboard() {
   const [shiftDetails, setShiftDetails] = useState('Shift A - Day');
   const [targetVsActual] = useState('120,000 vs 100,000');
   const shiftDetailNum = {
-    'Shift A':0,
-    'Shift B':1,
-    'Shift C':2
+    'Shift A':1,
+    'Shift B':2,
+    'Shift C':3
   }
 
   // Update shiftDetails whenever selectedShift changes
