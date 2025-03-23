@@ -109,7 +109,7 @@ export default function Dashboard() {
     
     getoee(serialNumber,selectedDate,shiftDetailNum[selectedShift]).then((data)=>{
       if (data) {
-        setShiftData(data[0].d)
+        setShiftData(data[data.length - 1].d)
       }else{
         setShiftData({shiftLengthHours: 0,
           shortBreaksCount: 0,
