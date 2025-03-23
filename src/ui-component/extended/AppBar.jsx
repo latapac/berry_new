@@ -20,8 +20,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
-// project imports
-import Logo from 'ui-component/Logo';
+
 
 // assets
 import { IconBook, IconCreditCard, IconDashboard, IconHome2 } from '@tabler/icons-react';
@@ -61,9 +60,6 @@ export default function AppBar({ ...others }) {
       <MuiAppBar>
         <Container>
           <Toolbar sx={{ py: 2.5, px: `0 !important` }}>
-            <Typography component={RouterLink} to="/" sx={{ flexGrow: 1, textAlign: 'left' }}>
-              <Logo />
-            </Typography>
             <Stack direction="row" sx={{ display: { xs: 'none', sm: 'block' } }} spacing={{ xs: 1.5, md: 2.5 }}>
               <Button color="inherit" component={Link} href="#">
                 Home
