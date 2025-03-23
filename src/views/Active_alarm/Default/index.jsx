@@ -2,21 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { getAuditTrailData } from '../../../backservice';
 import { useLocation } from 'react-router';
 
-// Helper function to determine alarm color based on severity
-const getAlarmColor = (severity) => {
-  switch (severity) {
-    case 'emergency':
-      return 'bg-red-100'; // Red background for emergency alarms
-    case 'warning':
-      return 'bg-yellow-100'; // Yellow background for warnings
-    case 'info':
-      return 'bg-blue-100'; // Blue background for informational alarms
-    default:
-      return 'bg-white'; // Default background
-  }
-};
-
-const AlarmTable = ({ alarms, currentPage, itemsPerPage, onPageChange }) => {
+const AlarmTable = ({ alarms, currentPage, itemsPerPage }) => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedAlarms = alarms.slice(startIndex, startIndex + itemsPerPage);
 
@@ -35,20 +21,15 @@ const AlarmTable = ({ alarms, currentPage, itemsPerPage, onPageChange }) => {
               <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b">Machine Line</th>
               <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b">Timestamp</th>
               <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b">Description</th>
-              <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b">Severity</th>
             </tr>
           </thead>
           <tbody>
             {paginatedAlarms.map((alarm) => (
-              <tr
-                key={alarm._id}
-                className={`${getAlarmColor(alarm.d?.severity)} text-gray-800 transition-transform hover:-translate-y-0.5`}
-              >
+              <tr key={alarm._id} className="bg-white text-gray-800 transition-transform hover:-translate-y-0.5">
                 <td className="px-2 py-3 text-sm">{alarm._id}</td>
                 <td className="px-2 py-3 text-sm">{alarm.d?.machineLine || 'N/A'}</td>
                 <td className="px-2 py-3 text-sm">{new Date(alarm.d?.trigger_time).toLocaleString()}</td>
                 <td className="px-2 py-3 text-sm">{alarm.d?.message || 'N/A'}</td>
-                <td className="px-2 py-3 text-sm">{alarm.d?.severity || 'N/A'}</td>
               </tr>
             ))}
           </tbody>
@@ -57,10 +38,7 @@ const AlarmTable = ({ alarms, currentPage, itemsPerPage, onPageChange }) => {
         {/* Mobile Table */}
         <div className="md:hidden">
           {paginatedAlarms.map((alarm) => (
-            <div
-              key={alarm._id}
-              className={`${getAlarmColor(alarm.d?.severity)} text-gray-800 p-4 mb-4 rounded-lg shadow-sm`}
-            >
+            <div key={alarm._id} className="bg-white text-gray-800 p-4 mb-4 rounded-lg shadow-sm">
               <div className="grid grid-cols-2 gap-2">
                 <div className="font-medium">Alarm ID:</div>
                 <div>{alarm._id}</div>
@@ -70,37 +48,17 @@ const AlarmTable = ({ alarms, currentPage, itemsPerPage, onPageChange }) => {
                 <div>{new Date(alarm.d?.trigger_time).toLocaleString()}</div>
                 <div className="font-medium">Description:</div>
                 <div>{alarm.d?.message || 'N/A'}</div>
-                <div className="font-medium">Severity:</div>
-                <div>{alarm.d?.severity || 'N/A'}</div>
               </div>
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Pagination Controls for Active Alarms Overview */}
-      <div className="flex justify-center mt-4">
-        <button
-          onClick={() => onPageChange(currentPage - 1, 'active')}
-          disabled={currentPage === 1}
-          className="px-4 py-2 mx-1 bg-blue-500 text-white rounded-lg disabled:bg-gray-300"
-        >
-          Previous
-        </button>
-        <button
-          onClick={() => onPageChange(currentPage + 1, 'active')}
-          disabled={currentPage === Math.ceil(alarms.length / itemsPerPage)}
-          className="px-4 py-2 mx-1 bg-blue-500 text-white rounded-lg disabled:bg-gray-300"
-        >
-          Next
-        </button>
       </div>
     </div>
   );
 };
 
 // History component
-const AlarmHistory = ({ history, currentPage, itemsPerPage, onPageChange }) => {
+const AlarmHistory = ({ history, currentPage, itemsPerPage }) => {
   const [filter, setFilter] = useState('');
 
   const filteredHistory = history.filter(alarm =>
@@ -135,20 +93,15 @@ const AlarmHistory = ({ history, currentPage, itemsPerPage, onPageChange }) => {
               <th className="px-2 py-3">Timestamp</th>
               <th className="px-2 py-3">Description</th>
               <th className="px-2 py-3">Resolution Status</th>
-              <th className="px-2 py-3">Severity</th>
             </tr>
           </thead>
           <tbody>
             {paginatedHistory.map((alarm) => (
-              <tr
-                key={alarm._id}
-                className={`${getAlarmColor(alarm.d?.severity)} hover:bg-gray-100 transition-colors`}
-              >
+              <tr key={alarm._id} className="hover:bg-gray-100 transition-colors">
                 <td className="px-2 py-3 text-sm">{alarm._id}</td>
                 <td className="px-2 py-3 text-sm">{new Date(alarm.d?.trigger_time).toLocaleString()}</td>
                 <td className="px-2 py-3 text-sm">{alarm.d?.message || 'N/A'}</td>
                 <td className="px-2 py-3 text-sm">{alarm.d?.status || 'N/A'}</td>
-                <td className="px-2 py-3 text-sm">{alarm.d?.severity || 'N/A'}</td>
               </tr>
             ))}
           </tbody>
@@ -157,10 +110,7 @@ const AlarmHistory = ({ history, currentPage, itemsPerPage, onPageChange }) => {
         {/* Mobile Table */}
         <div className="md:hidden">
           {paginatedHistory.map((alarm) => (
-            <div
-              key={alarm._id}
-              className={`${getAlarmColor(alarm.d?.severity)} text-gray-800 p-4 mb-4 rounded-lg shadow-sm`}
-            >
+            <div key={alarm._id} className="bg-white text-gray-800 p-4 mb-4 rounded-lg shadow-sm">
               <div className="grid grid-cols-2 gap-2">
                 <div className="font-medium">ID:</div>
                 <div>{alarm._id}</div>
@@ -170,30 +120,10 @@ const AlarmHistory = ({ history, currentPage, itemsPerPage, onPageChange }) => {
                 <div>{alarm.d?.message || 'N/A'}</div>
                 <div className="font-medium">Resolution Status:</div>
                 <div>{alarm.d?.status || 'N/A'}</div>
-                <div className="font-medium">Severity:</div>
-                <div>{alarm.d?.severity || 'N/A'}</div>
               </div>
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Pagination Controls for Alarm History */}
-      <div className="flex justify-center mt-4">
-        <button
-          onClick={() => onPageChange(currentPage - 1, 'history')}
-          disabled={currentPage === 1}
-          className="px-4 py-2 mx-1 bg-blue-500 text-white rounded-lg disabled:bg-gray-300"
-        >
-          Previous
-        </button>
-        <button
-          onClick={() => onPageChange(currentPage + 1, 'history')}
-          disabled={currentPage === Math.ceil(filteredHistory.length / itemsPerPage)}
-          className="px-4 py-2 mx-1 bg-blue-500 text-white rounded-lg disabled:bg-gray-300"
-        >
-          Next
-        </button>
       </div>
     </div>
   );
@@ -205,8 +135,7 @@ function App() {
   const [alarmHistory, setAlarmHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeAlarmsPage, setActiveAlarmsPage] = useState(1); // Pagination for Active Alarms
-  const [alarmHistoryPage, setAlarmHistoryPage] = useState(1); // Pagination for Alarm History
+  const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8; // Number of items to display per page
   const lastFetchTime = useRef(new Date().toISOString());
   const location = useLocation();
@@ -258,13 +187,8 @@ function App() {
     return () => clearInterval(intervalId);
   }, []);
 
-  // Handle page change for both tables
-  const handlePageChange = (newPage, tableType) => {
-    if (tableType === 'active') {
-      setActiveAlarmsPage(newPage);
-    } else if (tableType === 'history') {
-      setAlarmHistoryPage(newPage);
-    }
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
   };
 
   if (loading) {
@@ -286,18 +210,29 @@ function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-300 p-4 md:p-8">
       <h1 className="text-2xl md:text-3xl font-bold text-gray-800 text-left mb-5">Alarm Monitoring System</h1>
-      <AlarmTable
-        alarms={activeAlarms}
-        currentPage={activeAlarmsPage}
-        itemsPerPage={itemsPerPage}
-        onPageChange={handlePageChange}
-      />
-      <AlarmHistory
-        history={alarmHistory}
-        currentPage={alarmHistoryPage}
-        itemsPerPage={itemsPerPage}
-        onPageChange={handlePageChange}
-      />
+      <AlarmTable alarms={activeAlarms} currentPage={currentPage} itemsPerPage={itemsPerPage} />
+      <AlarmHistory history={alarmHistory} currentPage={currentPage} itemsPerPage={itemsPerPage} />
+
+      {/* Pagination Controls */}
+      <div className="flex justify-center mt-4">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-4 py-2 mx-1 bg-blue-500 text-white rounded-lg disabled:bg-gray-300"
+        >
+          Previous
+        </button>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={
+            currentPage === Math.ceil(activeAlarms.length / itemsPerPage) ||
+            currentPage === Math.ceil(alarmHistory.length / itemsPerPage)
+          }
+          className="px-4 py-2 mx-1 bg-blue-500 text-white rounded-lg disabled:bg-gray-300"
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }
