@@ -162,7 +162,7 @@ const AlarmHistory = ({ history, currentPage, itemsPerPage, onPageChange }) => {
 function App() {
   const [activeAlarms, setActiveAlarms] = useState([]);
   const [alarmHistory, setAlarmHistory] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeAlarmsPage, setActiveAlarmsPage] = useState(1); // Pagination for Active Alarms
   const [alarmHistoryPage, setAlarmHistoryPage] = useState(1); // Pagination for Alarm History
@@ -218,7 +218,7 @@ function App() {
         console.error('Error fetching data:', error);
         setError('Failed to fetch data. Please try again later.');
       } finally {
-        setLoading(false);
+        // setLoading(false);
       }
     };
 
@@ -241,13 +241,13 @@ function App() {
     setActiveTab(tab);
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-2xl font-bold text-gray-800">Loading...</div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+  //       <div className="text-2xl font-bold text-gray-800"></div>
+  //     </div>
+  //   );
+  // }
 
   if (error) {
     return (
