@@ -55,7 +55,7 @@ const SpeedBox = ({ speed, isLoading, status }) => {
           </span>
         </div>
       </div>
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-left">
         <div className="relative w-16 h-16 sm:w-20 sm:h-20">
           <svg className="w-full h-full" viewBox="0 0 36 36">
             <circle cx="18" cy="18" r="16" fill="none" stroke="#e5e7eb" strokeWidth="4" />
@@ -399,52 +399,45 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
 };
 
 // OEE Graph
-const OEEGraph = ({ availability, performance, quality, isLoading, timeRange }) => {
+const OEEGraph = ({ speedData, isLoading, timeRange }) => {
   const [dataPoints, setDataPoints] = useState([]);
 
   useEffect(() => {
     if (!isLoading) {
       const points = [];
-      const maxOEE = 100;
+      const maxSpeed = 300;
       const intervalMinutes = 15;
       const totalMinutes = timeRange * 60;
       const timePoints = Math.floor(totalMinutes / intervalMinutes);
       const startTime = new Date();
       startTime.setHours(8, 0, 0, 0);
 
-      const baseAvailability = parseFloat(availability) || 0;
-      const basePerformance = parseFloat(performance) || 0;
-      const baseQuality = parseFloat(quality) || 0;
+      const baseSpeed = parseFloat(speedData) || 0;
       for (let i = 0; i <= timePoints; i++) {
         const time = new Date(startTime.getTime() + i * intervalMinutes * 60 * 1000);
-        const fluctuationA = Math.sin(i / 10) * 10 + (Math.random() * 5 - 2.5);
-        const fluctuationP = Math.sin(i / 10 + 1) * 10 + (Math.random() * 5 - 2.5);
-        const fluctuationQ = Math.sin(i / 10 + 2) * 10 + (Math.random() * 5 - 2.5);
-        const simulatedAvailability = Math.max(0, Math.min(100, baseAvailability + fluctuationA));
-        const simulatedPerformance = Math.max(0, Math.min(100, basePerformance + fluctuationP));
-        const simulatedQuality = Math.max(0, Math.min(100, baseQuality + fluctuationQ));
-        const oee = (simulatedAvailability * simulatedPerformance * simulatedQuality) / 10000;
-        points.push({ time, oee });
+        const fluctuation = Math.sin(i / 10) * 50 + (Math.random() * 20 - 10);
+        const speed = Math.max(0, Math.min(maxSpeed, baseSpeed + fluctuation));
+        points.push({ time, speed });
       }
       setDataPoints(points);
     }
-  }, [availability, performance, quality, isLoading, timeRange]);
+  }, [speedData, isLoading, timeRange]);
 
   const formatTime = (date) => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
   const width = 600;
-  const height = 150;
-  const padding = 0;
-  const maxOEE = 100;
+  const height = 200;
+  const padding = 15;
+  const maxSpeed = 300;
   const xScale = (width - 2 * padding) / (dataPoints.length - 1 || 1);
-  const yScale = (height - 2 * padding) / maxOEE;
+  const yScale = (height - 2 * padding) / maxSpeed;
 
   const linePath = dataPoints
     .map((point, index) => {
       const x = padding + index * xScale;
-      const y = height - padding - point.oee * yScale;
+      const y = height - padding - point.speed * yScale;
       return `${index === 0 ? 'M' : 'L'} ${x},${y}`;
     })
     .join(' ');
@@ -466,9 +459,9 @@ const OEEGraph = ({ availability, performance, quality, isLoading, timeRange }) 
           <line
             key={index}
             x1={padding}
-            y1={height - padding - level * maxOEE * yScale}
+            y1={height - padding - level * maxSpeed * yScale}
             x2={width - padding}
-            y2={height - padding - level * maxOEE * yScale}
+            y2={height - padding - level * maxSpeed * yScale}
             stroke="#e5e7eb"
             strokeWidth="1"
           />
@@ -495,12 +488,12 @@ const OEEGraph = ({ availability, performance, quality, isLoading, timeRange }) 
           <text
             key={index}
             x={padding - 10}
-            y={height - padding - level * maxOEE * yScale + 5}
+            y={height - padding - level * maxSpeed * yScale + 5}
             textAnchor="end"
             fontSize="10"
             fill="#6b7280"
           >
-            {(level * maxOEE).toFixed(0)}%
+            {(level * maxSpeed).toFixed(0)}%
           </text>
         ))}
 
@@ -577,56 +570,48 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
-<div className="w-full mb-0 flex justify-between items-center no-print">
-
-  {/* <h1 className="text-2xl font-bold text-gray-900 mb-4">
-    Dashboard
-  </h1> */}
-
-
-<h1 className="text-2xl font-bold text-gray-900 mb-4">
-  Dashboard - {' '}
-  {serialNumber && (
-    <span className="text-sm text-white bg-gray-400 px-2 py-1 rounded">
-      {serialNumber}
-    </span>
-  )}
-</h1>
-
-
-  <div className="mb-8 flex space-x-2"> {/* Added flex and space-x-2 for spacing */}
-    <button
-      className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
-      onClick={() => navigate("/oee?serial_number=" + serialNumber)}
-    >
-      OEE
-    </button>
-    <button
-      className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
-      onClick={() => navigate("/production?serial_number=" + serialNumber)}
-    >
-      Production
-    </button>
-    <button
-      className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
-      onClick={() => navigate("/batch?serial_number=" + serialNumber)}
-    >
-      Batch
-    </button>
-    <button
-      className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
-      onClick={() => navigate("/oee?serial_number=" + serialNumber)}
-    >
-      Report
-    </button>
-    <button
-      className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
-      onClick={() => navigate("/audit?serial_number=" + serialNumber)}
-    >
-      Audit
-    </button>
-  </div>
-</div>
+      <div className="w-full mb-0 flex justify-between items-center no-print">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">
+          Dashboard - {' '}
+          {serialNumber && (
+            <span className="text-sm text-white bg-gray-400 px-2 py-1 rounded">
+              {serialNumber}
+            </span>
+          )}
+        </h1>
+        <div className="mb-8 flex space-x-2">
+          <button
+            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
+            onClick={() => navigate("/oee?serial_number=" + serialNumber)}
+          >
+            OEE
+          </button>
+          <button
+            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
+            onClick={() => navigate("/production?serial_number=" + serialNumber)}
+          >
+            Production
+          </button>
+          <button
+            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
+            onClick={() => navigate("/batch?serial_number=" + serialNumber)}
+          >
+            Batch
+          </button>
+          <button
+            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
+            onClick={() => navigate("/oee?serial_number=" + serialNumber)}
+          >
+            Report
+          </button>
+          <button
+            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
+            onClick={() => navigate("/audit?serial_number=" + serialNumber)}
+          >
+            Audit
+          </button>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <SpeedBox
@@ -660,15 +645,14 @@ export default function Dashboard() {
           setTimeRange={setTimeRange}
         />
         <OEEGraph
-          availability={machineData?.d?.Availability?.[0]}
-          performance={machineData?.d?.Performance?.[0]}
-          quality={machineData?.d?.Quality?.[0]}
+          speedData={machineData?.d?.current_speed[0]} // Pass speed data to OEE graph
           isLoading={isLoading}
           timeRange={timeRange}
         />
       </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <SpeedBox
+        <SpeedBox
           speed={machineData?.d?.current_speed[0]}
           isLoading={isLoading}
           status={status}
@@ -728,7 +712,5 @@ export default function Dashboard() {
         </Grid>
       </Grid>
     </div>
-
-    
   );
 }
