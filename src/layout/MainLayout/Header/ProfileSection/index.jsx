@@ -1,38 +1,33 @@
 import { useEffect, useRef, useState } from 'react';
-
-// material-ui
 import { useTheme } from '@mui/material/styles';
-import Avatar from '@mui/material/Avatar';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import Chip from '@mui/material/Chip';
-import ClickAwayListener from '@mui/material/ClickAwayListener';
-import Divider from '@mui/material/Divider';
-import Grid from '@mui/material/Grid2';
-import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Paper from '@mui/material/Paper';
-import Popper from '@mui/material/Popper';
-import Stack from '@mui/material/Stack';
-import Switch from '@mui/material/Switch';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
+import { 
+  Avatar, 
+  Card, 
+  CardContent, 
+  Chip, 
+  ClickAwayListener, 
+  Divider, 
+  Grid, 
+  List, 
+  ListItemButton, 
+  ListItemIcon, 
+  ListItemText, 
+  Paper, 
+  Popper, 
+  Stack, 
+  Switch, 
+  Typography, 
+  Box 
+} from '@mui/material';
 import { logoutService } from '../../../../backservice';
-// project imports
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
 import useConfig from 'hooks/useConfig';
-import { useDispatch } from 'react-redux';
-
-// assets
+import { useDispatch, useSelector } from 'react-redux';
 import User1 from 'assets/images/users/blue.webp';
-import { IconLogout, IconSettings, IconUser } from '@tabler/icons-react';
+import { IconLogout, IconSettings } from '@tabler/icons-react';
 import { logout } from '../../../../store/authslice';
 import { useNavigate } from 'react-router';
-
-// ==============================|| PROFILE MENU ||============================== //
 
 export default function ProfileSection() {
   const theme = useTheme();
@@ -40,12 +35,14 @@ export default function ProfileSection() {
   const [notification, setNotification] = useState(false);
   const [selectedIndex] = useState(-1);
   const [open, setOpen] = useState(false);
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  
+  // Get user data from Redux store - updated to handle potential undefined states
+  const userData = useSelector((state) => state.authSlice?.userData || {});
+  const userName = userData?.username || 'User';
+  const userDesignation = userData?.designation || userData?.role || 'Staff';
 
-  /**
-   * anchorRef is used on different components and specifying one type leads to other components throwing an error
-   * */
   const anchorRef = useRef(null);
 
   const handleToggle = () => {
@@ -56,15 +53,13 @@ export default function ProfileSection() {
     if (anchorRef.current && anchorRef.current.contains(event.target)) {
       return;
     }
-
     setOpen(false);
   };
 
-  function handleLogout(){
-    logoutService()
-    dispatch(logout())
-    navigate("/pages/login")
-    
+  function handleLogout() {
+    logoutService();
+    dispatch(logout());
+    navigate("/pages/login");
   }
 
   const prevOpen = useRef(open);
@@ -72,10 +67,8 @@ export default function ProfileSection() {
     if (prevOpen.current === true && open === false) {
       anchorRef.current.focus();
     }
-
     prevOpen.current = open;
   }, [open]);
-
 
   return (
     <>
@@ -85,6 +78,10 @@ export default function ProfileSection() {
           height: '48px',
           alignItems: 'center',
           borderRadius: '27px',
+          transition: 'all 0.2s ease-in-out',
+          '&:hover': {
+            transform: 'scale(1.05)'
+          },
           '& .MuiChip-label': {
             lineHeight: 0
           }
@@ -92,11 +89,13 @@ export default function ProfileSection() {
         icon={
           <Avatar
             src={User1}
-            alt="user-images"
+            alt="user-profile"
             sx={{
               ...theme.typography.mediumAvatar,
               margin: '8px 0 8px 8px !important',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              border: '2px solid',
+              borderColor: theme.palette.primary.main
             }}
             ref={anchorRef}
             aria-controls={open ? 'menu-list-grow' : undefined}
@@ -104,7 +103,7 @@ export default function ProfileSection() {
             color="inherit"
           />
         }
-        label={<IconSettings stroke={1.5} size="24px" />}
+        label={<IconSettings stroke={1.5} size="24px" color={theme.palette.primary.main} />}
         ref={anchorRef}
         aria-controls={open ? 'menu-list-grow' : undefined}
         aria-haspopup="true"
@@ -112,92 +111,155 @@ export default function ProfileSection() {
         color="primary"
         aria-label="user-account"
       />
+      
       <Popper
-        placement="bottom"
+        placement="bottom-end"
         open={open}
         anchorEl={anchorRef.current}
         role={undefined}
         transition
         disablePortal
-        modifiers={[
-          {
-            name: 'offset',
-            options: {
-              offset: [0, 14]
+        popperOptions={{
+          modifiers: [
+            {
+              name: 'offset',
+              options: {
+                offset: [0, 14]
+              }
             }
-          }
-        ]}
+          ]
+        }}
+        sx={{
+          zIndex: theme.zIndex.modal + 1
+        }}
       >
         {({ TransitionProps }) => (
           <ClickAwayListener onClickAway={handleClose}>
             <Transitions in={open} {...TransitionProps}>
-              <Paper>
+              <Paper elevation={8}>
                 {open && (
-                  <MainCard border={false} elevation={16} content={false} boxShadow shadow={theme.shadows[16]}>
-                    <Box sx={{ p: 2, pb: 0 }}>
-                      <Stack>
-                        <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
-                          <Typography variant="h4">Good Morning,</Typography>
-                          <Typography component="span" variant="h4" sx={{ fontWeight: 400 }}>
-                            Pacmac Admin
-                          </Typography>
+                  <MainCard 
+                    border={false} 
+                    elevation={16} 
+                    content={false} 
+                    boxShadow 
+                    shadow={theme.shadows[16]}
+                    sx={{
+                      minWidth: '300px',
+                      maxWidth: '350px',
+                      background: theme.palette.background.paper,
+                      border: `1px solid ${theme.palette.divider}`,
+                      borderRadius: `${borderRadius}px`,
+                      overflow: 'hidden'
+                    }}
+                  >
+                    {/* User Profile Header */}
+                    <Box sx={{ 
+                      p: 2, 
+                      pb: 1.5,
+                      background: theme.palette.primary.light,
+                      color: theme.palette.primary.contrastText
+                    }}>
+                      <Stack spacing={0.5}>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          <Avatar
+                            src={User1}
+                            alt={userName}
+                            sx={{
+                              width: 48,
+                              height: 48,
+                              border: `2px solid ${theme.palette.background.paper}`
+                            }}
+                          />
+                          <Stack>
+                            <Typography variant="h5" component="div" sx={{ fontWeight: 600 }}>
+                              {userName}
+                            </Typography>
+                            <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                              {userDesignation}
+                            </Typography>
+                          </Stack>
                         </Stack>
-                        <Typography variant="subtitle2">Admin</Typography>
                       </Stack>
-
-                      <Divider />
                     </Box>
+                    
+                    <Divider />
+
+                    {/* Profile Menu Content */}
                     <Box
                       sx={{
                         p: 2,
-                        py: 0,
+                        py: 1,
                         height: '100%',
                         maxHeight: 'calc(100vh - 250px)',
-                        overflowX: 'hidden',
-                        '&::-webkit-scrollbar': { width: 5 }
+                        overflowY: 'auto',
+                        '&::-webkit-scrollbar': { 
+                          width: 5,
+                          background: 'transparent'
+                        },
+                        '&::-webkit-scrollbar-thumb': {
+                          background: theme.palette.divider,
+                          borderRadius: 3
+                        }
                       }}
                     >
-                      
-  
-                      <Divider />
-                      <Card sx={{ bgcolor: 'primary.light', my: 2 }}>
-                        <CardContent>
-                          <Grid container spacing={3} direction="column">
-                            
-                            <Grid>
-                              <Grid container sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
-                                <Grid>
-                                  <Typography variant="subtitle1">Allow Notifications</Typography>
-                                </Grid>
-                                <Grid>
-                                  <Switch
-                                    checked={notification}
-                                    onChange={(e) => setNotification(e.target.checked)}
-                                    name="sdm"
-                                    size="small"
-                                  />
-                                </Grid>
-                              </Grid>
+                      {/* Notification Settings */}
+                      <Card 
+                        sx={{ 
+                          bgcolor: 'background.default', 
+                          my: 1.5,
+                          boxShadow: 'none',
+                          border: `1px solid ${theme.palette.divider}`
+                        }}
+                      >
+                        <CardContent sx={{ py: 1.5 }}>
+                          <Grid container alignItems="center" justifyContent="space-between">
+                            <Grid item>
+                              <Typography variant="subtitle1">Notifications</Typography>
+                              <Typography variant="body2" color="textSecondary">
+                                Manage your alerts
+                              </Typography>
+                            </Grid>
+                            <Grid item>
+                              <Switch
+                                checked={notification}
+                                onChange={(e) => setNotification(e.target.checked)}
+                                color="primary"
+                                size="medium"
+                              />
                             </Grid>
                           </Grid>
                         </CardContent>
                       </Card>
-                      <Divider />
-                      <List
-                        component="nav"
-                        sx={{
-                          width: '100%',
-                          maxWidth: 350,
-                          minWidth: 300,
-                          borderRadius: `${borderRadius}px`,
-                          '& .MuiListItemButton-root': { mt: 0.5 }
-                        }}
-                      >                 
-                        <ListItemButton onClick={handleLogout} sx={{ borderRadius: `${borderRadius}px` }} selected={selectedIndex === 4}>
-                          <ListItemIcon>
+
+                      <Divider sx={{ my: 1 }} />
+
+                      {/* Logout Option */}
+                      <List disablePadding>
+                        <ListItemButton 
+                          onClick={handleLogout}
+                          sx={{
+                            borderRadius: `${borderRadius}px`,
+                            px: 2,
+                            py: 1.5,
+                            '&:hover': {
+                              backgroundColor: theme.palette.error.light,
+                              '& .MuiListItemIcon-root': {
+                                color: theme.palette.error.main
+                              }
+                            }
+                          }}
+                        >
+                          <ListItemIcon sx={{ minWidth: 36 }}>
                             <IconLogout stroke={1.5} size="20px" />
                           </ListItemIcon>
-                          <ListItemText  primary={<Typography variant="body2">Logout</Typography>} />
+                          <ListItemText 
+                            primary={
+                              <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                                Logout
+                              </Typography>
+                            } 
+                          />
                         </ListItemButton>
                       </List>
                     </Box>
