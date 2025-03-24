@@ -435,8 +435,8 @@ const OEEGraph = ({ availability, performance, quality, isLoading, timeRange }) 
   };
 
   const width = 600;
-  const height = 120;
-  const padding = 40;
+  const height = 150;
+  const padding = 0;
   const maxOEE = 100;
   const xScale = (width - 2 * padding) / (dataPoints.length - 1 || 1);
   const yScale = (height - 2 * padding) / maxOEE;
