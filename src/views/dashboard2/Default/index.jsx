@@ -549,7 +549,7 @@ export default function Dashboard() {
       });
      getSpeedHistory(serialNumber)
        .then((data)=>{
-          setSpeedHistory(data)
+          setSpeedHistory(data?.data)
        })
   }, [serialNumber]);
 
