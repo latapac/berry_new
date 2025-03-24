@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Grid from '@mui/material/Grid';
 import TotalOrderLineChartCard from './TotalOrderLineChartCard';
 import TotalIncomeDarkCard from '../../../ui-component/cards/TotalIncomeDarkCard';
-import { getMachineData } from "../../../backservice";
+import { getMachineData, getSpeedHistory } from "../../../backservice";
 import { gridSpacing } from 'store/constant';
 import { useLocation } from 'react-router';
 import { useNavigate } from 'react-router';
@@ -530,6 +530,7 @@ export default function Dashboard() {
   const [isLoading, setLoading] = useState(true);
   const [machineData, setMachineData] = useState({});
   const [timeRange, setTimeRange] = useState(8);
+  const [speedHistory,setSpeedHistory] = useState([])
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const serialNumber = queryParams.get('serial_number');
@@ -546,6 +547,10 @@ export default function Dashboard() {
         console.error("Error fetching machine data:", error);
         setLoading(false);
       });
+     getSpeedHistory(serialNumber)
+       .then((data)=>{
+          setSpeedHistory(data)
+       })
   }, [serialNumber]);
 
   useEffect(() => {
