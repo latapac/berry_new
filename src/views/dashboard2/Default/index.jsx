@@ -572,36 +572,58 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-2xl font-bold text-gray-900 mb-4">Analytics</h1>
+<div className="w-full mb-0 flex justify-between items-center no-print">
 
-      <div className="mb-8">
-        <button
-          className="text-sm text-gray-700 bg-white border border-gray-200 rounded-md px-3 py-1 mr-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          onClick={() => navigate("/oee?serial_number=" + serialNumber)}
-        >
-          OEE
-        </button>
-        <button
-          className="text-sm text-gray-700 bg-white border border-gray-200 rounded-md px-3 py-1 mr-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          onClick={() => navigate("/production?serial_number=" + serialNumber)}
-        >
-          Production
-        </button>
-        <button
-          className="text-sm text-gray-700 bg-white border border-gray-200 rounded-md px-3 py-1 mr-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          onClick={() => navigate("/batch?serial_number=" + serialNumber)}
-        >
-          Batch
-        </button>
-        <button
-          className="text-sm text-gray-700 bg-white border border-gray-200 rounded-md px-3 py-1 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          onClick={() => navigate("/oee?serial_number=" + serialNumber)}
-        >
-          Report
-        </button>
-      </div>
+  {/* <h1 className="text-2xl font-bold text-gray-900 mb-4">
+    Dashboard
+  </h1> */}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+<h1 className="text-2xl font-bold text-gray-900 mb-4">
+  Dashboard - {' '}
+  {serialNumber && (
+    <span className="text-sm text-white bg-gray-400 px-2 py-1 rounded">
+      {serialNumber}
+    </span>
+  )}
+</h1>
+
+
+  <div className="mb-8 flex space-x-2"> {/* Added flex and space-x-2 for spacing */}
+    <button
+      className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
+      onClick={() => navigate("/oee?serial_number=" + serialNumber)}
+    >
+      OEE
+    </button>
+    <button
+      className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
+      onClick={() => navigate("/production?serial_number=" + serialNumber)}
+    >
+      Production
+    </button>
+    <button
+      className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
+      onClick={() => navigate("/batch?serial_number=" + serialNumber)}
+    >
+      Batch
+    </button>
+    <button
+      className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
+      onClick={() => navigate("/oee?serial_number=" + serialNumber)}
+    >
+      Report
+    </button>
+    <button
+      className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
+      onClick={() => navigate("/audit?serial_number=" + serialNumber)}
+    >
+      Audit
+    </button>
+  </div>
+</div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <SpeedBox
           speed={machineData?.d?.current_speed[0]}
           isLoading={isLoading}
@@ -638,6 +660,29 @@ export default function Dashboard() {
           quality={machineData?.d?.Quality?.[0]}
           isLoading={isLoading}
           timeRange={timeRange}
+        />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <SpeedBox
+          speed={machineData?.d?.current_speed[0]}
+          isLoading={isLoading}
+          status={status}
+        />
+        <GoodProductionBox
+          goodValue={machineData?.d?.Good_Count[0]}
+          rejectValue={machineData?.d?.Reject_Counters[0]}
+          totalValue={machineData?.d?.Total_Production[0]}
+          isLoading={isLoading}
+        />
+        <OEEBox
+          availability={machineData?.d?.Availability?.[0]}
+          performance={machineData?.d?.Performance?.[0]}
+          quality={machineData?.d?.Quality?.[0]}
+          isLoading={isLoading}
+        />
+        <TotalProductionBox
+          value={machineData?.d?.Total_Production[0]}
+          isLoading={isLoading}
         />
       </div>
 
@@ -678,5 +723,7 @@ export default function Dashboard() {
         </Grid>
       </Grid>
     </div>
+
+    
   );
 }
