@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
-import Grid from '@mui/material/Grid2';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import MainCard from 'ui-component/cards/MainCard';
@@ -9,35 +8,53 @@ import SkeletonEarningCard from 'ui-component/cards/Skeleton/EarningCard';
 import { getMachineData } from '../../../backservice';
 import { useNavigate } from 'react-router';
 import { mstatus, getMstatusBGColor } from '../../../constants';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
+import StopIcon from '@mui/icons-material/Stop';
+import ErrorIcon from '@mui/icons-material/Error';
+
+// Utility functions remain unchanged
+const formatSerialNumber = (serialNumber) => {
+  if (!serialNumber || typeof serialNumber !== 'string') return 'N/A';
+  const prefixMatch = serialNumber.match(/^[A-Za-z]+/);
+  const prefix = prefixMatch ? prefixMatch[0] : '';
+  if (!prefix) return serialNumber;
+  const numericPart = serialNumber.slice(prefix.length);
+  if (numericPart.length < 8) return serialNumber;
+  const yearPart = numericPart.slice(0, 4);
+  const numberPart = numericPart.slice(4, 8);
+  const formattedYear = `${yearPart.slice(0, 2)}-${yearPart.slice(2)}`;
+  return `${prefix}/${formattedYear}/${numberPart}`;
+};
+
+const getStatusIcon = (status) => {
+  switch (status) {
+    case 'Execute':
+      return <PlayArrowIcon sx={{ fontSize: '1rem', mr: 0.5, verticalAlign: 'middle' }} />;
+    case 'Idle':
+      return <PauseIcon sx={{ fontSize: '1rem', mr: 0.5, verticalAlign: 'middle' }} />;
+    case 'Aborted':
+      return <StopIcon sx={{ fontSize: '1rem', mr: 0.5, verticalAlign: 'middle' }} />;
+    case 'Offline':
+    case 'Unknown':
+    default:
+      return <ErrorIcon sx={{ fontSize: "1rem", mr: 0.5, verticalAlign: 'middle' }} />;
+  }
+};
 
 export default function EarningCard({ isLoading, data }) {
   const [machineData, setMachineData] = useState({});
   const navigate = useNavigate();
   const theme = useTheme();
 
-  function formatTimestamp(isoString) {
-    const date = new Date(isoString);
-    return date.toLocaleString('en-US', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
-    });
-  }
-
   const getOfflineDuration = (timestamp) => {
     if (!timestamp) return 'N/A';
     const lastOnline = new Date(timestamp);
     const currentTime = new Date();
     const diffMs = currentTime - lastOnline;
-    
     const minutes = Math.floor(diffMs / 60000);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
-
     if (days > 0) return `${days}d ${hours % 24}h`;
     if (hours > 0) return `${hours}h ${minutes % 60}m`;
     return `${minutes}m`;
@@ -51,18 +68,30 @@ export default function EarningCard({ isLoading, data }) {
   };
 
   useEffect(() => {
-    if (data?.serial_number) {
-      getMachineData(data.serial_number).then(setMachineData);
-    }
-  }, [data]);
+    if (!data?.serial_number) return;
+    const fetchData = async () => {
+      const newData = await getMachineData(data.serial_number);
+      setMachineData(newData);
+    };
+    fetchData();
+    const interval = setInterval(fetchData, 5000);
+    return () => clearInterval(interval);
+  }, [data?.serial_number]);
 
   const isOnline = dataChange(machineData?.ts);
   const machineType = data?.serial_number?.startsWith("PAC") ? "Cartoning" : "Tube Filling";
   const modelType = data?.serial_number?.startsWith("PAC") ? "PAC300" : "MAC300";
   const lineNumber = data?.line_number || machineData?.line_number || 'N/A';
-  // Assuming speed is available in machineData, adjust as needed
-  const currentSpeed = machineData?.speed || 0; // Replace with actual speed field
-  const maxSpeed = 300; // Adjust this based on your machine's max speed
+  const currentSpeed = machineData?.speed || 0;
+  const maxSpeed = 300;
+  const speedPercentage = ((currentSpeed / maxSpeed) * 100).toFixed(0);
+  const oee = machineData?.oee || 0;
+  const formattedSerialNumber = formatSerialNumber(data?.serial_number);
+  const radius = 45;
+  const circumference = 2 * Math.PI * radius;
+  const speedProgress = (currentSpeed / maxSpeed) * circumference;
+  const oeeProgress = (oee / 100) * circumference;
+  const statusText = !isOnline ? 'Offline' : (mstatus[machineData?.d?.status[0]] || 'Unknown');
 
   return (
     <>
@@ -82,174 +111,196 @@ export default function EarningCard({ isLoading, data }) {
             transition: 'all 0.3s ease',
             '&:hover': {
               transform: 'translateY(-4px)',
-              boxShadow: '0 6px 25px rgba(0, 0, 0, 0.15)'
+              boxShadow: '0 6px 25px rgba(0, 0, 0, 0.15)',
             },
             p: 0,
-            width: { xs: '100%', sm: 256, md: 288 },
-            maxWidth: { xs: '100%', sm: 288 },
-            minWidth: { xs: 224, sm: 256 }
+            width: { xs: '100%', sm: 'clamp(256px, 30vw, 288px)' }, // Fluid width with clamp
+            maxWidth: '100%',
+            minWidth: { xs: 'min(224px, 90vw)', sm: 256 },
           }}
         >
-          {/* Header */}
           <Box
             sx={{
               bgcolor: theme.palette.grey[200],
               borderTopLeftRadius: 2,
               borderTopRightRadius: 2,
-              p: 1,
+              p: { xs: 0.5, sm: 0.75 }, // Scaled padding
               display: 'flex',
               justifyContent: 'space-between',
-              alignItems: 'center'
+              alignItems: 'center',
             }}
           >
             <Typography
               variant="subtitle2"
               sx={{
-                fontSize: { xs: '0.75rem', sm: '0.8rem' },
+                fontSize: { xs: 'clamp(0.65rem, 2vw, 0.75rem)', sm: '0.8rem' },
                 fontWeight: 600,
-                color: theme.palette.grey[800]
+                color: theme.palette.grey[800],
+                whiteSpace: 'nowrap',
               }}
             >
-              Line: {lineNumber}
+              {modelType}
             </Typography>
             <Typography
               variant="subtitle2"
               sx={{
-                fontSize: { xs: '0.75rem', sm: '0.8rem' },
+                fontSize: { xs: 'clamp(0.65rem, 2vw, 0.75rem)', sm: '0.8rem' },
                 fontWeight: 600,
-                color: theme.palette.grey[800]
+                color: theme.palette.grey[800],
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                maxWidth: { xs: '50%', sm: '60%' },
               }}
             >
-              SL: {data?.serial_number || 'N/A'}
+               {formattedSerialNumber}
             </Typography>
           </Box>
 
-          {/* Main Content */}
-          <Box sx={{ p: { xs: 1.5, sm: 2 }, display: 'flex' }}>
-            {/* Left Section */}
-            <Box sx={{ flex: 1 }}>
+          <Box sx={{ p: { xs: 1, sm: 1.5 }, display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: { xs: 0.25, sm: 0.5 } }}>
               <Typography
                 variant="h6"
                 sx={{
-                  fontSize: { xs: '0.85rem', sm: '1rem' },
-                  fontWeight: 600,
-                  mb: 0.25,
-                  color: theme.palette.grey[800]
+                  fontSize: { xs: '1rem', sm: '1.2rem' },
+                  fontWeight: 800,
+                  color: theme.palette.grey[900],
+                  backgroundColor: theme.palette.grey[300],
+                  px: { xs: 0.75, sm: 1 },
+                  borderRadius: 1,
                 }}
               >
-                <span className={getMstatusBGColor(mstatus[machineData?.d?.status[0]])}>
-                  {mstatus[machineData?.d?.status[0]] || 'Unknown'}
-                </span>
+                L: {lineNumber}
               </Typography>
 
-              <Typography
-                sx={{
-                  fontSize: { xs: '0.8rem', sm: '0.9rem' },
-                  fontWeight: 500,
-                  mb: 0.25
-                }}
-              >
-                {machineType}
-              </Typography>
+              {/* Speed and OEE */}
+              <Box sx={{ display: 'flex', gap: { xs: 0.25, sm: 0.5 }, alignItems: 'center' }}>
+                {/* Speed Gauge */}
+                <Box sx={{ position: 'relative', width: { xs: 60, sm: 80 }, height: { xs: 60, sm: 80 }, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r={radius}
+                      fill="none"
+                      stroke={theme.palette.grey[300]}
+                      strokeWidth="3"
+                    />
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r={radius}
+                      fill="none"
+                      stroke="#26A69A"
+                      strokeWidth="6"
+                      strokeLinecap="round"
+                      strokeDasharray={`${speedProgress} ${circumference}`}
+                      transform="rotate(-90 50 50)"
+                    />
+                  </svg>
+                  <Typography
+                    sx={{
+                      fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                      color: theme.palette.grey[600],
+                      mt: { xs: 0.25, sm: 0.5 },
+                    }}
+                  >
+                    Speed
+                  </Typography>
+                </Box>
 
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                <Typography
-                  sx={{
-                    fontSize: { xs: '0.75rem', sm: '0.8rem' },
-                    color: theme.palette.grey[600]
-                  }}
-                >
-                  Model: {modelType}
-                </Typography>
+                {/* OEE Gauge */}
+                <Box sx={{ position: 'relative', width: { xs: 60, sm: 80 }, height: { xs: 60, sm: 80 }, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r={radius}
+                      fill="none"
+                      stroke={theme.palette.grey[300]}
+                      strokeWidth="3"
+                    />
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r={radius}
+                      fill="none"
+                      stroke="#AB47BC"
+                      strokeWidth="6"
+                      strokeLinecap="round"
+                      strokeDasharray={`${oeeProgress} ${circumference}`}
+                      transform="rotate(-90 50 50)"
+                    />
+                  </svg>
+                  <Typography
+                    sx={{
+                      fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                      color: theme.palette.grey[600],
+                      mt: { xs: 0.25, sm: 0.5 },
+                    }}
+                  >
+                    OEE
+                  </Typography>
+                </Box>
               </Box>
-
-              {/* <Typography
-                sx={{
-                  fontSize: '0.7rem',
-                  color: theme.palette.grey[500],
-                  mt: 0.25,
-                  display: { xs: 'none', sm: 'block' }
-                }}
-              >
-                Last: {machineData?.ts ? formatTimestamp(machineData.ts) : 'N/A'}
-              </Typography> */}
             </Box>
 
-            {/* Right Section - Speedometer */}
-            <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <Box sx={{ position: 'relative', width: 80, height: 80 }}>
-                <svg width="80" height="80" viewBox="0 0 100 100">
-                  {/* Background circle */}
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="45"
-                    fill="none"
-                    stroke={theme.palette.grey[300]}
-                    strokeWidth="10"
-                  />
-                  {/* Speed indicator */}
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="45"
-                    fill="none"
-                    stroke={isOnline ? theme.palette.success.main : theme.palette.error.main}
-                    strokeWidth="10"
-                    strokeDasharray={`${(currentSpeed / maxSpeed) * 283} 283`}
-                    transform="rotate(-90 50 50)"
-                  />
-                </svg>
-                <Typography
-                  sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    fontSize: { xs: '0.9rem', sm: '1rem' },
-                    fontWeight: 600,
-                    color: theme.palette.grey[800]
-                  }}
-                >
-                  {currentSpeed}
-                </Typography>
-              </Box>
+            {/* Status */}
+            <Box
+              sx={{
+                p: { xs: 0.25, sm: 0.5 },
+                pt: 0,
+                pb: 0,
+                mb: 0,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <Typography
+                variant="h6"
+                sx={{
+                  fontSize: { xs: '0.8rem', sm: '1rem' },
+                  fontWeight: 600,
+                  color: theme.palette.grey[800],
+                  display: 'flex',
+                  alignItems: 'center',
+                  mb: 0,
+                }}
+              >
+                {getStatusIcon(statusText)}
+                <span className={getMstatusBGColor(statusText)}>
+                  {statusText}
+                </span>
+              </Typography>
             </Box>
           </Box>
 
-          {/* Status Bar */}
+          {/* Thin Status Line at Bottom */}
           <Box
             sx={{
-              bgcolor: isOnline ? 'success.main' : 'error.main',
+              bgcolor: isOnline ? theme.palette.success.main : theme.palette.error.main,
+              height: { xs: '16px', sm: '20px' }, // Scaled height
               borderBottomLeftRadius: 2,
               borderBottomRightRadius: 2,
-              p: 0.75,
               display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
-            <Typography 
-              variant="caption" 
-              sx={{ 
-                color: '#fff', 
-                fontWeight: 600,
-                fontSize: { xs: '0.65rem', sm: '0.7rem' }
+            <Typography
+              sx={{
+                fontSize: { xs: 'clamp(0.6rem, 1.5vw, 0.7rem)', sm: '0.75rem' },
+                color: theme.palette.grey[100],
+                fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+                fontWeight: 400,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
               }}
             >
-              {isOnline ? 'Online' : 'Offline'}
+              {isOnline ? 'Online' : `Offline ${getOfflineDuration(machineData?.ts)}`}
             </Typography>
-            {!isOnline && (
-              <Typography
-                variant="caption"
-                sx={{
-                  color: '#fff',
-                  fontSize: { xs: '0.6rem', sm: '0.65rem' }
-                }}
-              >
-                {getOfflineDuration(machineData?.ts)}
-              </Typography>
-            )}
           </Box>
         </MainCard>
       )}
@@ -261,11 +312,11 @@ EarningCard.propTypes = {
   isLoading: PropTypes.bool,
   data: PropTypes.shape({
     serial_number: PropTypes.string,
-    line_number: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-  })
+    line_number: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  }),
 };
 
 EarningCard.defaultProps = {
   isLoading: false,
-  data: { serial_number: 'N/A' }
+  data: { serial_number: 'N/A' },
 };
