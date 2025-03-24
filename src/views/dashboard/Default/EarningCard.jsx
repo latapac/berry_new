@@ -82,10 +82,10 @@ export default function EarningCard({ isLoading, data }) {
   const machineType = data?.serial_number?.startsWith("PAC") ? "Cartoning" : "Tube Filling";
   const modelType = data?.serial_number?.startsWith("PAC") ? "PAC300" : "MAC300";
   const lineNumber = data?.line_number || machineData?.line_number || 'N/A';
-  const currentSpeed = machineData?.speed || 0;
+  const currentSpeed = machineData?.d?.current_speed[0] || 0;
   const maxSpeed = 300;
   const speedPercentage = ((currentSpeed / maxSpeed) * 100).toFixed(0);
-  const oee = machineData?.oee || 0;
+  const oee = machineData?.d?.current_OEE[0] || 0;
   const formattedSerialNumber = formatSerialNumber(data?.serial_number);
   const radius = 45;
   const circumference = 2 * Math.PI * radius;
