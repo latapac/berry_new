@@ -445,7 +445,6 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
         </div>
       </div>
       <svg
-      <svg
         ref={svgRef}
         width="100%" 
         height={height + padding}
@@ -820,7 +819,7 @@ export default function Dashboard() {
           >
             Batch
           </button>
-          {/* <button
+          <button
             className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
             onClick={() => navigate("/oee?serial_number=" + serialNumber)}
           >
@@ -939,6 +938,5 @@ export default function Dashboard() {
           </Grid>
         </Grid>
       </Grid>
-    </div>
-  );
+    </div>)
 }
