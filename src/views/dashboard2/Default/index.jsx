@@ -256,12 +256,34 @@ const TotalProductionBox = ({ value, isLoading }) => {
   );
 };
 
-// Machine Speed Graph
+
+
 const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) => {
   const [dataPoints, setDataPoints] = useState([]);
-  const [zoomLevel, setZoomLevel] = useState(1); // 1 = normal, >1 = zoom in, <1 = zoom out
-  const [panOffset, setPanOffset] = useState(0); // For panning left/right
+  const [zoomState, setZoomState] = useState({
+    scale: 1,
+    offset: 0,
+    maxOffset: 0
+  });
   const svgRef = useRef(null);
+  const containerRef = useRef(null);
+  const [dimensions, setDimensions] = useState({ width: 600, height: 200 });
+
+  // Update dimensions on resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (containerRef.current) {
+        setDimensions({
+          width: containerRef.current.clientWidth,
+          height: 200
+        });
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     if (!isLoading && speedData && speedData.length > 0) {
@@ -270,8 +292,12 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
         speed: item.speed
       }));
       setDataPoints(points);
+
+      // Calculate max offset based on data length
+      const maxOffset = dimensions.width * 0.8; // Allow some extra space
+      setZoomState(prev => ({ ...prev, maxOffset }));
     }
-  }, [speedData, isLoading]);
+  }, [speedData, isLoading, dimensions.width]);
 
   // Handle zoom and pan interactions
   useEffect(() => {
@@ -284,21 +310,42 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
 
     const handleWheel = (e) => {
       e.preventDefault();
-      const delta = e.deltaY > 0 ? 0.9 : 1.1; // Zoom out or in
-      setZoomLevel(prev => Math.max(0.1, Math.min(10, prev * delta)));
+      const containerRect = svg.getBoundingClientRect();
+      const mouseX = e.clientX - containerRect.left;
+      const graphX = mouseX - zoomState.offset;
+
+      const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+      const newScale = Math.max(0.5, Math.min(5, zoomState.scale * zoomFactor));
+
+      // Calculate new offset to zoom toward mouse position
+      const newOffset = mouseX - graphX * (newScale / zoomState.scale);
+
+      setZoomState(prev => ({
+        scale: newScale,
+        offset: Math.min(0, Math.max(prev.maxOffset * (1 - newScale), newOffset)),
+        maxOffset: prev.maxOffset
+      }));
     };
 
     const handleMouseDown = (e) => {
+      if (e.button !== 0) return; // Only left mouse button
       isDragging = true;
       startX = e.clientX;
-      startOffset = panOffset;
+      startOffset = zoomState.offset;
       svg.style.cursor = 'grabbing';
     };
 
     const handleMouseMove = (e) => {
       if (!isDragging) return;
       const dx = e.clientX - startX;
-      setPanOffset(startOffset + dx);
+      const newOffset = startOffset + dx;
+
+      // Constrain panning to valid range
+      const maxPossibleOffset = Math.min(0, zoomState.maxOffset * (1 - zoomState.scale));
+      setZoomState(prev => ({
+        ...prev,
+        offset: Math.max(maxPossibleOffset, Math.min(0, newOffset))
+      }));
     };
 
     const handleMouseUp = () => {
@@ -306,47 +353,31 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
       svg.style.cursor = 'grab';
     };
 
-    const handleMouseLeave = () => {
-      isDragging = false;
-      svg.style.cursor = 'default';
-    };
-
-    svg.addEventListener('wheel', handleWheel);
+    svg.addEventListener('wheel', handleWheel, { passive: false });
     svg.addEventListener('mousedown', handleMouseDown);
-    svg.addEventListener('mousemove', handleMouseMove);
-    svg.addEventListener('mouseup', handleMouseUp);
-    svg.addEventListener('mouseleave', handleMouseLeave);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
 
     return () => {
       svg.removeEventListener('wheel', handleWheel);
       svg.removeEventListener('mousedown', handleMouseDown);
-      svg.removeEventListener('mousemove', handleMouseMove);
-      svg.removeEventListener('mouseup', handleMouseUp);
-      svg.removeEventListener('mouseleave', handleMouseLeave);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [panOffset]);
+  }, [zoomState]);
 
-  const formatTime = (date, zoomLevel) => {
-    if (zoomLevel > 2) {
-      // Show seconds when zoomed in close
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    } else if (zoomLevel > 0.5) {
-      // Show minutes when moderately zoomed
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    } else {
-      // Show hours when zoomed out
-      return date.toLocaleTimeString([], { hour: '2-digit' });
-    }
+  // Format time labels, showing HH:MM:SS when zoomed in
+  const formatTime = (date) => {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   };
 
-  const width = 600;
-  const height = 200;
+  const { width, height } = dimensions;
   const padding = 15;
   const maxSpeed = 300;
 
-  // Calculate visible range based on zoom and pan
-  const visibleWidth = width / zoomLevel;
-  const visibleStart = Math.max(0, -panOffset / zoomLevel);
+  // Calculate visible range
+  const visibleWidth = width / zoomState.scale;
+  const visibleStart = Math.max(0, -zoomState.offset / zoomState.scale);
   const visibleEnd = Math.min(width, visibleStart + visibleWidth);
 
   // Filter data points to only render what's visible
@@ -355,55 +386,51 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
     return x >= visibleStart && x <= visibleEnd;
   });
 
-  // Calculate scales based on visible data
+  // Calculate scales
   const xScale = visibleDataPoints.length > 1
-    ? (width - 2 * padding) / (visibleDataPoints.length - 1) * zoomLevel
+    ? (width - 2 * padding) / (visibleDataPoints.length - 1)
     : 0;
   const yScale = (height - 2 * padding) / maxSpeed;
 
   const linePath = visibleDataPoints
     .map((point, index) => {
-      const x = padding + index * xScale + panOffset;
+      const x = padding + index * xScale * zoomState.scale + zoomState.offset;
       const y = height - padding - point.speed * yScale;
       return `${index === 0 ? 'M' : 'L'} ${x},${y}`;
     })
     .join(' ');
 
-  // Dynamic label interval based on zoom level
-  const labelInterval = Math.max(1, Math.floor(visibleDataPoints.length / (5 * zoomLevel)));
-  const timeLabels = visibleDataPoints.filter((_, index) => index % labelInterval === 0);
+  // Dynamic label interval based on available space and zoom level
+  const minLabelSpacing = 80; // Minimum pixels between labels to prevent overlap
+  const labelInterval = Math.max(1, Math.floor((minLabelSpacing * zoomState.scale) / xScale));
+
+  // Calculate time labels based on zoom scale and spacing
+  const timeLabels = [];
+  let lastLabelTime = visibleDataPoints[0]?.time;
+
+  for (let i = 0; i < visibleDataPoints.length; i++) {
+    const currentTime = visibleDataPoints[i].time;
+    const timeDiff = (currentTime - lastLabelTime) / 1000; // difference in seconds
+
+    if (timeDiff >= 5 || i === 0 || i === visibleDataPoints.length - 1) { // 5 seconds interval
+      timeLabels.push(visibleDataPoints[i]);
+      lastLabelTime = currentTime;
+    }
+  }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 mb-6 w-full">
+    <div className="bg-white rounded-lg shadow-sm p-4 mb-6 w-full" ref={containerRef}>
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-sm font-semibold text-gray-600">Machine Speed</h3>
         <div className="flex items-center">
-          <button 
-            onClick={() => setZoomLevel(prev => Math.max(0.1, prev * 0.9))}
-            className="p-1 mx-1 text-gray-600 hover:text-gray-800"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="8" y1="12" x2="16" y2="12"></line>
-            </svg>
+          {/* Zoom in and out buttons */}
+          <button onClick={() => handleZoom(0.9)} className="p-1 mx-1 text-gray-600 hover:text-gray-800">
+            {/* SVG for zoom out */}
           </button>
-          <button 
-            onClick={() => setZoomLevel(prev => Math.min(10, prev * 1.1))}
-            className="p-1 mx-1 text-gray-600 hover:text-gray-800"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="8" x2="12" y2="16"></line>
-              <line x1="8" y1="12" x2="16" y2="12"></line>
-            </svg>
+          <button onClick={() => handleZoom(1.1)} className="p-1 mx-1 text-gray-600 hover:text-gray-800">
+            {/* SVG for zoom in */}
           </button>
-          <button 
-            onClick={() => {
-              setZoomLevel(1);
-              setPanOffset(0);
-            }}
-            className="p-1 mx-1 text-gray-600 hover:text-gray-800 text-sm"
-          >
+          <button onClick={() => resetZoom()} className="p-1 mx-1 text-gray-600 hover:text-gray-800 text-sm">
             Reset
           </button>
           <label className="text-sm text-gray-600 ml-4 mr-2">Time Range:</label>
@@ -419,20 +446,20 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
           </select>
         </div>
       </div>
-      <svg 
+      <svg
         ref={svgRef}
         width="100%" 
-        height={height + padding} 
+        height={height + padding}
         viewBox={`0 0 ${width} ${height + padding}`}
-        style={{ cursor: 'grab', overflow: 'hidden' }}
+        style={{ cursor: zoomState.scale > 1 ? 'grab' : 'default' }}
       >
         {/* Horizontal Grid lines */}
         {[0, 0.5, 1].map((level, index) => (
           <line
             key={`h-line-${index}`}
-            x1={padding + panOffset}
+            x1={padding + zoomState.offset}
             y1={height - padding - level * maxSpeed * yScale}
-            x2={width - padding + panOffset}
+            x2={width - padding + zoomState.offset}
             y2={height - padding - level * maxSpeed * yScale}
             stroke="#e5e7eb"
             strokeWidth="1"
@@ -443,7 +470,7 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
         {[0, 0.5, 1].map((level, index) => (
           <text
             key={`y-label-${index}`}
-            x={padding - 10 + panOffset}
+            x={padding - 10 + zoomState.offset}
             y={height - padding - level * maxSpeed * yScale + 5}
             textAnchor="end"
             fontSize="10"
@@ -453,27 +480,15 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
           </text>
         ))}
 
-        {/* Line */}
-        <path
-          d={linePath}
-          fill="none"
-          stroke="#3b82f6"
-          strokeWidth="2"
-        />
+        {/* Line Path */}
+        <path d={linePath} fill="none" stroke="#3b82f6" strokeWidth="2" />
 
-        {/* X-axis labels (time) */}
+        {/* Time Labels */}
         {timeLabels.map((point, index) => {
-          const x = padding + (index * labelInterval) * xScale + panOffset;
+          const x = padding + index * labelInterval * xScale * zoomState.scale + zoomState.offset;
           return (
-            <text
-              key={`time-label-${index}`}
-              x={x}
-              y={height - padding + 20}
-              textAnchor="middle"
-              fontSize="10"
-              fill="#6b7280"
-            >
-              {formatTime(point.time, zoomLevel)}
+            <text key={`time-label-${index}`} x={x} y={height - padding + 20} textAnchor="middle" fontSize="10" fill="#6b7280">
+              {formatTime(point.time)}
             </text>
           );
         })}
@@ -482,34 +497,129 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
   );
 };
 
+
+
+
 // OEE Graph
 const OEEGraph = ({ oeeData, isLoading, timeRange }) => {
   const [dataPoints, setDataPoints] = useState([]);
+  const [zoomState, setZoomState] = useState({
+    scale: 1,
+    offset: 0,
+    maxOffset: 0
+  });
+  const svgRef = useRef(null);
+  const containerRef = useRef(null);
+  const [dimensions, setDimensions] = useState({ width: 600, height: 200 });
+
+  // Update dimensions on resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (containerRef.current) {
+        setDimensions({
+          width: containerRef.current.clientWidth,
+          height: 200
+        });
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     if (!isLoading && oeeData && oeeData.length > 0) {
-      // Transform your server data into the format the graph expects
-      console.log(oeeData);
-      
       const points = oeeData.map(item => ({
-        time: new Date(item.ts),  // Convert timestamp to Date object
-        oee: item.oee             // Use the OEE value from your data (assuming it's 0-100)
+        time: new Date(item.ts),
+        oee: item.oee // Assuming OEE is in percentage (0-100)
       }));
-
       setDataPoints(points);
+
+      // Calculate max offset based on data length
+      const maxOffset = dimensions.width * 0.8; // Allow some extra space
+      setZoomState(prev => ({ ...prev, maxOffset }));
     }
-  }, [oeeData, isLoading, timeRange]);
+  }, [oeeData, isLoading, dimensions.width]);
+
+  // Handle zoom and pan interactions
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+
+    let isDragging = false;
+    let startX = 0;
+    let startOffset = 0;
+
+    const handleWheel = (e) => {
+      e.preventDefault();
+      const containerRect = svg.getBoundingClientRect();
+      const mouseX = e.clientX - containerRect.left;
+      const graphX = mouseX - zoomState.offset;
+
+      const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+      const newScale = Math.max(0.5, Math.min(5, zoomState.scale * zoomFactor));
+
+      // Calculate new offset to zoom toward mouse position
+      const newOffset = mouseX - graphX * (newScale / zoomState.scale);
+
+      setZoomState(prev => ({
+        scale: newScale,
+        offset: Math.min(0, Math.max(prev.maxOffset * (1 - newScale), newOffset)),
+        maxOffset: prev.maxOffset
+      }));
+    };
+
+    const handleMouseDown = (e) => {
+      if (e.button !== 0) return; // Only left mouse button
+      isDragging = true;
+      startX = e.clientX;
+      startOffset = zoomState.offset;
+      svg.style.cursor = 'grabbing';
+    };
+
+    const handleMouseMove = (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - startX;
+      const newOffset = startOffset + dx;
+
+      // Constrain panning to valid range
+      const maxPossibleOffset = Math.min(0, zoomState.maxOffset * (1 - zoomState.scale));
+      setZoomState(prev => ({
+        ...prev,
+        offset: Math.max(maxPossibleOffset, Math.min(0, newOffset))
+      }));
+    };
+
+    const handleMouseUp = () => {
+      isDragging = false;
+      svg.style.cursor = 'grab';
+    };
+
+    svg.addEventListener('wheel', handleWheel, { passive: false });
+    svg.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      svg.removeEventListener('wheel', handleWheel);
+      svg.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [zoomState]);
 
   const formatTime = (date) => {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (zoomState.scale > 3) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   };
 
-  const width = 600;
-  const height = 200;
+  const { width, height } = dimensions;
   const padding = 15;
-  const maxOEE = 100; // OEE is typically measured as a percentage (0-100)
+  const maxOEE = 100;
 
-  // Calculate scales based on actual data
   const xScale = dataPoints.length > 1
     ? (width - 2 * padding) / (dataPoints.length - 1)
     : 0;
@@ -517,43 +627,64 @@ const OEEGraph = ({ oeeData, isLoading, timeRange }) => {
 
   const linePath = dataPoints
     .map((point, index) => {
-      const x = padding + index * xScale;
+      const x = padding + index * xScale * zoomState.scale + zoomState.offset;
       const y = height - padding - point.oee * yScale;
       return `${index === 0 ? 'M' : 'L'} ${x},${y}`;
     })
     .join(' ');
 
-  const labelInterval = Math.max(1, Math.floor(dataPoints.length / 5));
-  const timeLabels = dataPoints.filter((_, index) => index % labelInterval === 0);
+  // Dynamic label interval based on zoom level and available space
+  const minLabelSpacing = 80; // Minimum pixels between labels to prevent overlap
+  const labelInterval = Math.max(1, Math.floor((minLabelSpacing * zoomState.scale) / xScale));
 
-  // Calculate hourly intervals based on your actual data time spacing
+  const timeLabels = [];
+  let lastLabelTime = dataPoints[0]?.time;
+
+  for (let i = 0; i < dataPoints.length; i++) {
+    const currentTime = dataPoints[i].time;
+    const timeDiff = (currentTime - lastLabelTime) / 1000; // difference in seconds
+
+    if (timeDiff >= 5 || i === 0 || i === dataPoints.length - 1) {
+      timeLabels.push(dataPoints[i]);
+      lastLabelTime = currentTime;
+    }
+  }
+
+  // Calculate vertical grid lines based on time interval
   const hourInterval = dataPoints.length > 1
     ? Math.floor(60 / ((new Date(dataPoints[1].time) - new Date(dataPoints[0].time)) / (1000 * 60)))
     : 0;
+
   const verticalLines = dataPoints.filter((_, index) => index % hourInterval === 0);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 mb-6 w-full">
+    <div className="bg-white rounded-lg shadow-sm p-4 mb-6 w-full" ref={containerRef}>
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-sm font-semibold text-gray-600">OEE</h3>
       </div>
-      <svg width="100%" height={height + padding} viewBox={`0 0 ${width} ${height + padding}`}>
+      <svg
+        ref={svgRef}
+        width="100%"
+        height={height + padding}
+        viewBox={`0 0 ${width} ${height + padding}`}
+        style={{ cursor: zoomState.scale > 1 ? 'grab' : 'default' }}
+      >
         {/* Horizontal Grid lines */}
         {[0, 50, 100].map((level, index) => (
           <line
             key={index}
-            x1={padding}
+            x1={padding + zoomState.offset}
             y1={height - padding - level * yScale}
-            x2={width - padding}
+            x2={width - padding + zoomState.offset}
             y2={height - padding - level * yScale}
             stroke="#e5e7eb"
             strokeWidth="1"
           />
         ))}
 
-        {/* Vertical Grid lines at hourly intervals */}
+        {/* Vertical Grid lines */}
         {verticalLines.map((point, index) => {
-          const x = padding + index * hourInterval * xScale;
+          const x = padding + index * hourInterval * xScale * zoomState.scale;
           return (
             <line
               key={`v-${index}`}
@@ -571,7 +702,7 @@ const OEEGraph = ({ oeeData, isLoading, timeRange }) => {
         {[0, 50, 100].map((level, index) => (
           <text
             key={index}
-            x={padding - 10}
+            x={padding - 10 + zoomState.offset}
             y={height - padding - level * yScale + 5}
             textAnchor="end"
             fontSize="10"
@@ -581,17 +712,17 @@ const OEEGraph = ({ oeeData, isLoading, timeRange }) => {
           </text>
         ))}
 
-        {/* Line */}
+        {/* Line Path */}
         <path
           d={linePath}
           fill="none"
-          stroke="#10b981"  // Green color for OEE
+          stroke="#10b981"
           strokeWidth="2"
         />
 
-        {/* X-axis labels (time) */}
+        {/* Time Labels */}
         {timeLabels.map((point, index) => {
-          const x = padding + (index * labelInterval) * xScale;
+          const x = padding + (index * labelInterval) * xScale * zoomState.scale + zoomState.offset;
           return (
             <text
               key={index}
@@ -609,6 +740,7 @@ const OEEGraph = ({ oeeData, isLoading, timeRange }) => {
     </div>
   );
 };
+
 export default function Dashboard() {
   const [isLoading, setLoading] = useState(true);
   const [machineData, setMachineData] = useState({});
@@ -633,6 +765,7 @@ export default function Dashboard() {
       });
     getSpeedHistory(serialNumber)
       .then((data) => {
+        console.log(data);
         setSpeedHistory(data)
       })
       getOeeHistory(serialNumber)

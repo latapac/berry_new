@@ -157,8 +157,12 @@ export async function getMachineUser(mid) {
 
 
 export async function getSpeedHistory(mid) { 
+    const date = new Date()
+    const tarik = `${date.getFullYear()}-0${date.getMonth()+1}-${date.getDate()}`
     try {
-        const response = await fetch('http://'+server+':3000/getSpeedHistory/'+mid)
+        const response = await fetch('http://'+server+':3000/getSpeedHistory/'+mid+'?date='+tarik)
+        console.log('http://'+server+':3000/getSpeedHistory/'+mid+'?date='+tarik);
+        
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
@@ -177,8 +181,10 @@ export async function getSpeedHistory(mid) {
 }
 
 export async function getOeeHistory(mid) { 
+    const date = new Date()
+    const tarik = `${date.getFullYear()}-0${date.getMonth()+1}-${date.getDate()}`
     try {
-        const response = await fetch('http://'+server+':3000/getOeeHistory/'+mid)
+        const response = await fetch('http://'+server+':3000/getOeeHistory/'+mid+'?date='+tarik)
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
