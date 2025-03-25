@@ -79,12 +79,10 @@ export default function EarningCard({ isLoading, data }) {
   }, [data?.serial_number]);
 
   const isOnline = dataChange(machineData?.ts);
-  const machineType = data?.serial_number?.startsWith("PAC") ? "Cartoning" : "Tube Filling";
   const modelType = data?.serial_number?.startsWith("PAC") ? "PAC300" : "MAC300";
   const lineNumber = data?.line_number || machineData?.line_number || 'N/A';
   const currentSpeed = Number(machineData?.d?.current_speed[0]) || 0;
   const maxSpeed = 300;
-  const speedPercentage = ((currentSpeed / maxSpeed) * 100).toFixed(0);
   const oee = !isNaN(Number(machineData?.d?.current_OEE[0]).toFixed(2))?Number(machineData?.d?.current_OEE[0]).toFixed(2):0
   const formattedSerialNumber = formatSerialNumber(data?.serial_number);
   const radius = 45;
