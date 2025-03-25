@@ -39,6 +39,7 @@ function MenuList() {
             { id: 'batch', name: 'Batch Details' },
             { id: 'production', name: 'Production Details' },
             { id: 'oee', name: 'OEE Details' },
+            { id: 'Active_alarm', name: 'Active Alarm' },
             { 
               id: 'report', 
               name: 'Report',
