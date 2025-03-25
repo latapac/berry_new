@@ -1,11 +1,10 @@
-import { useEffect, useState , useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Grid from '@mui/material/Grid';
 import TotalOrderLineChartCard from './TotalOrderLineChartCard';
 import TotalIncomeDarkCard from '../../../ui-component/cards/TotalIncomeDarkCard';
 import { getMachineData, getSpeedHistory, getOeeHistory } from "../../../backservice";
 import { gridSpacing } from 'store/constant';
-import { useLocation } from 'react-router';
-import { useNavigate } from 'react-router';
+import { useLocation , useNavigate } from 'react-router-dom';
 
 const SpeedBox = ({ speed, isLoading, status }) => {
   const [animatedSpeed, setAnimatedSpeed] = useState(0);
@@ -44,7 +43,6 @@ const SpeedBox = ({ speed, isLoading, status }) => {
         <div className="flex items-center text-xs">
           <span
             className={`w-2 h-2 rounded-full mr-1 ${machineStatus.active ? '' : 'opacity-50'}`}
-            style={{ backgroundColor: machineStatus.color }}
           ></span>
           <span
             className={`text-xs font-semibold`}
@@ -113,9 +111,9 @@ const GoodProductionBox = ({ goodValue, rejectValue, totalValue, isLoading }) =>
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 h-[150px] relative">
+    <div className="bg-white rounded-lg shadow-sm p-4 h-[150px] flex flex-col justify-between">
       <h3 className="text-sm font-semibold text-gray-600 mb-2">Production</h3>
-      <div className="flex items-center mt-4">
+      <div className="flex items-center mt-2">
         <div className="relative w-16 h-16 sm:w-20 sm:h-20 mr-4">
           <svg className="w-full h-full" viewBox="0 0 36 36">
             {productionData.map((item, index) => {
@@ -378,7 +376,7 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-sm font-semibold text-gray-600">Machine Speed</h3>
         <div className="flex items-center">
-          <button 
+          <button
             onClick={() => setZoomLevel(prev => Math.max(0.1, prev * 0.9))}
             className="p-1 mx-1 text-gray-600 hover:text-gray-800"
           >
@@ -387,7 +385,7 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
               <line x1="8" y1="12" x2="16" y2="12"></line>
             </svg>
           </button>
-          <button 
+          <button
             onClick={() => setZoomLevel(prev => Math.min(10, prev * 1.1))}
             className="p-1 mx-1 text-gray-600 hover:text-gray-800"
           >
@@ -397,7 +395,7 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
               <line x1="8" y1="12" x2="16" y2="12"></line>
             </svg>
           </button>
-          <button 
+          <button
             onClick={() => {
               setZoomLevel(1);
               setPanOffset(0);
@@ -419,10 +417,10 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
           </select>
         </div>
       </div>
-      <svg 
+      <svg
         ref={svgRef}
-        width="100%" 
-        height={height + padding} 
+        width="100%"
+        height={height + padding}
         viewBox={`0 0 ${width} ${height + padding}`}
         style={{ cursor: 'grab', overflow: 'hidden' }}
       >
@@ -490,7 +488,7 @@ const OEEGraph = ({ oeeData, isLoading, timeRange }) => {
     if (!isLoading && oeeData && oeeData.length > 0) {
       // Transform your server data into the format the graph expects
       console.log(oeeData);
-      
+
       const points = oeeData.map(item => ({
         time: new Date(item.ts),  // Convert timestamp to Date object
         oee: item.oee             // Use the OEE value from your data (assuming it's 0-100)
@@ -614,10 +612,11 @@ export default function Dashboard() {
   const [machineData, setMachineData] = useState({});
   const [timeRange, setTimeRange] = useState(8);
   const [speedHistory, setSpeedHistory] = useState([])
-  const [OeeHistory,setOeeHistory]=useState([])
+  const [OeeHistory, setOeeHistory] = useState([])
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const serialNumber = queryParams.get('serial_number');
+  const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -635,7 +634,7 @@ export default function Dashboard() {
       .then((data) => {
         setSpeedHistory(data)
       })
-      getOeeHistory(serialNumber)
+    getOeeHistory(serialNumber)
       .then((data) => {
         setOeeHistory(data)
       })
@@ -655,6 +654,7 @@ export default function Dashboard() {
   }, [serialNumber]);
 
   const status = machineData?.d?.current_speed[0] > 0 ? 'running' : 'not running';
+
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
@@ -686,12 +686,64 @@ export default function Dashboard() {
           >
             Batch
           </button>
-          <button
+          {/* <button
             className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
             onClick={() => navigate("/oee?serial_number=" + serialNumber)}
           >
             Report
-          </button>
+          </button> */}
+          <div className="relative inline-block text-left">
+            {/* Main Report Button */}
+            <button
+              className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              Report
+            </button>
+
+            {/* Dropdown Menu */}
+            {isOpen && (
+              <div
+                className="origin-top-right absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10"
+                onMouseLeave={() => setIsOpen(false)} // Close when mouse leaves
+              >
+                <div className="py-1">
+                  {/* OEE Report Option */}
+                  <button
+                    onClick={() => {
+                      navigate("/alarm?serial_number=" + serialNumber);
+                      setIsOpen(false);
+                    }}
+                    className="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-400 w-full text-left"
+                  >
+                    Alarm Report
+                  </button>
+
+                  {/* Audit Option */}
+                  <button
+                    onClick={() => {
+                      navigate("/audit?serial_number=" + serialNumber);
+                      setIsOpen(false);
+                    }}
+                    className="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-400 w-full text-left"
+                  >
+                    Audit Report
+                  </button>
+
+                  {/* Batch Option */}
+                  <button
+                    onClick={() => {
+                      navigate("/batch?serial_number=" + serialNumber);
+                      setIsOpen(false);
+                    }}
+                    className="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-400 w-full text-left"
+                  >
+                    Batch
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
           <button
             className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
             onClick={() => navigate("/audit?serial_number=" + serialNumber)}
@@ -699,7 +751,7 @@ export default function Dashboard() {
             Audit
           </button>
           <button
-            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-18 h-6"
+            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
             onClick={() => navigate("/Active_alarm?serial_number=" + serialNumber)}
           >
             Active Alarm
@@ -739,7 +791,7 @@ export default function Dashboard() {
           setTimeRange={setTimeRange}
         />
         <OEEGraph
-          oeeData={OeeHistory}  
+          oeeData={OeeHistory}
           isLoading={isLoading}
           timeRange={timeRange}
         />
