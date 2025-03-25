@@ -605,6 +605,12 @@ export default function Dashboard() {
           >
             Audit
           </button>
+          <button
+            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-18 h-6"
+            onClick={() => navigate("/Active_alarm?serial_number=" + serialNumber)}
+          >
+            Active Alarm
+          </button>
         </div>
       </div>
 

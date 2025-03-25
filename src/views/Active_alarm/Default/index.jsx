@@ -259,7 +259,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
-      <h1 className="text-2xl font-bold text-gray-800 mb-5">Alarm Monitoring System</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-5">Alarm Monitoring System {serialNumber}</h1>
 
       {/* Tab Navigation */}
       <div className="flex gap-4 mb-4">
