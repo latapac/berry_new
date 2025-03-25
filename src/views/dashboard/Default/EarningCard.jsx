@@ -205,7 +205,7 @@ export default function EarningCard({ isLoading, data }) {
                         dominantBaseline="middle"
                         fill={theme.palette.text.primary}
                         style={{
-                          fontSize: '20px', // Adjust size as needed
+                          fontSize: '24px', // Adjust size as needed
                           fontWeight: 'bold',
                         }}
                       >
