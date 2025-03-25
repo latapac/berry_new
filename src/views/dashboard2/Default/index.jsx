@@ -4,7 +4,7 @@ import TotalOrderLineChartCard from './TotalOrderLineChartCard';
 import TotalIncomeDarkCard from '../../../ui-component/cards/TotalIncomeDarkCard';
 import { getMachineData, getSpeedHistory, getOeeHistory } from "../../../backservice";
 import { gridSpacing } from 'store/constant';
-import { useLocation , useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const SpeedBox = ({ speed, isLoading, status }) => {
   const [animatedSpeed, setAnimatedSpeed] = useState(0);
@@ -446,7 +446,7 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
       </div>
       <svg
         ref={svgRef}
-        width="100%" 
+        width="100%"
         height={height + padding}
         viewBox={`0 0 ${width} ${height + padding}`}
         style={{ cursor: zoomState.scale > 1 ? 'grab' : 'default' }}
@@ -819,12 +819,58 @@ export default function Dashboard() {
           >
             Batch
           </button>
-          <button
-            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
-            onClick={() => navigate("/oee?serial_number=" + serialNumber)}
-          >
-            Report
-          </button>
+          <div className="relative inline-block text-left">
+            {/* Main Report Button */}
+            <button
+              className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              Report
+            </button>
+
+            {/* Dropdown Menu */}
+            {isOpen && (
+              <div
+                className="origin-top-right absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10"
+                onMouseLeave={() => setIsOpen(false)} // Close when mouse leaves
+              >
+                <div className="py-1">
+                  {/* OEE Report Option */}
+                  <button
+                    onClick={() => {
+                      navigate("/alarm?serial_number=" + serialNumber);
+                      setIsOpen(false);
+                    }}
+                    className="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-400 w-full text-left"
+                  >
+                    Alarm Report
+                  </button>
+
+                  {/* Audit Option */}
+                  <button
+                    onClick={() => {
+                      navigate("/audit?serial_number=" + serialNumber);
+                      setIsOpen(false);
+                    }}
+                    className="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-400 w-full text-left"
+                  >
+                    Audit Report
+                  </button>
+
+                  {/* Batch Option */}
+                  <button
+                    onClick={() => {
+                      navigate("/batch?serial_number=" + serialNumber);
+                      setIsOpen(false);
+                    }}
+                    className="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-400 w-full text-left"
+                  >
+                    Batch Report
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
           <button
             className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
             onClick={() => navigate("/audit?serial_number=" + serialNumber)}
