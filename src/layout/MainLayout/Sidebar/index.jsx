@@ -2,11 +2,8 @@ import { memo, useMemo } from 'react';
 
 import useMediaQuery from '@mui/material/useMediaQuery';
 
-import Drawer from '@mui/material/Drawer';
-
 import Box from '@mui/material/Box';
 
-// third party
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
 
@@ -16,9 +13,7 @@ import MiniDrawerStyled from './MiniDrawerStyled';
 import useConfig from 'hooks/useConfig';
 import { drawerWidth } from 'store/constant';
 
-import { handlerDrawerOpen, useGetMenuMaster } from 'api/menu';
-
-// ==============================|| SIDEBAR DRAWER ||============================== //
+import {useGetMenuMaster } from 'api/menu';
 
 function Sidebar() {
   const downMD = useMediaQuery((theme) => theme.breakpoints.down('md'));
@@ -26,7 +21,7 @@ function Sidebar() {
   const { menuMaster } = useGetMenuMaster();
   const drawerOpen = menuMaster.isDashboardDrawerOpened;
 
-  const { miniDrawer, mode } = useConfig();
+  const { mode } = useConfig();
 
   
 
@@ -60,33 +55,9 @@ function Sidebar() {
 
   return (
     <Box component="nav" sx={{ flexShrink: { md: 0 }, width: { xs: 'auto', md: drawerWidth } }} aria-label="mailbox folders">
-      {downMD || (miniDrawer && drawerOpen) ? (
-        <Drawer
-          variant={downMD ? 'temporary' : 'persistent'}
-          anchor="left"
-          open={drawerOpen}
-          onClose={() => handlerDrawerOpen(!drawerOpen)}
-          sx={{
-            '& .MuiDrawer-paper': {
-              mt: downMD ? 0 : 11,
-              zIndex: 1099,
-              width: drawerWidth,
-              bgcolor: 'background.default',
-              color: 'text.primary',
-              borderRight: 'none'
-            }
-          }}
-          ModalProps={{ keepMounted: true }}
-          color="inherit"
-        >
-          {downMD}
-          {drawer}
-        </Drawer>
-      ) : (
         <MiniDrawerStyled variant="permanent" open={drawerOpen}>
-          {drawer}
+          {drawerOpen?drawer:""}
         </MiniDrawerStyled>
-      )}
     </Box>
   );
 }

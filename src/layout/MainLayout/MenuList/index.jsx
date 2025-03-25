@@ -14,8 +14,9 @@ import { useNavigate } from 'react-router';
 
 function MenuList() {
   const [expanded, setExpanded] = useState(null);
-  const [machines,setMachines] = useState([])
-  const navigate = useNavigate()
+  const [reportExpanded, setReportExpanded] = useState(null);
+  const [machines, setMachines] = useState([]);
+  const navigate = useNavigate();
   
   const userData = useSelector((state) => state.authSlice.userData);
 
@@ -23,10 +24,14 @@ function MenuList() {
     setExpanded(isExpanded ? panel : null);
   };
 
-  useEffect(()=>{
-    getMachines(userData?.c_id).then((data)=>{
-      const machinelist = data?.map((machine)=>{
-        return  {
+  const handleReportChange = (panel) => (event, isExpanded) => {
+    setReportExpanded(isExpanded ? panel : null);
+  };
+
+  useEffect(() => {
+    getMachines(userData?.c_id).then((data) => {
+      const machinelist = data?.map((machine) => {
+        return {
           id: machine._id,
           name: machine.serial_number,
           subItems: [
@@ -34,13 +39,65 @@ function MenuList() {
             { id: 'batch', name: 'Batch Details' },
             { id: 'production', name: 'Production Details' },
             { id: 'oee', name: 'OEE Details' },
-            { id: 'oee', name: 'Report' },
+            { 
+              id: 'report', 
+              name: 'Report',
+              subItems: [
+                { id: 'audit', name: 'Audit Report' },
+                { id: 'alarm', name: 'Alarm Report' }
+              ]
+            },
           ],
         }
       })
       setMachines(machinelist)
     })
-  },[userData])
+  }, [userData])
+
+  const renderSubItems = (subItems, machineName) => {
+    return subItems.map((subItem) => {
+      if (subItem.subItems) {
+        // This is a report item with nested subitems
+        return (
+          <Accordion
+            key={`${machineName}-${subItem.id}`}
+            expanded={reportExpanded === `${machineName}-${subItem.id}`}
+            onChange={handleReportChange(`${machineName}-${subItem.id}`)}
+            sx={{ boxShadow: 'none', margin: '0 !important' }}
+          >
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <ListItemText primary={subItem.name} />
+            </AccordionSummary>
+            <AccordionDetails sx={{ padding: 0 }}>
+              <List sx={{ padding: 0 }}>
+                {subItem.subItems.map((nestedItem) => (
+                  <ListItem 
+                    button 
+                    key={nestedItem.id}  
+                    onClick={() => { navigate(`/${nestedItem.id}?serial_number=${machineName}`) }}
+                    sx={{ pl: 4 }}
+                  >
+                    <ListItemText primary={nestedItem.name} />
+                  </ListItem>
+                ))}
+              </List>
+            </AccordionDetails>
+          </Accordion>
+        );
+      }
+      
+      // Regular subitem
+      return (
+        <ListItem 
+          button 
+          key={subItem.id}  
+          onClick={() => { navigate(`/${subItem.id}?serial_number=${machineName}`) }}
+        >
+          <ListItemText primary={subItem.name} />
+        </ListItem>
+      );
+    });
+  };
 
   return (
     <Box sx={{ mt: 1.5 }}>
@@ -62,11 +119,7 @@ function MenuList() {
                 </AccordionSummary>
                 <AccordionDetails>
                   <List>
-                    {machine.subItems.map((subItem) => (
-                      <ListItem button key={subItem.id}  onClick={()=>{navigate(`/${subItem.id}?serial_number=${machine.name}`)}}>
-                        <ListItemText primary={subItem.name} />
-                      </ListItem>
-                    ))}
+                    {renderSubItems(machine.subItems, machine.name)}
                   </List>
                 </AccordionDetails>
               </Accordion>
