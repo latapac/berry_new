@@ -55,7 +55,7 @@ const SpeedBox = ({ speed, isLoading, status }) => {
         </div>
       </div>
       <div className="flex items-center justify-left">
-        <div className="relative w-16 h-16 sm:w-20 sm:h-20">
+        <div className="relative w-16 h-16 sm:w-20 sm:h-20 mr-4">
           <svg className="w-full h-full" viewBox="0 0 36 36">
             <circle cx="18" cy="18" r="16" fill="none" stroke="#e5e7eb" strokeWidth="4" />
             <circle
@@ -157,8 +157,8 @@ const OEEBox = ({ availability, performance, quality, isLoading }) => {
   return (
     <div className="bg-white rounded-lg shadow-sm p-4 h-[150px] flex flex-col justify-between">
       <h3 className="text-xs font-semibold text-gray-600">OEE</h3>
-      <div className="flex items-center">
-        <div className="relative w-12 h-12 sm:w-16 sm:h-16 mr-2">
+      <div className="flex items-center gap-5">
+        <div className="relative w-16 h-16 sm:w-20 sm:h-20">
           <svg className="w-full h-full" viewBox="0 0 36 36">
             {oeeData.map((item, index) => {
               const percentage = (item.value / total) * 100;
@@ -193,10 +193,10 @@ const OEEBox = ({ availability, performance, quality, isLoading }) => {
           </svg>
         </div>
         <div className="flex-1">
-          <div className="space-y-0.5">
+          <div className="space-y-2">
             {oeeData.map((item, index) => (
               <div key={index} className="flex items-center text-[10px] sm:text-xs">
-                <span className="w-2 h-2 rounded-full mr-1" style={{ backgroundColor: item.color }}></span>
+                <span className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: item.color }}></span>
                 <span className="text-gray-600">{item.name}: {isLoading ? '-' : item.value.toFixed(1)}%</span>
               </div>
             ))}
@@ -669,34 +669,40 @@ export default function Dashboard() {
         </h1>
         <div className="mb-8 flex space-x-2">
           <button
-            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-18 h-6"
+            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
             onClick={() => navigate("/oee?serial_number=" + serialNumber)}
           >
             OEE
           </button>
           <button
-            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-18 h-6"
+            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
             onClick={() => navigate("/production?serial_number=" + serialNumber)}
           >
             Production
           </button>
           <button
-            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-18 h-6"
+            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
             onClick={() => navigate("/batch?serial_number=" + serialNumber)}
           >
             Batch
           </button>
           <button
-            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-18 h-6"
+            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
             onClick={() => navigate("/oee?serial_number=" + serialNumber)}
           >
             Report
           </button>
           <button
-            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-18 h-6"
+            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
             onClick={() => navigate("/audit?serial_number=" + serialNumber)}
           >
             Audit
+          </button>
+          <button
+            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-18 h-6"
+            onClick={() => navigate("/Active_alarm?serial_number=" + serialNumber)}
+          >
+            Active Alarm
           </button>
         </div>
       </div>
