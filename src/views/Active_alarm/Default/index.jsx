@@ -187,15 +187,10 @@ function App() {
           item.topic === "alarm" && item.d && item.d.trigger_time
         );
 
-        // Debugging: Log the raw alarm data
-        console.log('Raw Alarm Data:', alarmItems);
-
         // Separate unrecovered alarms (active) and all alarms (history)
         const unrecoveredAlarms = alarmItems.filter(alarm => alarm.d?.status !== 'recovered');
         const historicalAlarms = alarmItems; // Include all alarms in history
 
-        // Debugging: Log the filtered unrecovered alarms
-        console.log('Unrecovered Alarms:', unrecoveredAlarms);
 
         // Sort active alarms by latest first
         const sortedActiveAlarms = [...unrecoveredAlarms].sort((a, b) => {
