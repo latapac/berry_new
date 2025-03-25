@@ -10,9 +10,7 @@ import Grid from '@mui/material/Grid2';
 import Typography from '@mui/material/Typography';
 import MuiBreadcrumbs from '@mui/material/Breadcrumbs';
 import Box from '@mui/material/Box';
-
-// project imports
-import navigation from 'menu-items';
+;
 
 // assets
 import { IconChevronRight, IconTallymark1 } from '@tabler/icons-react';
