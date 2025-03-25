@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import PropTypes, { number } from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
@@ -85,7 +85,7 @@ export default function EarningCard({ isLoading, data }) {
   const currentSpeed = Number(machineData?.d?.current_speed[0]) || 0;
   const maxSpeed = 300;
   const speedPercentage = ((currentSpeed / maxSpeed) * 100).toFixed(0);
-  const oee = Number(machineData?.d?.current_OEE[0]).toFixed(2) || 0;
+  const oee = !isNaN(Number(machineData?.d?.current_OEE[0]).toFixed(2))?Number(machineData?.d?.current_OEE[0]).toFixed(2):0
   const formattedSerialNumber = formatSerialNumber(data?.serial_number);
   const radius = 45;
   const circumference = 2 * Math.PI * radius;
@@ -211,7 +211,7 @@ export default function EarningCard({ isLoading, data }) {
                           fontWeight: 'bold',
                         }}
                       >
-                        {currentSpeed} {/* Calculates percentage */}
+                        {currentSpeed} 
                       </text>
                     </svg>
                     <Typography
@@ -260,7 +260,7 @@ export default function EarningCard({ isLoading, data }) {
                         fontWeight: 'bold',
                       }}
                     >
-                      {oee}
+                      {oee}%
                     </text>
                   </svg>
                   <Typography
