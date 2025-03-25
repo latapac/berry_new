@@ -1,11 +1,10 @@
-import { useEffect, useState , useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Grid from '@mui/material/Grid';
 import TotalOrderLineChartCard from './TotalOrderLineChartCard';
 import TotalIncomeDarkCard from '../../../ui-component/cards/TotalIncomeDarkCard';
 import { getMachineData, getSpeedHistory, getOeeHistory } from "../../../backservice";
 import { gridSpacing } from 'store/constant';
-import { useLocation } from 'react-router';
-import { useNavigate } from 'react-router';
+import { useLocation , useNavigate } from 'react-router-dom';
 
 const SpeedBox = ({ speed, isLoading, status }) => {
   const [animatedSpeed, setAnimatedSpeed] = useState(0);
@@ -44,7 +43,6 @@ const SpeedBox = ({ speed, isLoading, status }) => {
         <div className="flex items-center text-xs">
           <span
             className={`w-2 h-2 rounded-full mr-1 ${machineStatus.active ? '' : 'opacity-50'}`}
-            style={{ backgroundColor: machineStatus.color }}
           ></span>
           <span
             className={`text-xs font-semibold`}
@@ -113,9 +111,9 @@ const GoodProductionBox = ({ goodValue, rejectValue, totalValue, isLoading }) =>
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 h-[150px] relative">
+    <div className="bg-white rounded-lg shadow-sm p-4 h-[150px] flex flex-col justify-between">
       <h3 className="text-sm font-semibold text-gray-600 mb-2">Production</h3>
-      <div className="flex items-center mt-4">
+      <div className="flex items-center mt-2">
         <div className="relative w-16 h-16 sm:w-20 sm:h-20 mr-4">
           <svg className="w-full h-full" viewBox="0 0 36 36">
             {productionData.map((item, index) => {
@@ -447,6 +445,7 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
         </div>
       </div>
       <svg
+      <svg
         ref={svgRef}
         width="100%" 
         height={height + padding}
@@ -746,10 +745,11 @@ export default function Dashboard() {
   const [machineData, setMachineData] = useState({});
   const [timeRange, setTimeRange] = useState(8);
   const [speedHistory, setSpeedHistory] = useState([])
-  const [OeeHistory,setOeeHistory]=useState([])
+  const [OeeHistory, setOeeHistory] = useState([])
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const serialNumber = queryParams.get('serial_number');
+  const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -768,7 +768,7 @@ export default function Dashboard() {
         console.log(data);
         setSpeedHistory(data)
       })
-      getOeeHistory(serialNumber)
+    getOeeHistory(serialNumber)
       .then((data) => {
         setOeeHistory(data)
       })
@@ -788,6 +788,7 @@ export default function Dashboard() {
   }, [serialNumber]);
 
   const status = machineData?.d?.current_speed[0] > 0 ? 'running' : 'not running';
+
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
@@ -819,7 +820,7 @@ export default function Dashboard() {
           >
             Batch
           </button>
-          <button
+          {/* <button
             className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
             onClick={() => navigate("/oee?serial_number=" + serialNumber)}
           >
@@ -832,7 +833,7 @@ export default function Dashboard() {
             Audit
           </button>
           <button
-            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-18 h-6"
+            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
             onClick={() => navigate("/Active_alarm?serial_number=" + serialNumber)}
           >
             Active Alarm
@@ -872,7 +873,7 @@ export default function Dashboard() {
           setTimeRange={setTimeRange}
         />
         <OEEGraph
-          oeeData={OeeHistory}  
+          oeeData={OeeHistory}
           isLoading={isLoading}
           timeRange={timeRange}
         />

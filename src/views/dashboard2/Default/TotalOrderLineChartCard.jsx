@@ -1,23 +1,18 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-// material-ui
-import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import MainCard from 'ui-component/cards/MainCard';
 import SkeletonTotalOrderCard from 'ui-component/cards/Skeleton/EarningCard';
 
 export default function TotalOrderLineChartCard({ isLoading, Count, name }) {
-    const theme = useTheme();
     const [timeValue, setTimeValue] = React.useState(false);
 
     const handleChangeTime = (event, newValue) => {
         setTimeValue(newValue);
     };
 
-    // Debug: Log the raw Count value
-    console.log('Raw Count:', Count, 'Type:', typeof Count);
 
     // Format Count to remove decimal places, handling numbers and numeric strings
     let formattedCount;
@@ -28,8 +23,6 @@ export default function TotalOrderLineChartCard({ isLoading, Count, name }) {
         formattedCount = Math.floor(numericCount); // Remove decimal part
     }
 
-    // Debug: Log the formatted value
-    console.log('Formatted Count:', formattedCount);
 
     return (
         <>

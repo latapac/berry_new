@@ -187,15 +187,10 @@ function App() {
           item.topic === "alarm" && item.d && item.d.trigger_time
         );
 
-        // Debugging: Log the raw alarm data
-        console.log('Raw Alarm Data:', alarmItems);
-
         // Separate unrecovered alarms (active) and all alarms (history)
         const unrecoveredAlarms = alarmItems.filter(alarm => alarm.d?.status !== 'recovered');
         const historicalAlarms = alarmItems; // Include all alarms in history
 
-        // Debugging: Log the filtered unrecovered alarms
-        console.log('Unrecovered Alarms:', unrecoveredAlarms);
 
         // Sort active alarms by latest first
         const sortedActiveAlarms = [...unrecoveredAlarms].sort((a, b) => {
@@ -259,7 +254,11 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
-      <h1 className="text-2xl font-bold text-gray-800 mb-5">Alarm Monitoring System {serialNumber}</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-5">Alarm Monitoring System -
+      <span className="text-xl  font-bold text-white bg-gray-400 px-2 py-1 rounded">
+              {serialNumber}
+            </span>
+            </h1>
 
       {/* Tab Navigation */}
       <div className="flex gap-4 mb-4">

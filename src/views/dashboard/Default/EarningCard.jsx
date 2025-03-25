@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import PropTypes, { number } from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
@@ -79,13 +79,11 @@ export default function EarningCard({ isLoading, data }) {
   }, [data?.serial_number]);
 
   const isOnline = dataChange(machineData?.ts);
-  const machineType = data?.serial_number?.startsWith("PAC") ? "Cartoning" : "Tube Filling";
   const modelType = data?.serial_number?.startsWith("PAC") ? "PAC300" : "MAC300";
   const lineNumber = data?.line_number || machineData?.line_number || 'N/A';
-  const currentSpeed = machineData?.d?.current_speed[0] || 0;
+  const currentSpeed = Number(machineData?.d?.current_speed[0]) || 0;
   const maxSpeed = 300;
-  const speedPercentage = ((currentSpeed / maxSpeed) * 100).toFixed(0);
-  const oee = machineData?.d?.current_OEE[0] || 0;
+  const oee = !isNaN(Number(machineData?.d?.current_OEE[0]).toFixed(2))?Number(machineData?.d?.current_OEE[0]).toFixed(2):0
   const formattedSerialNumber = formatSerialNumber(data?.serial_number);
   const radius = 45;
   const circumference = 2 * Math.PI * radius;
@@ -153,7 +151,7 @@ export default function EarningCard({ isLoading, data }) {
                 maxWidth: { xs: '50%', sm: '60%' },
               }}
             >
-               {formattedSerialNumber}
+              {formattedSerialNumber}
             </Typography>
           </Box>
 
@@ -176,37 +174,54 @@ export default function EarningCard({ isLoading, data }) {
               {/* Speed and OEE */}
               <Box sx={{ display: 'flex', gap: { xs: 0.25, sm: 0.5 }, alignItems: 'center' }}>
                 {/* Speed Gauge */}
-                <Box sx={{ position: 'relative', width: { xs: 60, sm: 80 }, height: { xs: 60, sm: 80 }, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r={radius}
-                      fill="none"
-                      stroke={theme.palette.grey[300]}
-                      strokeWidth="3"
-                    />
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r={radius}
-                      fill="none"
-                      stroke="#26A69A"
-                      strokeWidth="6"
-                      strokeLinecap="round"
-                      strokeDasharray={`${speedProgress} ${circumference}`}
-                      transform="rotate(-90 50 50)"
-                    />
-                  </svg>
-                  <Typography
-                    sx={{
-                      fontSize: { xs: '0.6rem', sm: '0.75rem' },
-                      color: theme.palette.grey[600],
-                      mt: { xs: 0.25, sm: 0.5 },
-                    }}
-                  >
-                    Speed
-                  </Typography>
+                <Box sx={{ display: 'flex', gap: { xs: 0.25, sm: 0.5 }, alignItems: 'center' }}>
+                  {/* Speed Gauge */}
+                  <Box sx={{ position: 'relative', width: { xs: 60, sm: 80 }, height: { xs: 60, sm: 80 }, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r={radius}
+                        fill="none"
+                        stroke={theme.palette.grey[300]}
+                        strokeWidth="3"
+                      />
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r={radius}
+                        fill="none"
+                        stroke="#26A69A"
+                        strokeWidth="6"
+                        strokeLinecap="round"
+                        strokeDasharray={`${speedProgress} ${circumference}`}
+                        transform="rotate(-90 50 50)"
+                      />
+                      {/* Centered number/text */}
+                      <text
+                        x="50"
+                        y="50"
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        fill={theme.palette.text.primary}
+                        style={{
+                          fontSize: '24px', // Adjust size as needed
+                          fontWeight: 'bold',
+                        }}
+                      >
+                        {currentSpeed} 
+                      </text>
+                    </svg>
+                    <Typography
+                      sx={{
+                        fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                        color: theme.palette.grey[600],
+                        mt: { xs: 0.25, sm: 0.5 },
+                      }}
+                    >
+                      Speed
+                    </Typography>
+                  </Box>
                 </Box>
 
                 {/* OEE Gauge */}
@@ -231,6 +246,20 @@ export default function EarningCard({ isLoading, data }) {
                       strokeDasharray={`${oeeProgress} ${circumference}`}
                       transform="rotate(-90 50 50)"
                     />
+                    {/* Add this text element for the centered number */}
+                    <text
+                      x="50"
+                      y="50"
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      fill={theme.palette.text.primary}
+                      style={{
+                        fontSize: '24px',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      {oee}%
+                    </text>
                   </svg>
                   <Typography
                     sx={{
