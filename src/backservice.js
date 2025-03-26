@@ -47,23 +47,14 @@ export default async function addUser(data){
         "Content-Type": "application/json", // specify the content type
       },
       body: JSON.stringify({
-        //   name:"hvv",
-        //   company_id:'11',
-        //   createdAt:Date.now(),
-        // username: "admin",
-        // password: 'admin',
-        // email: "xyz@gmail.com",
-        // company_id: '11',
-        // status: true,
-        // role: "dev"
         ...data
       })
     })
-    const data = response.json()
-    if (data.status==200) {
+    const res = await response.json()
+    if (res.status==200) {
         return true
     } else {
-        console.log(data);
+        console.log(res);
         return false
     }
 }

@@ -55,7 +55,6 @@ export default function BatchDetails() {
     getBatch(serialNumber,selectedDate).then((data)=>{
       setBatchDetail(data[0])
     })
-    
   },[selectedDate])
 
   return (

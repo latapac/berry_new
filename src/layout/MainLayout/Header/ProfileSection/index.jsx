@@ -19,7 +19,7 @@ import {
   Typography,
   Box
 } from '@mui/material';
-import { logoutService } from '../../../../backservice';
+import addUser, { logoutService } from '../../../../backservice';
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
 import useConfig from 'hooks/useConfig';
@@ -63,6 +63,42 @@ export default function ProfileSection() {
     navigate("/pages/login");
   }
 
+
+  function handleSubmit(e) {
+    e.preventDefault()
+    const formdata = new FormData(e.target)
+    const username = formdata.get("username")
+    const pass = formdata.get("password")
+    const role = formdata.get("role")
+    const name = formdata.get("name")
+    if (!username || !pass || !role) {
+      alert("add all field")
+      return
+    }
+
+      const data = { 
+        createdAt:Date.now(),
+        username,
+        password:pass,
+        company_id: userData?.c_id,
+        email:"xyz@gmail.com",
+        status: true,
+        role: "dev",
+        name
+      }
+
+      addUser(data).then((data)=>{
+        if (data) {
+          alert("user added succesfully")
+          handleModal()
+        }else{
+          alert("user add failed")
+        }
+      })
+    
+    
+  }
+
   function handleModal() {
     setIsModalOpen(!isModelOpen)
   }
@@ -77,87 +113,91 @@ export default function ProfileSection() {
 
   return (
     <>
-    {isModelOpen&&(
-      
-      <dialog 
-  open 
-  className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-opacity-30 ml-[50vw] mt-12"
->
-  <div className="w-full max-w-md bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100">
-    <div className="flex justify-between items-center p-6 border-b border-gray-100">
-      <h2 className="text-xl font-semibold text-gray-900">Add New User</h2>
-      <button 
-        onClick={handleModal}
-        className="p-1 rounded-full hover:bg-gray-100 transition-colors"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-    </div>
+      {isModelOpen && (
 
-    {/* Form */}
-    <form method="dialog" className="p-6 space-y-5">
-      <div className="space-y-1">
-        <label className="text-sm font-medium text-gray-700">Username</label>
-        <input 
-          type="text" 
-          placeholder="Enter username"
-          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-        />
-      </div>
-
-      <div className="space-y-1">
-        <label className="text-sm font-medium text-gray-700">Password</label>
-        <input 
-          type="password" 
-          placeholder="••••••••"
-          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-        />
-      </div>
-
-      <div className="space-y-1">
-        <label className="text-sm font-medium text-gray-700">Email</label>
-        <input 
-          type="email" 
-          placeholder="user@example.com"
-          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-        />
-      </div>
-
-      <div className="space-y-1">
-        <label className="text-sm font-medium text-gray-700">Role</label>
-        <select
-          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all appearance-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiAjdjI0NjVlZCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwb2x5bGluZSBwb2ludHM9IjYgOSAxMiAxNSAxOCA5Ij48L3BvbHlsaW5lPjwvc3ZnPg==')] bg-no-repeat bg-[right_0.75rem_center]"
+        <dialog
+          open
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-opacity-30 ml-[50vw] mt-12"
         >
-          <option value="Admin">Admin</option>
-          <option value="Operator">Operator</option>
-          <option value="Manager">Manager</option>
-        </select>
-      </div>
+          <div className="w-full max-w-md bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100">
+            <div className="flex justify-between items-center p-6 border-b border-gray-100">
+              <h2 className="text-xl font-semibold text-gray-900">Add New User</h2>
+              <button
+                onClick={handleModal}
+                className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
 
-      {/* Footer with Submit Button */}
-      <div className="flex justify-end gap-3 pt-4">
-        <button 
-          type="button"
-          onClick={handleModal}
-          className="px-4 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50 transition-colors"
-        >
-          Cancel
-        </button>
-        <button 
-          type="submit"
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-        >
-          Add User
-        </button>
-      </div>
-    </form>
-  </div>
-</dialog>
-    )}
-     
+            {/* Form */}
+            <form onSubmit={handleSubmit} method="dialog" className="p-6 space-y-5">
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-gray-700">Username</label>
+                <input
+                  type="text"
+                  placeholder="Enter username"
+                  name='username'
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-gray-700">Name</label>
+                <input
+                  type="text"
+                  placeholder="Enter name"
+                  name='name'
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-gray-700">Password</label>
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  name='password'
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-gray-700">Role</label>
+                <select
+                  name='role'
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all appearance-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiAjdjI0NjVlZCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwb2x5bGluZSBwb2ludHM9IjYgOSAxMiAxNSAxOCA5Ij48L3BvbHlsaW5lPjwvc3ZnPg==')] bg-no-repeat bg-[right_0.75rem_center]"
+                >
+                  <option value="Admin">Admin</option>
+                  <option value="Operator">Operator</option>
+                  <option value="Manager">Manager</option>
+                </select>
+              </div>
+
+              {/* Footer with Submit Button */}
+              <div className="flex justify-end gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={handleModal}
+                  className="px-4 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                >
+                  Add User
+                </button>
+              </div>
+            </form>
+          </div>
+        </dialog>
+      )}
+
       <Chip
         sx={{
           ml: 2,
