@@ -764,7 +764,6 @@ export default function Dashboard() {
       });
     getSpeedHistory(serialNumber)
       .then((data) => {
-        console.log(data);
         setSpeedHistory(data)
       })
     getOeeHistory(serialNumber)

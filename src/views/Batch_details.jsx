@@ -1,7 +1,7 @@
 import React, { useState,useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useLocation } from 'react-router';
-import { getoee } from '../backservice';
+import { getBatch, getoee } from '../backservice';
 
 const batchData = [
   { batchId: 1, startTime: '2023-10-01 08:00', endTime: '2023-10-01 16:00', machineLineNo: 'Line 1', status: 'Completed', unitsProduced: 500 },
@@ -19,6 +19,9 @@ export default function BatchDetails() {
   const [selectedBatch, setSelectedBatch] = useState(null);
   const [isPrinting, setIsPrinting] = useState(false);
   const [selectedShift, setSelectedShift] = useState('Shift A');
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const serialNumber = queryParams.get('serial_number');
 
   const getCurrentDate = () => {
     const today = new Date();
@@ -44,24 +47,15 @@ export default function BatchDetails() {
       case 'In Progress': return '#ffa000';
       case 'Pending': return '#f44336';
       default: return '#000';
+    }   
+  };
+
+  useEffect(()=>{
+    getBatch(serialNumber,selectedDate).then((data)=>{
+      console.log(data);
+    })
     
-      useEffect(()=>{
-        getoee(serialNumber,selectedDate,shiftDetailNum[selectedShift]).then((data)=>{
-          if (data) {
-            setShiftData(data[data.length - 1].d)
-          }else{
-            setShiftData({shiftLengthHours: 0,
-              shortBreaksCount: 0,
-              shortBreaksMinutesEach: 0,
-              mealBreakCount: 0,
-              mealBreakMinutesEach: 0,
-              downTime: 0,
-              idealRunRate: 0,
-              totalProducts: 0,
-              rejectProducts: 0})
-          }
-        })}
-  )}};
+  },[selectedDate])
 
   return (
     <div className="min-h-screen flex flex-col items-center p-4 bg-gray-100">
