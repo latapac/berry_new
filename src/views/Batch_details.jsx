@@ -1,7 +1,7 @@
 import React, { useState,useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useLocation } from 'react-router';
-import { getBatch, getoee } from '../backservice';
+import { getBatch } from '../backservice';
 
 const batchData = [
   { batchId: 1, startTime: '2023-10-01 08:00', endTime: '2023-10-01 16:00', machineLineNo: 'Line 1', status: 'Completed', unitsProduced: 500 },

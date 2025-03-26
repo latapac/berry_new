@@ -40,6 +40,34 @@ export function checkLoginService(){
     }
 }
 
+export default async function addUser(data){
+    const response = await fetch("http://64.227.139.217:3000/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json", // specify the content type
+      },
+      body: JSON.stringify({
+        //   name:"hvv",
+        //   company_id:'11',
+        //   createdAt:Date.now(),
+        // username: "admin",
+        // password: 'admin',
+        // email: "xyz@gmail.com",
+        // company_id: '11',
+        // status: true,
+        // role: "dev"
+        ...data
+      })
+    })
+    const data = response.json()
+    if (data.status==200) {
+        return true
+    } else {
+        console.log(data);
+        return false
+    }
+}
+
 export async function getMachines(cid) {
     try {
         const data = await fetch("http://"+server+":3000/getMachine/"+cid)
