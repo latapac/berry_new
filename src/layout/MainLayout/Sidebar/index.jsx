@@ -52,11 +52,14 @@ function Sidebar() {
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [downMD, drawerOpen, mode]);
-
+ 
+  if (!drawerOpen) {
+    return (  <Box component="nav" sx={{ flexShrink: { md: 0 }, width: { xs: 'auto', md: 130} }} aria-label="mailbox folders"></Box>)
+  }
   return (
     <Box component="nav" sx={{ flexShrink: { md: 0 }, width: { xs: 'auto', md: drawerWidth } }} aria-label="mailbox folders">
         <MiniDrawerStyled variant="permanent" open={drawerOpen}>
-          {drawerOpen?drawer:""}
+          {drawer}
         </MiniDrawerStyled>
     </Box>
   );
