@@ -37,15 +37,16 @@ const SpeedBox = ({ speed, isLoading, status }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 h-[150px] flex flex-col justify-between">
+    <div className="bg-white rounded-lg shadow-sm p-4 h-full min-h-[150px] flex flex-col justify-between">
       <div className="flex justify-between items-center mb-2">
         <h3 className="text-sm font-semibold text-gray-600">Speed</h3>
         <div className="flex items-center text-xs">
           <span
             className={`w-2 h-2 rounded-full mr-1 ${machineStatus.active ? '' : 'opacity-50'}`}
+            style={{ backgroundColor: machineStatus.color }}
           ></span>
           <span
-            className={`text-xs font-semibold`}
+            className="text-xs font-semibold"
             style={{ color: machineStatus.color }}
           >
             {machineStatus.name}
@@ -111,7 +112,7 @@ const GoodProductionBox = ({ goodValue, rejectValue, totalValue, isLoading }) =>
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 h-[150px] flex flex-col justify-between">
+    <div className="bg-white rounded-lg shadow-sm p-4 h-full min-h-[150px] flex flex-col justify-between">
       <h3 className="text-sm font-semibold text-gray-600 mb-2">Production</h3>
       <div className="flex items-center mt-2">
         <div className="relative w-16 h-16 sm:w-20 sm:h-20 mr-4">
@@ -153,9 +154,9 @@ const OEEBox = ({ availability, performance, quality, isLoading }) => {
   let startAngle = 0;
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 h-[150px] flex flex-col justify-between">
+    <div className="bg-white rounded-lg shadow-sm p-4 h-full min-h-[150px] flex flex-col justify-between">
       <h3 className="text-xs font-semibold text-gray-600">OEE</h3>
-      <div className="flex items-center gap-5">
+      <div className="flex items-center gap-2 sm:gap-5">
         <div className="relative w-16 h-16 sm:w-20 sm:h-20">
           <svg className="w-full h-full" viewBox="0 0 36 36">
             {oeeData.map((item, index) => {
@@ -191,10 +192,10 @@ const OEEBox = ({ availability, performance, quality, isLoading }) => {
           </svg>
         </div>
         <div className="flex-1">
-          <div className="space-y-2">
+          <div className="space-y-1 sm:space-y-2">
             {oeeData.map((item, index) => (
               <div key={index} className="flex items-center text-[10px] sm:text-xs">
-                <span className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: item.color }}></span>
+                <span className="w-2 h-2 rounded-full mr-1 sm:mr-2" style={{ backgroundColor: item.color }}></span>
                 <span className="text-gray-600">{item.name}: {isLoading ? '-' : item.value.toFixed(1)}%</span>
               </div>
             ))}
@@ -233,7 +234,7 @@ const TotalProductionBox = ({ value, isLoading }) => {
   ];
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 h-[150px] flex flex-col justify-between">
+    <div className="bg-white rounded-lg shadow-sm p-4 h-full min-h-[150px] flex flex-col justify-between">
       <h3 className="text-xs font-semibold text-gray-600">Total Production</h3>
       <div className="text-sm font-bold text-gray-900">
         {isLoading ? '-' : animatedValue.toFixed(0)} units
@@ -253,8 +254,6 @@ const TotalProductionBox = ({ value, isLoading }) => {
     </div>
   );
 };
-
-
 
 const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) => {
   const [dataPoints, setDataPoints] = useState([]);
@@ -296,6 +295,23 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
       setZoomState(prev => ({ ...prev, maxOffset }));
     }
   }, [speedData, isLoading, dimensions.width]);
+
+  const handleZoom = (factor) => {
+    const newScale = Math.max(0.5, Math.min(5, zoomState.scale * factor));
+    setZoomState(prev => ({
+      ...prev,
+      scale: newScale,
+      offset: Math.min(0, Math.max(prev.maxOffset * (1 - newScale), prev.offset))
+    }));
+  };
+
+  const resetZoom = () => {
+    setZoomState({
+      scale: 1,
+      offset: 0,
+      maxOffset: zoomState.maxOffset
+    });
+  };
 
   // Handle zoom and pan interactions
   useEffect(() => {
@@ -418,24 +434,28 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-4 mb-6 w-full" ref={containerRef}>
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
         <h3 className="text-sm font-semibold text-gray-600">Machine Speed</h3>
-        <div className="flex items-center">
+        <div className="flex items-center flex-wrap gap-2">
           {/* Zoom in and out buttons */}
-          <button onClick={() => handleZoom(0.9)} className="p-1 mx-1 text-gray-600 hover:text-gray-800">
-            {/* SVG for zoom out */}
+          <button onClick={() => handleZoom(0.9)} className="p-1 text-gray-600 hover:text-gray-800">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+            </svg>
           </button>
-          <button onClick={() => handleZoom(1.1)} className="p-1 mx-1 text-gray-600 hover:text-gray-800">
-            {/* SVG for zoom in */}
+          <button onClick={() => handleZoom(1.1)} className="p-1 text-gray-600 hover:text-gray-800">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
           </button>
-          <button onClick={() => resetZoom()} className="p-1 mx-1 text-gray-600 hover:text-gray-800 text-sm">
+          <button onClick={() => resetZoom()} className="p-1 text-gray-600 hover:text-gray-800 text-xs sm:text-sm">
             Reset
           </button>
-          <label className="text-sm text-gray-600 ml-4 mr-2">Time Range:</label>
+          <label className="text-xs sm:text-sm text-gray-600">Time Range:</label>
           <select
             value={timeRange}
             onChange={(e) => setTimeRange(Number(e.target.value))}
-            className="text-sm text-gray-700 bg-white border border-gray-200 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="text-xs sm:text-sm text-gray-700 bg-white border border-gray-200 rounded-md px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
           >
             <option value={1}>1 Hour</option>
             <option value={4}>4 Hours</option>
@@ -495,10 +515,6 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
   );
 };
 
-
-
-
-// OEE Graph
 const OEEGraph = ({ oeeData, isLoading, timeRange }) => {
   const [dataPoints, setDataPoints] = useState([]);
   const [zoomState, setZoomState] = useState({
@@ -539,6 +555,23 @@ const OEEGraph = ({ oeeData, isLoading, timeRange }) => {
       setZoomState(prev => ({ ...prev, maxOffset }));
     }
   }, [oeeData, isLoading, dimensions.width]);
+
+  const handleZoom = (factor) => {
+    const newScale = Math.max(0.5, Math.min(5, zoomState.scale * factor));
+    setZoomState(prev => ({
+      ...prev,
+      scale: newScale,
+      offset: Math.min(0, Math.max(prev.maxOffset * (1 - newScale), prev.offset))
+    }));
+  };
+
+  const resetZoom = () => {
+    setZoomState({
+      scale: 1,
+      offset: 0,
+      maxOffset: zoomState.maxOffset
+    });
+  };
 
   // Handle zoom and pan interactions
   useEffect(() => {
@@ -657,8 +690,23 @@ const OEEGraph = ({ oeeData, isLoading, timeRange }) => {
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-4 mb-6 w-full" ref={containerRef}>
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
         <h3 className="text-sm font-semibold text-gray-600">OEE</h3>
+        <div className="flex items-center flex-wrap gap-2">
+          <button onClick={() => handleZoom(0.9)} className="p-1 text-gray-600 hover:text-gray-800">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+            </svg>
+          </button>
+          <button onClick={() => handleZoom(1.1)} className="p-1 text-gray-600 hover:text-gray-800">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+          </button>
+          <button onClick={() => resetZoom()} className="p-1 text-gray-600 hover:text-gray-800 text-xs sm:text-sm">
+            Reset
+          </button>
+        </div>
       </div>
       <svg
         ref={svgRef}
@@ -764,6 +812,7 @@ export default function Dashboard() {
       });
     getSpeedHistory(serialNumber)
       .then((data) => {
+        console.log(data);
         setSpeedHistory(data)
       })
     getOeeHistory(serialNumber)
@@ -787,19 +836,19 @@ export default function Dashboard() {
 
   const status = machineData?.d?.current_speed[0] > 0 ? 'running' : 'not running';
 
-
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="w-full mb-0 flex justify-between items-center no-print">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
+      <div className="w-full mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 no-print">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
           Dashboard - {' '}
           {serialNumber && (
-            <span className="text-sm text-white bg-gray-400 px-2 py-1 rounded">
+            <span className="text-xs sm:text-sm text-white bg-gray-400 px-2 py-1 rounded">
               {serialNumber}
             </span>
           )}
         </h1>
-        <div className="mb-8 flex space-x-2">
+        <div className="flex flex-wrap gap-2">
+         
           <button
             className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
             onClick={() => navigate("/oee?serial_number=" + serialNumber)}

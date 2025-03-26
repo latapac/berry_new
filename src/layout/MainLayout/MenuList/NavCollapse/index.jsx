@@ -137,7 +137,7 @@ export default function NavCollapse({ menu, level, parentId }) {
 
   const Icon = menu.icon;
   const menuIcon = menu.icon ? (
-    <Icon strokeWidth={1.5} size={drawerOpen ? '20px' : '24px'} />
+    <Icon strokeWidth={1} size={drawerOpen ? '20px' : '24px'} />
   ) : (
     <FiberManualRecordIcon
       sx={{
