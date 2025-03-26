@@ -1,7 +1,7 @@
 import React, { useState,useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useLocation } from 'react-router';
-import { getBatch } from '../backservice';
+import { getBatch} from '../backservice';
 
 const batchData = [
   { batchId: 1, startTime: '2023-10-01 08:00', endTime: '2023-10-01 16:00', machineLineNo: 'Line 1', status: 'Completed', unitsProduced: 500 },
@@ -18,6 +18,7 @@ const metricsData = [
 export default function BatchDetails() {
   const [selectedBatch, setSelectedBatch] = useState(null);
   const [isPrinting, setIsPrinting] = useState(false);
+  const [batchDetail,setBatchDetail] = useState({})
   const [selectedShift, setSelectedShift] = useState('Shift A');
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -52,7 +53,7 @@ export default function BatchDetails() {
 
   useEffect(()=>{
     getBatch(serialNumber,selectedDate).then((data)=>{
-      console.log(data);
+      setBatchDetail(data[0])
     })
     
   },[selectedDate])
@@ -142,12 +143,11 @@ export default function BatchDetails() {
                     onClick={() => setSelectedBatch(batch.batchId)}
                     className={`hover:bg-gray-50 transition-colors cursor-pointer ${selectedBatch === batch.batchId ? 'bg-blue-50' : ''}`}
                   >
-                    <td className="px-2 py-1 text-xs border-b border-r border-gray-300 text-center">{batch.batchId}</td>
-                    <td className="px-2 py-1 text-xs border-b border-r border-gray-300 text-center">{batch.startTime}</td>
+                    <td className="px-2 py-1 text-xs border-b border-r border-gray-300 text-center">{batchDetail?.d?.Batch_Number[0]}</td>
+                    <td className="px-2 py-1 text-xs border-b border-r border-gray-300 text-center">{batchDetail?.ts}</td>
                     <td className="px-2 py-1 text-xs border-b border-r border-gray-300 text-center">{batch.endTime}</td>
                     <td className="px-2 py-1 text-xs border-b border-r border-gray-300 text-center">{batch.machineLineNo}</td>
-                    <td className="px-2 py-1 text-xs border-b border-r border-gray-300 text-center" style={{ color: getStatusColor(batch.status) }}>
-                      {batch.status}
+                    <td className="px-2 py-1 text-xs border-b border-r border-gray-300 text-center" >{batchDetail?.d?.Batch_status[0]}
                     </td>
                     <td className="px-2 py-1 text-xs border-b border-gray-300 text-center">{batch.unitsProduced}</td>
                   </tr>
