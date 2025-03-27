@@ -915,6 +915,15 @@ export default function Dashboard() {
                   >
                     Batch Report
                   </button>
+                  <button
+                    onClick={() => {
+                      navigate("/OEE_graph?serial_number=" + serialNumber);
+                      setIsOpen(false);
+                    }}
+                    className="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-400 w-full text-left"
+                  >
+                    OEE Graph
+                  </button>
                 </div>
               </div>
             )}
