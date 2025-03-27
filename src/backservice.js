@@ -59,6 +59,21 @@ export default async function addUser(data){
     }
 }
 
+export async function getUsers(cid) {
+    try {
+        const data = await fetch("http://"+server+":3000/allusers/"+cid)
+        const md = await data.json()
+        if (md.status==200) {
+            return md.data
+        }else{
+            return false
+        }
+    } catch (error) {
+        console.log(error);
+        return false
+    }
+}
+
 export async function getMachines(cid) {
     try {
         const data = await fetch("http://"+server+":3000/getMachine/"+cid)

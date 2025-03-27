@@ -17,15 +17,16 @@ import {
   Stack,
   Switch,
   Typography,
+  Collapse,
   Box
 } from '@mui/material';
-import addUser, { logoutService } from '../../../../backservice';
+import addUser, { getUsers, logoutService } from '../../../../backservice';
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
 import useConfig from 'hooks/useConfig';
 import { useDispatch, useSelector } from 'react-redux';
 import User1 from 'assets/images/users/blue.webp';
-import { IconPlus, IconLogout, IconSettings } from '@tabler/icons-react';
+import { IconPlus, IconLogout, IconSettings, IconUsers, IconChevronDown, IconChevronUp } from '@tabler/icons-react';
 import { logout } from '../../../../store/authslice';
 import { useNavigate } from 'react-router';
 
@@ -33,16 +34,16 @@ export default function ProfileSection() {
   const theme = useTheme();
   const { borderRadius } = useConfig();
   const [notification, setNotification] = useState(false);
-  const [selectedIndex] = useState(-1);
   const [open, setOpen] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isModelOpen, setIsModalOpen] = useState(false)
 
-  // Get user data from Redux store - updated to handle potential undefined states
   const userData = useSelector((state) => state.authSlice?.userData || {});
   const userName = userData?.username || 'User';
   const userDesignation = userData?.designation || userData?.role || 'Staff';
+  const [userListOpen, setUserListOpen] = useState(false);
+  const [users, setUsers] = useState([]);
 
   const anchorRef = useRef(null);
 
@@ -76,30 +77,34 @@ export default function ProfileSection() {
       return
     }
 
-      const data = { 
-        createdAt:Date.now(),
-        username,
-        password:pass,
-        company_id: userData?.c_id,
-        email:"xyz@gmail.com",
-        status: true,
-        role,
-        name
-      }
+    const data = {
+      createdAt: Date.now(),
+      username,
+      password: pass,
+      company_id: userData?.c_id,
+      email: "xyz@gmail.com",
+      status: true,
+      role,
+      name
+    }
 
-      addUser(data).then((data)=>{
-        if (data) {
-          alert("user added succesfully")
-          handleModal()
-        }else{
-          alert("user add failed")
-        }
-      })
-    
-    
+    addUser(data).then((data) => {
+      if (data) {
+        alert("user added succesfully")
+        handleModal()
+        getUsers(userData?.c_id).then((data) => {
+          setUsers(data)
+        })
+      } else {
+        alert("user add failed")
+      }
+    })
+
+
   }
 
   function handleModal() {
+    setOpen(false);
     setIsModalOpen(!isModelOpen)
   }
 
@@ -110,92 +115,97 @@ export default function ProfileSection() {
     }
     prevOpen.current = open;
   }, [open]);
+  useEffect(() => {
+    // Fetch users from your API here
+    getUsers(userData?.c_id).then((data) => {
+      setUsers(data)
+    })
+
+  }, []);
 
   return (
     <>
       {isModelOpen && (
 
-        <dialog
-          open
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-opacity-30 ml-[50vw] mt-12"
-        >
-          <div className="w-full max-w-md bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100">
-            <div className="flex justify-between items-center p-6 border-b border-gray-100">
-              <h2 className="text-xl font-semibold text-gray-900">Add New User</h2>
-              <button
-                onClick={handleModal}
-                className="p-1 rounded-full hover:bg-gray-100 transition-colors"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-              </button>
-            </div>
-
-            {/* Form */}
-            <form onSubmit={handleSubmit} method="dialog" className="p-6 space-y-5">
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-700">Username</label>
-                <input
-                  type="text"
-                  placeholder="Enter username"
-                  name='username'
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-700">Name</label>
-                <input
-                  type="text"
-                  placeholder="Enter name"
-                  name='name'
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-700">Password</label>
-                <input
-                  type="password"
-                  placeholder="••••••••"
-                  name='password'
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-700">Role</label>
-                <select
-                  name='role'
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all appearance-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiAjdjI0NjVlZCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwb2x5bGluZSBwb2ludHM9IjYgOSAxMiAxNSAxOCA5Ij48L3BvbHlsaW5lPjwvc3ZnPg==')] bg-no-repeat bg-[right_0.75rem_center]"
-                >
-                  <option value="Admin">Admin</option>
-                  <option value="Operator">Operator</option>
-                  <option value="Manager">Manager</option>
-                </select>
-              </div>
-
-              {/* Footer with Submit Button */}
-              <div className="flex justify-end gap-3 pt-4">
+        <div className={`fixed inset-0 z-[9999] ${isModelOpen ? 'block' : 'hidden'}`}>
+          <div className="absolute inset-0 bg-black opacity-45" onClick={handleModal}></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-md p-4">
+            <div className="bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100">
+              <div className="flex justify-between items-center p-6 border-b border-gray-100">
+                <h2 className="text-xl font-semibold text-gray-900">Add New User</h2>
                 <button
-                  type="button"
                   onClick={handleModal}
-                  className="px-4 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="p-1 rounded-full hover:bg-gray-100 transition-colors"
                 >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-                >
-                  Add User
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
                 </button>
               </div>
-            </form>
+
+              <form onSubmit={handleSubmit} method="dialog" className="p-6 space-y-5">
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700">Username</label>
+                  <input
+                    type="text"
+                    placeholder="Enter username"
+                    name='username'
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700">Name</label>
+                  <input
+                    type="text"
+                    placeholder="Enter name"
+                    name='name'
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700">Password</label>
+                  <input
+                    type="password"
+                    placeholder="••••••••"
+                    name='password'
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700">Role</label>
+                  <select
+                    name='role'
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all appearance-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiAjdjI0NjVlZCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwb2x5bGluZSBwb2ludHM9IjYgOSAxMiAxNSAxOCA5Ij48L3BvbHlsaW5lPjwvc3ZnPg==')] bg-no-repeat bg-[right_0.75rem_center]"
+                  >
+                    <option value="Admin">Admin</option>
+                    <option value="Operator">Operator</option>
+                    <option value="Manager">Manager</option>
+                  </select>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={handleModal}
+                    className="px-4 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                  >
+                    Add User
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </dialog>
+        </div>
       )}
 
       <Chip
@@ -360,33 +370,92 @@ export default function ProfileSection() {
 
                       <Divider sx={{ my: 1 }} />
 
-                      {/* Logout Option */}
-                      <List disablePadding>
+                      {userData?.role == "admin" ? (<List disablePadding>
+                        {/* User Management Dropdown */}
                         <ListItemButton
-                          onClick={handleModal}
+                          onClick={() => setUserListOpen(!userListOpen)}
                           sx={{
                             borderRadius: `${borderRadius}px`,
                             px: 2,
                             py: 1.5,
                             '&:hover': {
-                              backgroundColor: theme.palette.error.light,
+                              backgroundColor: theme.palette.primary.light,
                               '& .MuiListItemIcon-root': {
-                                color: theme.palette.error.main
+                                color: theme.palette.primary.main
                               }
                             }
                           }}
                         >
                           <ListItemIcon sx={{ minWidth: 36 }}>
-                            <IconPlus stroke={1.5} size="20px" />
+                            <IconUsers stroke={1.5} size="20px" />
                           </ListItemIcon>
                           <ListItemText
                             primary={
                               <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                                Add User
+                                User Management
                               </Typography>
                             }
                           />
+                          {userListOpen ? (
+                            <IconChevronUp size="20px" />
+                          ) : (
+                            <IconChevronDown size="20px" />
+                          )}
                         </ListItemButton>
+
+                        <Collapse in={userListOpen} timeout="auto" unmountOnExit>
+                          <List component="div" disablePadding sx={{ pl: 4 }}>
+                            {users.map((user) => (
+                              <ListItemButton
+                                key={user.id}
+                                sx={{
+                                  borderRadius: `${borderRadius}px`,
+                                  px: 2,
+                                  py: 1,
+                                  '&:hover': {
+                                    backgroundColor: theme.palette.action.hover
+                                  }
+                                }}
+                              >
+                                <ListItemText
+                                  primary={user.username}
+                                  secondary={user.role}
+                                  primaryTypographyProps={{ variant: 'body2' }}
+                                  secondaryTypographyProps={{ variant: 'caption' }}
+                                />
+                              </ListItemButton>
+                            ))}
+                            <ListItemButton
+                              onClick={handleModal}
+                              sx={{
+                                borderRadius: `${borderRadius}px`,
+                                px: 2,
+                                py: 1.5,
+                                '&:hover': {
+                                  backgroundColor: theme.palette.success.light,
+                                  '& .MuiListItemIcon-root': {
+                                    color: theme.palette.success.main
+                                  }
+                                }
+                              }}
+                            >
+                              <ListItemIcon sx={{ minWidth: 36 }}>
+                                <IconPlus stroke={1.5} size="20px" />
+                              </ListItemIcon>
+                              <ListItemText
+                                primary={
+                                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                    Add User
+                                  </Typography>
+                                }
+                              />
+                            </ListItemButton>
+                          </List>
+                        </Collapse>
+                      </List>) : (<></>)}
+
+                      {/* Logout Option */}
+                      <List disablePadding>
                         <ListItemButton
                           onClick={handleLogout}
                           sx={{
