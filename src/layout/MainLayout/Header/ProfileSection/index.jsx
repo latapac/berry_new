@@ -83,7 +83,7 @@ export default function ProfileSection() {
         company_id: userData?.c_id,
         email:"xyz@gmail.com",
         status: true,
-        role: "dev",
+        role,
         name
       }
 
