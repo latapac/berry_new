@@ -8,7 +8,7 @@ import SkeletonEarningCard from 'ui-component/cards/Skeleton/EarningCard';
 
 export default function EarningCard({ isLoading, data }) {
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl] = React.useState(null);
 
 
   return (
