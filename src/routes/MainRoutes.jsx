@@ -10,6 +10,7 @@ import AlarmReport from './Alarm';
 import Protected from './AuthLayout';
 import Active_alarm from '../views/Active_alarm/Default';
 import Batch_details from '../views/batch_details';
+import OEE_graph from '../views/OEE/Default/OEE_graph';
 
 
 // dashboard routing
@@ -38,6 +39,10 @@ const MainRoutes = {
     {
       path: 'batch',
       element: <Batch_details />
+    },
+    {
+      path: 'OEE_graph',
+      element: <OEE_graph />
     },
     {
       path: 'OEE',
