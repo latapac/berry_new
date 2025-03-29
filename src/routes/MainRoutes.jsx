@@ -1,6 +1,3 @@
-
-
-// project imports
 import MainLayout from 'layout/MainLayout';
 import AuditTrail from './Audit_Trial';
 import Dashboard from '../views/dashboard2/Default';
@@ -14,12 +11,7 @@ import OeeGraph from '../views/OeeGraph';
 import MachineGraph from '../views/MachineGraph';
 import UserManagement from '../views/UserManagement';
 
-
-// dashboard routing
 import DashboardDefault from 'views/dashboard/Default'
-
-
-// ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
   path: '/',
