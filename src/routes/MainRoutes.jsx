@@ -9,9 +9,10 @@ import Production from '../views/Production/Default';
 import AlarmReport from './Alarm';
 import Protected from './AuthLayout';
 import Active_alarm from '../views/Active_alarm/Default';
-import Batch_details from '../views/batch_details';
-import OEE_graph from '../views/OEE/Default/OEE_graph';
-import UserManagement from '../views/UserManagement';
+import BatchDetails from '../views/Batchdetails';
+import OeeGraph from '../views/OeeGraph';
+import UserManagementPage from '../views/UserManagementPage';
+import MachineGraph from '../views/MachineGraph';
 
 
 // dashboard routing
@@ -39,19 +40,23 @@ const MainRoutes = {
     },
     {
       path: 'batch',
-      element: <Batch_details />
+      element: <BatchDetails />
     },
     {
       path: 'alluser',
       element: <UserManagementPage />
     },
     {
-      path: 'OEE_graph',
-      element: <OEE_graph />
+      path: 'oeeGraph',
+      element: <OeeGraph />
     },
     {
       path: 'OEE',
       element: <OEE />
+    },
+    {
+      path:'machineGraph',
+      element: <MachineGraph/>
     },
     {
       path: 'Active_alarm',
@@ -76,6 +81,10 @@ const MainRoutes = {
     {
       path: '/alarm',
       element: <AlarmReport />
+    },
+    {
+      path: '/batchDetails ',
+      element: <BatchDetails />
     }
   ]
 };

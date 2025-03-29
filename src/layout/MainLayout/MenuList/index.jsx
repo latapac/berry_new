@@ -103,7 +103,7 @@ function MenuList() {
   return (
     <Box sx={{ mt: 1.5 }}>
       <Accordion sx={{ boxShadow: 'none' }}>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />} >
           <Typography variant="h6">Machines</Typography>
         </AccordionSummary>
         <AccordionDetails>
