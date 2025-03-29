@@ -299,20 +299,20 @@ export default function ProfileSection() {
                             px: 2,
                             py: 1.5,
                             '&:hover': {
-                              backgroundColor: theme.palette.primary.light,
+                              backgroundColor: theme.palette.error.light,
                               '& .MuiListItemIcon-root': {
-                                color: theme.palette.primary.main
+                                color: theme.palette.error.main
                               }
                             }
                           }}
                         >
                           <ListItemIcon sx={{ minWidth: 36 }}>
-                            <IconUsers stroke={1.5} size="20px" />
+                            <IconLogout stroke={1.5} size="20px" />
                           </ListItemIcon>
                           <ListItemText
                             primary={
                               <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                                User Management
+                                UserPage
                               </Typography>
                             }
                           />

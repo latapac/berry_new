@@ -42,6 +42,10 @@ const MainRoutes = {
       element: <Batch_details />
     },
     {
+      path: 'alluser',
+      element: <UserManagementPage />
+    },
+    {
       path: 'OEE_graph',
       element: <OEE_graph />
     },

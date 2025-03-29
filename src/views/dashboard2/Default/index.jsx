@@ -81,7 +81,6 @@ const SpeedBox = ({ speed, isLoading, status }) => {
   );
 };
 
-// Good Production Box
 const GoodProductionBox = ({ goodValue, rejectValue, totalValue, isLoading }) => {
   const productionData = [
     { name: 'Good', value: parseFloat(goodValue) || 0, color: '#22c55e' },
@@ -141,7 +140,6 @@ const GoodProductionBox = ({ goodValue, rejectValue, totalValue, isLoading }) =>
   );
 };
 
-// OEE Box with donut chart (Updated)
 const OEEBox = ({ availability, performance, quality, isLoading }) => {
   const oeeData = [
     { name: 'Availability', value: parseFloat(availability) || 0, color: '#3b82f6' },
@@ -206,7 +204,6 @@ const OEEBox = ({ availability, performance, quality, isLoading }) => {
   );
 };
 
-// Total Production Box (Updated)
 const TotalProductionBox = ({ value, isLoading }) => {
   const [animatedValue, setAnimatedValue] = useState(0);
 
@@ -262,6 +259,7 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
     offset: 0,
     maxOffset: 0
   });
+  const [hoveredPoint, setHoveredPoint] = useState(null);
   const svgRef = useRef(null);
   const containerRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 600, height: 200 });
@@ -291,7 +289,7 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
       setDataPoints(points);
 
       // Calculate max offset based on data length
-      const maxOffset = dimensions.width * 0.8; // Allow some extra space
+      const maxOffset = dimensions.width * 0.8;
       setZoomState(prev => ({ ...prev, maxOffset }));
     }
   }, [speedData, isLoading, dimensions.width]);
@@ -313,74 +311,46 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
     });
   };
 
-  // Handle zoom and pan interactions
-  useEffect(() => {
-    const svg = svgRef.current;
-    if (!svg) return;
+  const handleMouseMove = (e) => {
+    if (!svgRef.current) return;
+    
+    const svgRect = svgRef.current.getBoundingClientRect();
+    const mouseX = e.clientX - svgRect.left - zoomState.offset;
+    const mouseY = e.clientY - svgRect.top;
 
-    let isDragging = false;
-    let startX = 0;
-    let startOffset = 0;
+    const { width, height } = dimensions;
+    const padding = 15;
+    const maxSpeed = 300;
+    const yScale = (height - 2 * padding) / maxSpeed;
+    
+    // Find the closest data point
+    let closestPoint = null;
+    let minDistance = Infinity;
 
-    const handleWheel = (e) => {
-      e.preventDefault();
-      const containerRect = svg.getBoundingClientRect();
-      const mouseX = e.clientX - containerRect.left;
-      const graphX = mouseX - zoomState.offset;
+    dataPoints.forEach((point, index) => {
+      const x = padding + index * ((width - 2 * padding) / (dataPoints.length - 1)) * zoomState.scale;
+      const y = height - padding - point.speed * yScale;
+      
+      const distance = Math.sqrt(Math.pow(x - mouseX, 2) + Math.pow(y - mouseY, 2));
+      
+      if (distance < minDistance && distance < 20) {
+        minDistance = distance;
+        closestPoint = {
+          ...point,
+          x,
+          y,
+          index
+        };
+      }
+    });
 
-      const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
-      const newScale = Math.max(0.5, Math.min(5, zoomState.scale * zoomFactor));
+    setHoveredPoint(closestPoint);
+  };
 
-      // Calculate new offset to zoom toward mouse position
-      const newOffset = mouseX - graphX * (newScale / zoomState.scale);
+  const handleMouseLeave = () => {
+    setHoveredPoint(null);
+  };
 
-      setZoomState(prev => ({
-        scale: newScale,
-        offset: Math.min(0, Math.max(prev.maxOffset * (1 - newScale), newOffset)),
-        maxOffset: prev.maxOffset
-      }));
-    };
-
-    const handleMouseDown = (e) => {
-      if (e.button !== 0) return; // Only left mouse button
-      isDragging = true;
-      startX = e.clientX;
-      startOffset = zoomState.offset;
-      svg.style.cursor = 'grabbing';
-    };
-
-    const handleMouseMove = (e) => {
-      if (!isDragging) return;
-      const dx = e.clientX - startX;
-      const newOffset = startOffset + dx;
-
-      // Constrain panning to valid range
-      const maxPossibleOffset = Math.min(0, zoomState.maxOffset * (1 - zoomState.scale));
-      setZoomState(prev => ({
-        ...prev,
-        offset: Math.max(maxPossibleOffset, Math.min(0, newOffset))
-      }));
-    };
-
-    const handleMouseUp = () => {
-      isDragging = false;
-      svg.style.cursor = 'grab';
-    };
-
-    svg.addEventListener('wheel', handleWheel, { passive: false });
-    svg.addEventListener('mousedown', handleMouseDown);
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
-
-    return () => {
-      svg.removeEventListener('wheel', handleWheel);
-      svg.removeEventListener('mousedown', handleMouseDown);
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [zoomState]);
-
-  // Format time labels, showing HH:MM:SS when zoomed in
   const formatTime = (date) => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   };
@@ -415,7 +385,7 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
     .join(' ');
 
   // Dynamic label interval based on available space and zoom level
-  const minLabelSpacing = 80; // Minimum pixels between labels to prevent overlap
+  const minLabelSpacing = 80;
   const labelInterval = Math.max(1, Math.floor((minLabelSpacing * zoomState.scale) / xScale));
 
   // Calculate time labels based on zoom scale and spacing
@@ -424,9 +394,9 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
 
   for (let i = 0; i < visibleDataPoints.length; i++) {
     const currentTime = visibleDataPoints[i].time;
-    const timeDiff = (currentTime - lastLabelTime) / 1000; // difference in seconds
+    const timeDiff = (currentTime - lastLabelTime) / 1000;
 
-    if (timeDiff >= 5 || i === 0 || i === visibleDataPoints.length - 1) { // 5 seconds interval
+    if (timeDiff >= 5 || i === 0 || i === visibleDataPoints.length - 1) {
       timeLabels.push(visibleDataPoints[i]);
       lastLabelTime = currentTime;
     }
@@ -437,7 +407,6 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
         <h3 className="text-sm font-semibold text-gray-600">Machine Speed</h3>
         <div className="flex items-center flex-wrap gap-2">
-          {/* Zoom in and out buttons */}
           <button onClick={() => handleZoom(0.9)} className="p-1 text-gray-600 hover:text-gray-800">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
@@ -470,6 +439,8 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
         height={height + padding}
         viewBox={`0 0 ${width} ${height + padding}`}
         style={{ cursor: zoomState.scale > 1 ? 'grab' : 'default' }}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
       >
         {/* Horizontal Grid lines */}
         {[0, 0.5, 1].map((level, index) => (
@@ -501,6 +472,22 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
         {/* Line Path */}
         <path d={linePath} fill="none" stroke="#3b82f6" strokeWidth="2" />
 
+        {/* Data points (small circles) */}
+        {visibleDataPoints.map((point, index) => {
+          const x = padding + index * xScale * zoomState.scale + zoomState.offset;
+          const y = height - padding - point.speed * yScale;
+          return (
+            <circle
+              key={`point-${index}`}
+              cx={x}
+              cy={y}
+              r={hoveredPoint?.index === index ? 4 : 2}
+              fill={hoveredPoint?.index === index ? "#3b82f6" : "#3b82f6"}
+              opacity={hoveredPoint?.index === index ? 1 : 0.7}
+            />
+          );
+        })}
+
         {/* Time Labels */}
         {timeLabels.map((point, index) => {
           const x = padding + index * labelInterval * xScale * zoomState.scale + zoomState.offset;
@@ -510,6 +497,62 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
             </text>
           );
         })}
+
+        {/* Hover tooltip */}
+        {hoveredPoint && (
+          <g>
+            {/* Vertical line at hovered point */}
+            <line
+              x1={hoveredPoint.x + zoomState.offset}
+              y1={padding}
+              x2={hoveredPoint.x + zoomState.offset}
+              y2={height - padding}
+              stroke="#94a3b8"
+              strokeWidth="1"
+              strokeDasharray="2,2"
+            />
+            
+            {/* Tooltip background */}
+            <rect
+              x={hoveredPoint.x + zoomState.offset + 10}
+              y={hoveredPoint.y - 30}
+              width={120}
+              height={40}
+              fill="white"
+              stroke="#e2e8f0"
+              rx="4"
+              ry="4"
+            />
+            
+            {/* Tooltip text */}
+            <text
+              x={hoveredPoint.x + zoomState.offset + 15}
+              y={hoveredPoint.y - 15}
+              fontSize="10"
+              fill="#334155"
+            >
+              {formatTime(hoveredPoint.time)}
+            </text>
+            <text
+              x={hoveredPoint.x + zoomState.offset + 15}
+              y={hoveredPoint.y - 5}
+              fontSize="10"
+              fill="#334155"
+            >
+              Speed: {hoveredPoint.speed.toFixed(0)} ppm
+            </text>
+            
+            {/* Circle highlight on hovered point */}
+            <circle
+              cx={hoveredPoint.x + zoomState.offset}
+              cy={hoveredPoint.y}
+              r="6"
+              fill="none"
+              stroke="#3b82f6"
+              strokeWidth="2"
+            />
+          </g>
+        )}
       </svg>
     </div>
   );
@@ -546,12 +589,12 @@ const OEEGraph = ({ oeeData, isLoading, timeRange }) => {
     if (!isLoading && oeeData && oeeData.length > 0) {
       const points = oeeData.map(item => ({
         time: new Date(item.ts),
-        oee: item.oee // Assuming OEE is in percentage (0-100)
+        oee: item.oee
       }));
       setDataPoints(points);
 
       // Calculate max offset based on data length
-      const maxOffset = dimensions.width * 0.8; // Allow some extra space
+      const maxOffset = dimensions.width * 0.8;
       setZoomState(prev => ({ ...prev, maxOffset }));
     }
   }, [oeeData, isLoading, dimensions.width]);
@@ -572,73 +615,6 @@ const OEEGraph = ({ oeeData, isLoading, timeRange }) => {
       maxOffset: zoomState.maxOffset
     });
   };
-
-  // Handle zoom and pan interactions
-  useEffect(() => {
-    const svg = svgRef.current;
-    if (!svg) return;
-
-    let isDragging = false;
-    let startX = 0;
-    let startOffset = 0;
-
-    const handleWheel = (e) => {
-      e.preventDefault();
-      const containerRect = svg.getBoundingClientRect();
-      const mouseX = e.clientX - containerRect.left;
-      const graphX = mouseX - zoomState.offset;
-
-      const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
-      const newScale = Math.max(0.5, Math.min(5, zoomState.scale * zoomFactor));
-
-      // Calculate new offset to zoom toward mouse position
-      const newOffset = mouseX - graphX * (newScale / zoomState.scale);
-
-      setZoomState(prev => ({
-        scale: newScale,
-        offset: Math.min(0, Math.max(prev.maxOffset * (1 - newScale), newOffset)),
-        maxOffset: prev.maxOffset
-      }));
-    };
-
-    const handleMouseDown = (e) => {
-      if (e.button !== 0) return; // Only left mouse button
-      isDragging = true;
-      startX = e.clientX;
-      startOffset = zoomState.offset;
-      svg.style.cursor = 'grabbing';
-    };
-
-    const handleMouseMove = (e) => {
-      if (!isDragging) return;
-      const dx = e.clientX - startX;
-      const newOffset = startOffset + dx;
-
-      // Constrain panning to valid range
-      const maxPossibleOffset = Math.min(0, zoomState.maxOffset * (1 - zoomState.scale));
-      setZoomState(prev => ({
-        ...prev,
-        offset: Math.max(maxPossibleOffset, Math.min(0, newOffset))
-      }));
-    };
-
-    const handleMouseUp = () => {
-      isDragging = false;
-      svg.style.cursor = 'grab';
-    };
-
-    svg.addEventListener('wheel', handleWheel, { passive: false });
-    svg.addEventListener('mousedown', handleMouseDown);
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
-
-    return () => {
-      svg.removeEventListener('wheel', handleWheel);
-      svg.removeEventListener('mousedown', handleMouseDown);
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [zoomState]);
 
   const formatTime = (date) => {
     if (zoomState.scale > 3) {
@@ -665,7 +641,7 @@ const OEEGraph = ({ oeeData, isLoading, timeRange }) => {
     .join(' ');
 
   // Dynamic label interval based on zoom level and available space
-  const minLabelSpacing = 80; // Minimum pixels between labels to prevent overlap
+  const minLabelSpacing = 80;
   const labelInterval = Math.max(1, Math.floor((minLabelSpacing * zoomState.scale) / xScale));
 
   const timeLabels = [];
@@ -673,7 +649,7 @@ const OEEGraph = ({ oeeData, isLoading, timeRange }) => {
 
   for (let i = 0; i < dataPoints.length; i++) {
     const currentTime = dataPoints[i].time;
-    const timeDiff = (currentTime - lastLabelTime) / 1000; // difference in seconds
+    const timeDiff = (currentTime - lastLabelTime) / 1000;
 
     if (timeDiff >= 5 || i === 0 || i === dataPoints.length - 1) {
       timeLabels.push(dataPoints[i]);
@@ -812,6 +788,7 @@ export default function Dashboard() {
       });
     getSpeedHistory(serialNumber)
       .then((data) => {
+        console.log(data);
         setSpeedHistory(data)
       })
     getOeeHistory(serialNumber)
@@ -847,7 +824,6 @@ export default function Dashboard() {
           )}
         </h1>
         <div className="flex flex-wrap gap-2">
-         
           <button
             className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
             onClick={() => navigate("/oee?serial_number=" + serialNumber)}
@@ -867,7 +843,6 @@ export default function Dashboard() {
             Batch
           </button>
           <div className="relative inline-block text-left">
-            {/* Main Report Button */}
             <button
               className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
               onClick={() => setIsOpen(!isOpen)}
@@ -875,14 +850,12 @@ export default function Dashboard() {
               Report
             </button>
 
-            {/* Dropdown Menu */}
             {isOpen && (
               <div
                 className="origin-top-right absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10"
-                onMouseLeave={() => setIsOpen(false)} // Close when mouse leaves
+                onMouseLeave={() => setIsOpen(false)}
               >
                 <div className="py-1">
-                  {/* OEE Report Option */}
                   <button
                     onClick={() => {
                       navigate("/alarm?serial_number=" + serialNumber);
@@ -892,8 +865,6 @@ export default function Dashboard() {
                   >
                     Alarm Report
                   </button>
-
-                  {/* Audit Option */}
                   <button
                     onClick={() => {
                       navigate("/audit?serial_number=" + serialNumber);
@@ -903,8 +874,6 @@ export default function Dashboard() {
                   >
                     Audit Report
                   </button>
-
-                  {/* Batch Option */}
                   <button
                     onClick={() => {
                       navigate("/batch?serial_number=" + serialNumber);
@@ -1040,5 +1009,6 @@ export default function Dashboard() {
           </Grid>
         </Grid>
       </Grid>
-    </div>)
+    </div>
+  );
 }
