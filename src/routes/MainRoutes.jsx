@@ -63,6 +63,10 @@ const MainRoutes = {
       element: <Active_alarm />
     },
     {
+      path: 'usermangement',
+      element: <UserManagement />
+    },
+    {
       path: 'Production',
       element: <Production/>
     },

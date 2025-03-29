@@ -17,16 +17,15 @@ import {
   Stack,
   Switch,
   Typography,
-  Collapse,
   Box
 } from '@mui/material';
-import addUser, { getUsers, logoutService } from '../../../../backservice';
+import { getUsers, logoutService , addUser} from '../../../../backservice';
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
 import useConfig from 'hooks/useConfig';
 import { useDispatch, useSelector } from 'react-redux';
 import User1 from 'assets/images/users/blue.webp';
-import { IconPlus, IconLogout, IconSettings, IconUsers, IconChevronDown, IconChevronUp } from '@tabler/icons-react';
+import {  IconLogout, IconSettings, IconUsers  } from '@tabler/icons-react';
 import { logout } from '../../../../store/authslice';
 import { useNavigate } from 'react-router';
 
@@ -125,6 +124,7 @@ export default function ProfileSection() {
 
   return (
     <>
+    
 
       <Chip
         sx={{
@@ -288,12 +288,12 @@ export default function ProfileSection() {
 
                       <Divider sx={{ my: 1 }} />
 
-        
-
-                      {/* Logout Option */}
-                      <List disablePadding>
-                      <ListItemButton
-                          onClick={()=>{navigate("/alluser")}}
+                      {userData?.role.toLowerCase() == "admin" ? (<List disablePadding>
+                        {/* User Management Dropdown */}
+                        <ListItemButton
+                          onClick={() =>{
+                            setOpen(false)
+                            navigate("/usermangement")}}
                           sx={{
                             borderRadius: `${borderRadius}px`,
                             px: 2,
@@ -317,6 +317,10 @@ export default function ProfileSection() {
                             }
                           />
                         </ListItemButton>
+                      </List>) : (<></>)}
+
+                      {/* Logout Option */}
+                      <List disablePadding>
                         <ListItemButton
                           onClick={handleLogout}
                           sx={{
