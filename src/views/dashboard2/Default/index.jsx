@@ -252,7 +252,8 @@ const TotalProductionBox = ({ value, isLoading }) => {
   );
 };
 
-const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) => {
+const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange, serialNumber }) => {
+  const navigate = useNavigate();
   const [dataPoints, setDataPoints] = useState([]);
   const [zoomState, setZoomState] = useState({
     scale: 1,
@@ -262,18 +263,23 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
   const [hoveredPoint, setHoveredPoint] = useState(null);
   const svgRef = useRef(null);
   const containerRef = useRef(null);
-  const [dimensions, setDimensions] = useState({ width: 600, height: 200 });
+  const [dimensions, setDimensions] = useState({ width: 600, height: 100 });
 
   // Update dimensions on resize
   useEffect(() => {
     const handleResize = () => {
       if (containerRef.current) {
+        // Calculate 5vw in pixels
+        const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+        const vwInPixels = vw * 0.05; // 5vw
+
         setDimensions({
-          width: containerRef.current.clientWidth,
+          width: containerRef.current.clientWidth - vwInPixels,
           height: 200
         });
       }
     };
+
 
     handleResize();
     window.addEventListener('resize', handleResize);
@@ -313,7 +319,7 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
 
   const handleMouseMove = (e) => {
     if (!svgRef.current) return;
-    
+
     const svgRect = svgRef.current.getBoundingClientRect();
     const mouseX = e.clientX - svgRect.left - zoomState.offset;
     const mouseY = e.clientY - svgRect.top;
@@ -322,7 +328,7 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
     const padding = 15;
     const maxSpeed = 300;
     const yScale = (height - 2 * padding) / maxSpeed;
-    
+
     // Find the closest data point
     let closestPoint = null;
     let minDistance = Infinity;
@@ -330,9 +336,9 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
     dataPoints.forEach((point, index) => {
       const x = padding + index * ((width - 2 * padding) / (dataPoints.length - 1)) * zoomState.scale;
       const y = height - padding - point.speed * yScale;
-      
+
       const distance = Math.sqrt(Math.pow(x - mouseX, 2) + Math.pow(y - mouseY, 2));
-      
+
       if (distance < minDistance && distance < 20) {
         minDistance = distance;
         closestPoint = {
@@ -403,7 +409,7 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 mb-6 w-full" ref={containerRef}>
+    <div className="bg-white rounded-lg shadow-sm p-4 mb-6 w-full" ref={containerRef} onClick={() => navigate("/machineGraph?serial_number=" + serialNumber)}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
         <h3 className="text-sm font-semibold text-gray-600">Machine Speed</h3>
         <div className="flex items-center flex-wrap gap-2">
@@ -443,31 +449,38 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
         onMouseLeave={handleMouseLeave}
       >
         {/* Horizontal Grid lines */}
-        {[0, 0.5, 1].map((level, index) => (
-          <line
-            key={`h-line-${index}`}
-            x1={padding + zoomState.offset}
-            y1={height - padding - level * maxSpeed * yScale}
-            x2={width - padding + zoomState.offset}
-            y2={height - padding - level * maxSpeed * yScale}
-            stroke="#e5e7eb"
-            strokeWidth="1"
-          />
-        ))}
+        {[0, 100, 200, 300].map((level) => {
+                    const yPos = height - padding - (level / maxSpeed) * (height - 2 * padding);
+                    return (
+                        <line
+                            key={`h-line-${level}`}
+                            x1={padding + zoomState.offset}
+                            y1={yPos}
+                            x2={width - padding + zoomState.offset}
+                            y2={yPos}
+                            stroke="#e5e7eb"
+                            strokeWidth="1"
+                        />
+                    );
+                })}
 
-        {/* Y-axis labels */}
-        {[0, 0.5, 1].map((level, index) => (
-          <text
-            key={`y-label-${index}`}
-            x={padding - 10 + zoomState.offset}
-            y={height - padding - level * maxSpeed * yScale + 5}
-            textAnchor="end"
-            fontSize="10"
-            fill="#6b7280"
-          >
-            {(level * maxSpeed).toFixed(0)}
-          </text>
-        ))}
+                {/* Y-axis labels */}
+                {[0, 100, 200, 300].map((level) => {
+                    const yPos = height - padding - (level / maxSpeed) * (height - 2 * padding);
+                    return (
+                        <text
+                            key={`y-label-${level}`}
+                            x={padding - 10 + zoomState.offset}
+                            y={yPos + 5}  // +5 to center the text vertically on the line
+                            textAnchor="end"
+                            fontSize="10"
+                            fill="#6b7280"
+                        >
+                            {level}
+                        </text>
+                    );
+                })}
+
 
         {/* Line Path */}
         <path d={linePath} fill="none" stroke="#3b82f6" strokeWidth="2" />
@@ -511,7 +524,7 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
               strokeWidth="1"
               strokeDasharray="2,2"
             />
-            
+
             {/* Tooltip background */}
             <rect
               x={hoveredPoint.x + zoomState.offset + 10}
@@ -523,7 +536,7 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
               rx="4"
               ry="4"
             />
-            
+
             {/* Tooltip text */}
             <text
               x={hoveredPoint.x + zoomState.offset + 15}
@@ -541,7 +554,7 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
             >
               Speed: {hoveredPoint.speed.toFixed(0)} ppm
             </text>
-            
+
             {/* Circle highlight on hovered point */}
             <circle
               cx={hoveredPoint.x + zoomState.offset}
@@ -558,8 +571,9 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange }) =>
   );
 };
 
-const OEEGraph = ({ oeeData, isLoading, timeRange }) => {
+const OEEGraph = ({ oeeData, isLoading, serialNumber }) => {
   const [dataPoints, setDataPoints] = useState([]);
+  const navigate = useNavigate()
   const [zoomState, setZoomState] = useState({
     scale: 1,
     offset: 0,
@@ -567,18 +581,22 @@ const OEEGraph = ({ oeeData, isLoading, timeRange }) => {
   });
   const svgRef = useRef(null);
   const containerRef = useRef(null);
-  const [dimensions, setDimensions] = useState({ width: 600, height: 200 });
+  const [dimensions, setDimensions] = useState({ width: 600, height: 100 });
 
   // Update dimensions on resize
   useEffect(() => {
     const handleResize = () => {
       if (containerRef.current) {
-        setDimensions({
-          width: containerRef.current.clientWidth,
-          height: 200
-        });
+          // Calculate 5vw in pixels
+          const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+          const vwInPixels = vw * 0.05; // 5vw
+          
+          setDimensions({
+              width: containerRef.current.clientWidth - vwInPixels,
+              height: 200
+          });
       }
-    };
+  };
 
     handleResize();
     window.addEventListener('resize', handleResize);
@@ -625,7 +643,7 @@ const OEEGraph = ({ oeeData, isLoading, timeRange }) => {
 
   const { width, height } = dimensions;
   const padding = 15;
-  const maxOEE = 100;
+  const maxOEE = 300;
 
   const xScale = dataPoints.length > 1
     ? (width - 2 * padding) / (dataPoints.length - 1)
@@ -665,7 +683,7 @@ const OEEGraph = ({ oeeData, isLoading, timeRange }) => {
   const verticalLines = dataPoints.filter((_, index) => index % hourInterval === 0);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 mb-6 w-full" ref={containerRef}>
+    <div className="bg-white rounded-lg shadow-sm p-4 mb-6 w-full" ref={containerRef} onClick={() => navigate("/oeeGraph?serial_number=" + serialNumber)}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
         <h3 className="text-sm font-semibold text-gray-600">OEE</h3>
         <div className="flex items-center flex-wrap gap-2">
@@ -691,29 +709,15 @@ const OEEGraph = ({ oeeData, isLoading, timeRange }) => {
         viewBox={`0 0 ${width} ${height + padding}`}
         style={{ cursor: zoomState.scale > 1 ? 'grab' : 'default' }}
       >
-        {/* Horizontal Grid lines */}
-        {[0, 50, 100].map((level, index) => (
-          <line
-            key={index}
-            x1={padding + zoomState.offset}
-            y1={height - padding - level * yScale}
-            x2={width - padding + zoomState.offset}
-            y2={height - padding - level * yScale}
-            stroke="#e5e7eb"
-            strokeWidth="1"
-          />
-        ))}
-
-        {/* Vertical Grid lines */}
-        {verticalLines.map((point, index) => {
-          const x = padding + index * hourInterval * xScale * zoomState.scale;
+        {[0, 100, 200, 300].map((level) => {
+          const yPos = height - padding - (level / maxOEE) * (height - 2 * padding);
           return (
             <line
-              key={`v-${index}`}
-              x1={x}
-              y1={padding}
-              x2={x}
-              y2={height - padding}
+              key={`h-line-${level}`}
+              x1={padding + zoomState.offset}
+              y1={yPos}
+              x2={width - padding + zoomState.offset}
+              y2={yPos}
               stroke="#e5e7eb"
               strokeWidth="1"
             />
@@ -721,19 +725,21 @@ const OEEGraph = ({ oeeData, isLoading, timeRange }) => {
         })}
 
         {/* Y-axis labels */}
-        {[0, 50, 100].map((level, index) => (
-          <text
-            key={index}
-            x={padding - 10 + zoomState.offset}
-            y={height - padding - level * yScale + 5}
-            textAnchor="end"
-            fontSize="10"
-            fill="#6b7280"
-          >
-            {level}%
-          </text>
-        ))}
-
+        {[0, 100, 200, 300].map((level) => {
+          const yPos = height - padding - (level / maxOEE) * (height - 2 * padding);
+          return (
+            <text
+              key={`y-label-${level}`}
+              x={padding - 10 + zoomState.offset}
+              y={yPos + 5}  // +5 to center the text vertically on the line
+              textAnchor="end"
+              fontSize="10"
+              fill="#6b7280"
+            >
+              {level}
+            </text>
+          );
+        })}
         {/* Line Path */}
         <path
           d={linePath}
@@ -941,11 +947,13 @@ export default function Dashboard() {
           isLoading={isLoading}
           timeRange={timeRange}
           setTimeRange={setTimeRange}
+          serialNumber={serialNumber}
         />
         <OEEGraph
           oeeData={OeeHistory}
           isLoading={isLoading}
           timeRange={timeRange}
+          serialNumber={serialNumber}
         />
       </div>
 
