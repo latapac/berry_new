@@ -36,13 +36,10 @@ export default function ProfileSection() {
   const [open, setOpen] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [isModelOpen, setIsModalOpen] = useState(false)
 
   const userData = useSelector((state) => state.authSlice?.userData || {});
   const userName = userData?.username || 'User';
   const userDesignation = userData?.designation || userData?.role || 'Staff';
-  const [userListOpen, setUserListOpen] = useState(false);
-  const [users, setUsers] = useState([]);
 
   const anchorRef = useRef(null);
 
@@ -63,50 +60,6 @@ export default function ProfileSection() {
     navigate("/pages/login");
   }
 
-
-  function handleSubmit(e) {
-    e.preventDefault()
-    const formdata = new FormData(e.target)
-    const username = formdata.get("username")
-    const pass = formdata.get("password")
-    const role = formdata.get("role")
-    const name = formdata.get("name")
-    if (!username || !pass || !role) {
-      alert("add all field")
-      return
-    }
-
-    const data = {
-      createdAt: Date.now(),
-      username,
-      password: pass,
-      company_id: userData?.c_id,
-      email: "xyz@gmail.com",
-      status: true,
-      role,
-      name
-    }
-
-    addUser(data).then((data) => {
-      if (data) {
-        alert("user added succesfully")
-        handleModal()
-        getUsers(userData?.c_id).then((data) => {
-          setUsers(data)
-        })
-      } else {
-        alert("user add failed")
-      }
-    })
-
-
-  }
-
-  function handleModal() {
-    setOpen(false);
-    setIsModalOpen(!isModelOpen)
-  }
-
   const prevOpen = useRef(open);
   useEffect(() => {
     if (prevOpen.current === true && open === false) {
@@ -114,18 +67,9 @@ export default function ProfileSection() {
     }
     prevOpen.current = open;
   }, [open]);
-  useEffect(() => {
-    // Fetch users from your API here
-    getUsers(userData?.c_id).then((data) => {
-      setUsers(data)
-    })
-
-  }, []);
 
   return (
     <>
-    
-
       <Chip
         sx={{
           ml: 2,
@@ -239,7 +183,6 @@ export default function ProfileSection() {
 
                     <Divider />
 
-                    {/* Profile Menu Content */}
                     <Box
                       sx={{
                         p: 2,
@@ -257,7 +200,6 @@ export default function ProfileSection() {
                         }
                       }}
                     >
-                      {/* Notification Settings */}
                       <Card
                         sx={{
                           bgcolor: 'background.default',
@@ -306,13 +248,10 @@ export default function ProfileSection() {
                             }
                           }}
                         >
-                          <ListItemIcon sx={{ minWidth: 36 }}>
-                            <IconLogout stroke={1.5} size="20px" />
-                          </ListItemIcon>
                           <ListItemText
                             primary={
                               <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                                UserPage
+                                User Mangement
                               </Typography>
                             }
                           />

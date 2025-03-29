@@ -31,7 +31,7 @@ function Sidebar() {
   function getHomeBtn(pathname) {
     if (pathname == "/") {
       return (<></>)
-    } else if (pathname == "/dash") {
+    } else if (pathname == "/dash" || pathname=="/usermangement") {
       return (<div className='p-2 
     rounded-xl 
     bg-blue-800 
