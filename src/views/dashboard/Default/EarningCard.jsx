@@ -79,7 +79,7 @@ export default function EarningCard({ isLoading, data }) {
   }, [data?.serial_number]);
 
   const isOnline = dataChange(machineData?.ts);
-  const modelType = data?.serial_number?.startsWith("PAC") ? "PAC300" : "MAC300";
+  const modelType = data?.model.toUpperCase()
   const lineNumber = data?.line_number || machineData?.line_number || 'N/A';
   const currentSpeed = Number(machineData?.d?.current_speed[0]) || 0;
   const maxSpeed = 300;
