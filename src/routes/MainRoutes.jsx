@@ -11,8 +11,8 @@ import Protected from './AuthLayout';
 import Active_alarm from '../views/Active_alarm/Default';
 import BatchDetails from '../views/Batchdetails';
 import OeeGraph from '../views/OeeGraph';
-import UserManagementPage from '../views/UserManagementPage';
 import MachineGraph from '../views/MachineGraph';
+import UserManagement from '../views/UserManagement';
 
 
 // dashboard routing
@@ -44,7 +44,7 @@ const MainRoutes = {
     },
     {
       path: 'alluser',
-      element: <UserManagementPage />
+      element: <UserManagement />
     },
     {
       path: 'oeeGraph',
