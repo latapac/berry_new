@@ -40,7 +40,7 @@ export function checkLoginService(){
     }
 }
 
-export default async function addUser(data){
+export async function addUser(data){
     const response = await fetch("http://64.227.139.217:3000/signup", {
       method: "POST",
       headers: {
@@ -72,6 +72,45 @@ export async function getUsers(cid) {
         console.log(error);
         return false
     }
+}
+
+export async function deleteUser(username) {
+    const response = await fetch("http://64.227.139.217:3000/deleteUser", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", // specify the content type
+        },
+        body: JSON.stringify({
+          username
+        })
+      })
+      const res = await response.json()
+      if (res.status==200) {
+          return true
+      } else {
+          console.log(res);
+          return false
+      }
+}
+
+export async function updateUserPass(username,password) {
+    const response = await fetch("http://64.227.139.217:3000/updateUserPassword", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", // specify the content type
+        },
+        body: JSON.stringify({
+          username,
+          password
+        })
+      })
+      const res = await response.json()
+      if (res.status==200) {
+          return true
+      } else {
+          console.log(res);
+          return false
+      }
 }
 
 export async function getMachines(cid) {

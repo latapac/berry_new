@@ -11,6 +11,7 @@ import Protected from './AuthLayout';
 import Active_alarm from '../views/Active_alarm/Default';
 import Batch_details from '../views/batch_details';
 import OEE_graph from '../views/OEE/Default/OEE_graph';
+import UserManagement from '../views/UserManagement';
 
 
 // dashboard routing
@@ -51,6 +52,10 @@ const MainRoutes = {
     {
       path: 'Active_alarm',
       element: <Active_alarm />
+    },
+    {
+      path: 'usermangement',
+      element: <UserManagement />
     },
     {
       path: 'Production',
