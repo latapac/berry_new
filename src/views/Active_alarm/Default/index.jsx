@@ -27,10 +27,10 @@ const AlarmTable = ({ alarms, currentPage, itemsPerPage, onPageChange, isMobile 
           {paginatedAlarms.map((alarm) => (
             <div key={alarm._id} className={`${getAlarmColor(alarm.d?.severity)} p-3 border rounded`}>
               <div className="grid grid-cols-2 gap-1">
-                <div>
+                {/* <div>
                   <span className="font-medium">ID: </span>
                   <span className="truncate block">{alarm._id}</span>
-                </div>
+                </div> */}
                 <div>
                   <span className="font-medium">Line: </span>
                   <span>{alarm.d?.machineLine || 'N/A'}</span>
@@ -222,7 +222,7 @@ const AlarmHistory = ({ history, currentPage, itemsPerPage, onPageChange, isMobi
         <table className="w-full border-collapse">
           <thead className="bg-gray-200 text-gray-700">
             <tr>
-              <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b">ID</th>
+              {/* <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b">ID</th> */}
               <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b">Timestamp</th>
               <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b">Description</th>
               <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b">Status</th>
@@ -234,7 +234,7 @@ const AlarmHistory = ({ history, currentPage, itemsPerPage, onPageChange, isMobi
                 key={alarm._id}
                 className={`${getAlarmColor(alarm.d?.severity)} text-gray-800 hover:bg-gray-50`}
               >
-                <td className="px-2 py-2 text-xs border-b truncate max-w-[80px]">{alarm._id}</td>
+                {/* <td className="px-2 py-2 text-xs border-b truncate max-w-[80px]">{alarm._id}</td> */}
                 <td className="px-2 py-2 text-xs border-b whitespace-nowrap">
                   {new Date(alarm.d?.trigger_time).toLocaleString()}
                 </td>
