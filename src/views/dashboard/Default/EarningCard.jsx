@@ -78,10 +78,11 @@ export default function EarningCard({ isLoading, data }) {
     const interval = setInterval(fetchData, 5000);
     return () => clearInterval(interval);
   }, [data?.serial_number]);
+  
 
   const isOnline = dataChange(machineData?.ts);
   const modelType = data?.model.toUpperCase()
-  const lineNumber = data?.line_number || machineData?.line_number || 'N/A';
+  const lineNumber =  data?.lineNo || 'N/A';
   const currentSpeed = Number(machineData?.d?.current_speed[0]) || 0;
   const maxSpeed = 300;
   const oee = !isNaN(Number(machineData?.d?.current_OEE[0]).toFixed(2))?Number(machineData?.d?.current_OEE[0]).toFixed(2):0
