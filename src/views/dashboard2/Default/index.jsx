@@ -209,7 +209,7 @@ const OEEBox = ({ availability, performance, quality, isLoading }) => {
       </div>
     </div>
   );
-};sH
+};
 
 
 
