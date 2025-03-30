@@ -12,6 +12,13 @@ import { useSelector } from 'react-redux';
 import { getMachines } from '../../../backservice';
 import { useNavigate } from 'react-router';
 import { IconAssembly } from '@tabler/icons-react';
+import { IconAnalyze } from '@tabler/icons-react';
+import { IconRosetteDiscountCheck } from '@tabler/icons-react';
+import { IconBrandAdobePremier } from '@tabler/icons-react';
+import { IconPercentage10} from '@tabler/icons-react';
+import { IconAlarm } from '@tabler/icons-react';
+import { IconFileDescription } from '@tabler/icons-react';
+
 
 function MenuList() {
   const [expanded, setExpanded] = useState(null);
@@ -29,6 +36,25 @@ function MenuList() {
     setReportExpanded(isExpanded ? panel : null);
   };
 
+  function getSubItemIcon(subItem){
+    switch (subItem) {
+      case "Analytics":
+        return (<IconAnalyze/>)
+      case "Batch Details":
+        return (<IconRosetteDiscountCheck/>)
+      case "Production Details":
+        return (<IconBrandAdobePremier/>)
+      case "OEE Details":
+        return (<IconPercentage10/>)
+      case "Active Alarm":
+        return (<IconAlarm/>)
+      case "Report":
+        return (<IconFileDescription/>)
+      default:
+        break;
+    }
+  }
+
   useEffect(() => {
     getMachines(userData?.c_id).then((data) => {
       const machinelist = data?.map((machine) => {
@@ -36,10 +62,10 @@ function MenuList() {
           id: machine._id,
           name: machine.serial_number,
           subItems: [
-            { id: 'dash', name: 'Analytics' },
-            { id: 'batch', name: 'Batch Details' },
-            { id: 'production', name: 'Production Details' },
-            { id: 'oee', name: 'OEE Details' },
+            { id: 'dash', name: 'Analytics'},
+            { id: 'batch', name: 'Batch Details'},
+            { id: 'production', name: 'Production Details'},
+            { id: 'oee', name: 'OEE Details'},
             { id: 'Active_alarm', name: 'Active Alarm' },
             { 
               id: 'report', 
@@ -79,7 +105,7 @@ function MenuList() {
                     onClick={() => { navigate(`/${nestedItem.id}?serial_number=${machineName}`) }}
                     sx={{ pl: 4 }}
                   >
-                    <ListItemText primary={nestedItem.name} />
+                  <ListItemText primary={nestedItem.name} />
                   </ListItem>
                 ))}
               </List>
@@ -95,7 +121,7 @@ function MenuList() {
           key={subItem.id}  
           onClick={() => { navigate(`/${subItem.id}?serial_number=${machineName}`) }}
         >
-          <ListItemText primary={subItem.name} />
+          {getSubItemIcon(subItem.name)}<ListItemText primary={subItem.name} sx={{marginLeft:2}} />
         </ListItem>
       );
     });
@@ -117,11 +143,11 @@ function MenuList() {
                 sx={{ boxShadow: 'none' }}
               >
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography>{machine.name}</Typography>
+                  <Typography>{machine.icon}{machine.name}</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <List>
-                    {renderSubItems(machine.subItems, machine.name)}
+                    {renderSubItems(machine.subItems, machine.name, machine.icon)}
                   </List>
                 </AccordionDetails>
               </Accordion>

@@ -5,6 +5,8 @@ import TotalIncomeDarkCard from '../../../ui-component/cards/TotalIncomeDarkCard
 import { getMachineData, getSpeedHistory, getOeeHistory } from "../../../backservice";
 import { gridSpacing } from 'store/constant';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
 
 const SpeedBox = ({ speed, isLoading, status }) => {
   const [animatedSpeed, setAnimatedSpeed] = useState(0);
@@ -204,53 +206,61 @@ const OEEBox = ({ availability, performance, quality, isLoading }) => {
   );
 };
 
+
+
 const TotalProductionBox = ({ value, isLoading }) => {
-  const [animatedValue, setAnimatedValue] = useState(0);
-
-  useEffect(() => {
-    if (!isLoading && value !== undefined) {
-      const target = parseFloat(value) || 0;
-      const interval = setInterval(() => {
-        setAnimatedValue((prev) => {
-          const diff = target - prev;
-          if (Math.abs(diff) < 1) {
-            clearInterval(interval);
-            return target;
-          }
-          return prev + diff / 20;
-        });
-      }, 50);
-      return () => clearInterval(interval);
-    }
-  }, [value, isLoading]);
-
-  const dummyLines = [
-    { color: '#f87171', path: 'M0,20 Q10,10 20,20 T40,20 T60,10 T80,20' },
-    { color: '#60a5fa', path: 'M0,15 Q10,20 20,15 T40,15 T60,20 T80,15' },
-    { color: '#facc15', path: 'M0,18 Q10,15 20,18 T40,18 T60,15 T80,18' },
+  // Sample data - replace with your actual data
+  const data = [
+    { name: ' Shift 1', value: 20 },
+    { name: 'Shift 2', value: 45 },
+    { name: 'Shift 3', value: 28 },
+  
   ];
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-4 h-full min-h-[150px] flex flex-col justify-between">
-      <h3 className="text-xs font-semibold text-gray-600">Total Production</h3>
-      <div className="text-sm font-bold text-gray-900">
-        {isLoading ? '-' : animatedValue.toFixed(0)} units
+      <div className='flex flex-row'>
+        <h3 className="text-xs font-semibold text-gray-600">Total Production</h3>
+        <h3 className='ml-[10vh] text-xs font-bold'>Yesterday</h3>
       </div>
-      <div className="space-y-0.5">
-        {dummyLines.map((item, index) => (
-          <div key={index} className="flex items-center gap-1">
-            <svg className="w-12 h-3 sm:w-16 sm:h-4" viewBox="0 0 80 20">
-              <path d={item.path} fill="none" stroke={item.color} strokeWidth="1" />
-            </svg>
-            <span className="text-[10px] sm:text-xs text-gray-500">
-              {index === 0 ? '60% / 370°C / 3.3 GHz' : index === 1 ? '54% / 310°C / 3.3 GHz' : '54% / 310°C / 3.3 GHz'}
-            </span>
+      
+      <div className="h-[120px] mt-2">
+        {isLoading ? (
+          <div className="flex items-center justify-center h-full">
+            Loading...
           </div>
-        ))}
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <XAxis 
+                dataKey="name" 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fontSize: 10 }}
+              />
+              <YAxis 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fontSize: 10 }}
+                width={20}
+              />
+              <Tooltip />
+              <Bar 
+                dataKey="value" 
+                fill="#8884d8" 
+                radius={[3, 3, 0, 0]}
+                barSize={22}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
       </div>
     </div>
   );
 };
+
+
 
 const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange, serialNumber }) => {
   const navigate = useNavigate();
