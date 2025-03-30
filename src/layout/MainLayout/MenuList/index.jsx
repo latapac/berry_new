@@ -121,7 +121,7 @@ function MenuList() {
           key={subItem.id}  
           onClick={() => { navigate(`/${subItem.id}?serial_number=${machineName}`) }}
         >
-          {getSubItemIcon(subItem.name)}<ListItemText primary={subItem.name} sx={{marginLeft:2}} />
+         <div className='text-gray-600 w-0.1 mr-6 '>{getSubItemIcon(subItem.name)}</div> <ListItemText primary={subItem.name} sx={{marginLeft:-2}} />
         </ListItem>
       );
     });

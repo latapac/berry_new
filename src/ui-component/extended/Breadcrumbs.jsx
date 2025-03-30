@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 // material-ui
@@ -69,19 +69,6 @@ export default function Breadcrumbs({
 
   let customLocation = location.pathname;
 
-  useEffect(() => {
-    navigation?.items?.map((menu) => {
-      if (menu.type && menu.type === 'group') {
-        if (menu?.url && menu.url === customLocation) {
-          setMain(menu);
-          setItem(menu);
-        } else {
-          getCollapse(menu);
-        }
-      }
-      return false;
-    });
-  });
 
   // set active item state
   const getCollapse = (menu) => {

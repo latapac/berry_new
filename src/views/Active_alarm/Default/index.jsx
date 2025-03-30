@@ -82,7 +82,6 @@ const AlarmTable = ({ alarms, currentPage, itemsPerPage, onPageChange, isMobile 
         <table className="w-full border-collapse">
           <thead className="bg-gray-200 text-gray-700">
             <tr>
-              <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b">Alarm ID</th>
               <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b">Machine Line</th>
               <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b">Timestamp</th>
               <th className="px-2 py-1 text-xs font-medium uppercase tracking-wider border-b">Description</th>
@@ -92,9 +91,9 @@ const AlarmTable = ({ alarms, currentPage, itemsPerPage, onPageChange, isMobile 
             {paginatedAlarms.map((alarm) => (
               <tr
                 key={alarm._id}
-                className={`${getAlarmColor(alarm.d?.severity)} text-gray-800 hover:bg-gray-50`}
+                className={`${getAlarmColor(alarm.d?.severity)} text-gray-800 hover:bg-gray-50 
+                `}
               >
-                <td className="px-2 py-2 text-xs border-b truncate max-w-[80px]">{alarm._id}</td>
                 <td className="px-2 py-2 text-xs border-b">{alarm.d?.machineLine || 'N/A'}</td>
                 <td className="px-2 py-2 text-xs border-b whitespace-nowrap">
                   {new Date(alarm.d?.trigger_time).toLocaleString()}
