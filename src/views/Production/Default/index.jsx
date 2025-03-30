@@ -5,7 +5,8 @@ import {
   Typography, 
   Skeleton, 
   Box, 
-  Grid 
+  Grid,
+  useTheme
 } from '@mui/material';
 import { Bar, Pie } from 'react-chartjs-2';
 import {
@@ -22,7 +23,6 @@ import { getMachineData } from "../../../backservice";
 import { gridSpacing } from 'store/constant';
 import { useLocation } from 'react-router';
 
-// Register ChartJS components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -34,24 +34,27 @@ ChartJS.register(
 );
 
 export default function Production() {
+  const theme = useTheme();
   const [isLoading, setLoading] = useState(true);
   const [machineData, setMachineData] = useState({});
   const [chartData, setChartData] = useState({
-    labels: [],
+    labels: ['Production'],
     datasets: [
       {
         label: 'Actual Production',
-        data: [],
-        backgroundColor: 'rgba(75, 192, 10,0.75)',
-        borderColor: 'rgba(75, 192, 10,3 )',
-        borderWidth: 3,
+        data: [0], // Default value, will be updated
+        backgroundColor: theme.palette.primary.main,
+        borderColor: theme.palette.primary.dark,
+        borderWidth: 2,
+        borderRadius: 4,
       },
       {
         label: 'Target Production',
-        data: [],
-        backgroundColor: 'rgba(255, 99, 132, 0.6)',
-        borderColor: 'rgba(255, 99, 132, 1)',
-        borderWidth: 3,
+        data: [67], // Static target value
+        backgroundColor: theme.palette.secondary.main,
+        borderColor: theme.palette.secondary.dark,
+        borderWidth: 2,
+        borderRadius: 4,
       },
     ],
   });
@@ -67,33 +70,31 @@ export default function Production() {
   useEffect(() => {
     getMachineData(serialNumber).then((data) => {
       setMachineData(data);
+      // Set the chart data with actual production
+      setChartData({
+        labels: ['Production'],
+        datasets: [
+          {
+            label: 'Actual Production',
+            data: [data?.d?.Total_Production[0] || 0], // Set actual production data
+            backgroundColor: theme.palette.primary.main,
+            borderColor: theme.palette.primary.dark,
+            borderWidth: 2,
+            borderRadius: 4,
+          },
+          {
+            label: 'Target Production',
+            data: [67], // Static target production value
+            backgroundColor: theme.palette.secondary.main,
+            borderColor: theme.palette.secondary.dark,
+            borderWidth: 2,
+            borderRadius: 4,
+          },
+        ],
+      });
     });
   }, [serialNumber]);
 
-  // Simulate live data updates every 5 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (machineData) {
-        setChartData((prevData) => ({
-          labels: [...prevData.labels, new Date().toLocaleTimeString()],
-          datasets: [
-            {
-              ...prevData.datasets[0],
-              data: [machineData?.d?.Total_Production[0]],
-            },
-            {
-              ...prevData.datasets[1],
-              data: [67], // Target Production
-            },
-          ],
-        }));
-      }
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [machineData]);
-
-  // Chart configuration
   const barChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -106,7 +107,7 @@ export default function Production() {
             family: "'Roboto', sans-serif",
             weight: '500',
           },
-          color: '#333',
+          color: theme.palette.text.primary,
         },
       },
       title: {
@@ -117,7 +118,7 @@ export default function Production() {
           weight: 'bold',
           family: "'Roboto', sans-serif",
         },
-        color: '#333',
+        color: theme.palette.text.primary,
         padding: {
           top: 10,
           bottom: 20,
@@ -125,15 +126,22 @@ export default function Production() {
       },
       tooltip: {
         enabled: true,
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        backgroundColor: theme.palette.background.paper,
         titleFont: {
           size: 14,
           family: "'Roboto', sans-serif",
+          weight: 'bold',
+          color: theme.palette.text.primary
         },
         bodyFont: {
           size: 12,
           family: "'Roboto', sans-serif",
+          color: theme.palette.text.secondary
         },
+        cornerRadius: 4,
+        displayColors: true,
+        borderColor: theme.palette.divider,
+        borderWidth: 1,
       },
     },
     scales: {
@@ -142,7 +150,7 @@ export default function Production() {
           display: false,
         },
         ticks: {
-          color: '#666',
+          color: theme.palette.text.secondary,
           font: {
             size: 12,
             family: "'Roboto', sans-serif",
@@ -151,10 +159,11 @@ export default function Production() {
       },
       y: {
         grid: {
-          color: 'rgba(0, 0, 0, 0.1)',
+          color: theme.palette.divider,
+          drawBorder: false,
         },
         ticks: {
-          color: '#666',
+          color: theme.palette.text.secondary,
           font: {
             size: 12,
             family: "'Roboto', sans-serif",
@@ -165,19 +174,18 @@ export default function Production() {
     },
   };
 
-  // Pie chart data and options
   const pieChartData = {
     labels: ['Good Production', 'Rejected Production'],
     datasets: [
       {
         data: [machineData?.d?.Good_Count[0] || 0, machineData?.d?.Reject_Counters[0] || 0],
         backgroundColor: [
-          'rgba(75, 192, 192, 0.6)',
-          'rgba(255, 99, 132, 0.6)',
+          theme.palette.success.main,
+          theme.palette.error.main,
         ],
         borderColor: [
-          'rgba(75, 192, 192, 1)',
-          'rgba(255, 99, 132, 1)',
+          theme.palette.success.dark,
+          theme.palette.error.dark,
         ],
         borderWidth: 1,
       },
@@ -196,48 +204,122 @@ export default function Production() {
             family: "'Roboto', sans-serif",
             weight: '500',
           },
-          color: '#333',
+          color: theme.palette.text.primary,
         },
       },
       tooltip: {
+        backgroundColor: theme.palette.background.paper,
         bodyFont: {
           size: 12,
           family: "'Roboto', sans-serif",
+          color: theme.palette.text.secondary
+        },
+        titleFont: {
+          size: 14,
+          family: "'Roboto', sans-serif",
+          weight: 'bold',
+          color: theme.palette.text.primary
         },
       },
     },
   };
 
   return (
-    <Grid container spacing={gridSpacing}>
+    <Grid container spacing={gridSpacing} sx={{ p: 3 }}>
       {/* Top Row: Production Metrics */}
       <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
           <Grid item xs={12} sm={4}>
-            <Card sx={{ borderRadius: '12px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)' }}>
-              <CardContent sx={{ p: 3, textAlign: 'center', background: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)', color: '#fff' }}>
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>Total Production</Typography>
-                <Typography variant="h4" sx={{ fontWeight: 700 }}>
+            <Card sx={{ 
+              borderRadius: '8px', 
+              boxShadow: theme.shadows[3],
+              borderLeft: `4px solid ${theme.palette.primary.main}` 
+            }}>
+              <CardContent sx={{ p: 3 }}>
+                <Typography variant="subtitle1" sx={{ 
+                  fontWeight: 600, 
+                  color: theme.palette.text.secondary,
+                  mb: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1
+                }}>
+                  <Box component="span" sx={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: '50%',
+                    bgcolor: theme.palette.primary.main
+                  }}/>
+                  Total Production
+                </Typography>
+                <Typography variant="h4" sx={{ 
+                  fontWeight: 700,
+                  color: theme.palette.text.primary
+                }}>
                   {isLoading ? <Skeleton width="60%" /> : machineData?.d?.Total_Production[0]}
                 </Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={4}>
-            <Card sx={{ borderRadius: '12px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)' }}>
-              <CardContent sx={{ p: 3, textAlign: 'center', background: 'linear-gradient(135deg, #96e6a1 0%, #d4fc79 100%)', color: '#fff' }}>
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>Good Production</Typography>
-                <Typography variant="h4" sx={{ fontWeight: 700 }}>
+            <Card sx={{ 
+              borderRadius: '8px', 
+              boxShadow: theme.shadows[3],
+              borderLeft: `4px solid ${theme.palette.success.main}` 
+            }}>
+              <CardContent sx={{ p: 3 }}>
+                <Typography variant="subtitle1" sx={{ 
+                  fontWeight: 600, 
+                  color: theme.palette.text.secondary,
+                  mb: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1
+                }}>
+                  <Box component="span" sx={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: '50%',
+                    bgcolor: theme.palette.success.main
+                  }}/>
+                  Good Production
+                </Typography>
+                <Typography variant="h4" sx={{ 
+                  fontWeight: 700,
+                  color: theme.palette.text.primary
+                }}>
                   {isLoading ? <Skeleton width="60%" /> : machineData?.d?.Good_Count[0]}
                 </Typography>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={4}>
-            <Card sx={{ borderRadius: '12px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)' }}>
-              <CardContent sx={{ p: 3, textAlign: 'center', background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', color: '#fff' }}>
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>Rejected Production</Typography>
-                <Typography variant="h4" sx={{ fontWeight: 700 }}>
+            <Card sx={{ 
+              borderRadius: '8px', 
+              boxShadow: theme.shadows[3],
+              borderLeft: `4px solid ${theme.palette.error.main}` 
+            }}>
+              <CardContent sx={{ p: 3 }}>
+                <Typography variant="subtitle1" sx={{ 
+                  fontWeight: 600, 
+                  color: theme.palette.text.secondary,
+                  mb: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1
+                }}>
+                  <Box component="span" sx={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: '50%',
+                    bgcolor: theme.palette.error.main
+                  }}/>
+                  Rejected Production
+                </Typography>
+                <Typography variant="h4" sx={{ 
+                  fontWeight: 700,
+                  color: theme.palette.text.primary
+                }}>
                   {isLoading ? <Skeleton width="60%" /> : machineData?.d?.Reject_Counters[0]}
                 </Typography>
               </CardContent>
@@ -252,14 +334,36 @@ export default function Production() {
           {/* Bar Chart */}
           <Grid item xs={12} md={8}>
             <Card sx={{ 
-              borderRadius: '12px', 
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+              borderRadius: '8px', 
+              boxShadow: theme.shadows[3],
               height: '100%',
               minHeight: '400px'
             }}>
               <CardContent sx={{ p: 3, height: '100%' }}>
-                <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>Production Details</Typography>
-                <Box sx={{ height: 'calc(100% - 40px)', position: 'relative' }}>
+                <Typography variant="h6" sx={{ 
+                  fontWeight: 600, 
+                  mb: 2,
+                  color: theme.palette.text.primary,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1
+                }}>
+                  <Box component="span" sx={{
+                    width: 16,
+                    height: 16,
+                    borderRadius: '4px',
+                    bgcolor: theme.palette.primary.main
+                  }}/>
+                  Production Trend
+                </Typography>
+                <Box sx={{ 
+                  height: 'calc(100% - 40px)', 
+                  position: 'relative',
+                  border: `1px solid ${theme.palette.divider}`,
+                  borderRadius: '4px',
+                  p: 1,
+                  backgroundColor: theme.palette.background.paper
+                }}>
                   {isLoading ? (
                     <Skeleton variant="rectangular" height="100%" />
                   ) : (
@@ -273,14 +377,36 @@ export default function Production() {
           {/* Pie Chart */}
           <Grid item xs={12} md={4}>
             <Card sx={{ 
-              borderRadius: '12px', 
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+              borderRadius: '8px', 
+              boxShadow: theme.shadows[3],
               height: '100%',
               minHeight: '400px'
             }}>
               <CardContent sx={{ p: 3, height: '100%' }}>
-                <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>Good vs Bad Production</Typography>
-                <Box sx={{ height: 'calc(100% - 40px)', position: 'relative' }}>
+                <Typography variant="h6" sx={{ 
+                  fontWeight: 600, 
+                  mb: 2,
+                  color: theme.palette.text.primary,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1
+                }}>
+                  <Box component="span" sx={{
+                    width: 16,
+                    height: 16,
+                    borderRadius: '4px',
+                    bgcolor: theme.palette.success.main
+                  }}/>
+                  Quality Distribution
+                </Typography>
+                <Box sx={{ 
+                  height: 'calc(100% - 40px)', 
+                  position: 'relative',
+                  border: `1px solid ${theme.palette.divider}`,
+                  borderRadius: '4px',
+                  p: 1,
+                  backgroundColor: theme.palette.background.default
+                }}>
                   {isLoading ? (
                     <Skeleton variant="rectangular" height="100%" />
                   ) : (
