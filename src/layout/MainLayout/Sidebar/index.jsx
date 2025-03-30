@@ -9,7 +9,7 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 
 import MenuList from '../MenuList';
 import MiniDrawerStyled from './MiniDrawerStyled';
-import { IconArrowBackUp } from '@tabler/icons-react';
+import { IconCornerUpLeftDouble } from '@tabler/icons-react';
 import useConfig from 'hooks/useConfig';
 import { drawerWidth } from 'store/constant';
 import { useNavigate,useLocation } from 'react-router';
@@ -49,7 +49,7 @@ function Sidebar() {
     gap-1
     text-sm
     font-semibold' onClick={() => { navigate("/") }}>
-       <IconArrowBackUp /> <span>Back To Home</span>
+       <IconCornerUpLeftDouble /> <span>Back To Home</span>
       </div>)
     } else {
       return (<div className='p-2 
@@ -69,7 +69,7 @@ function Sidebar() {
     gap-1
     text-sm
     font-semibold' onClick={() => { navigate("/dash?serial_number=" + serialNumber) }}>
-         <IconArrowBackUp /> <span>Back To Dashboard</span>
+         <IconCornerUpLeftDouble /> <span>Back To Dashboard</span>
       </div>)
     }
   }

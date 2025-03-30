@@ -11,6 +11,7 @@ import ListItemText from '@mui/material/ListItemText';
 import { useSelector } from 'react-redux';
 import { getMachines } from '../../../backservice';
 import { useNavigate } from 'react-router';
+import { IconAssembly } from '@tabler/icons-react';
 
 function MenuList() {
   const [expanded, setExpanded] = useState(null);
@@ -104,7 +105,7 @@ function MenuList() {
     <Box sx={{ }}>
       <Accordion sx={{ boxShadow: 'none' }}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />} >
-          <Typography variant="h6">Machines</Typography>
+          <Typography variant="h6" sx={{display: 'flex',alignItems:'center',gap:1}}><IconAssembly/>Machines</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <List>
