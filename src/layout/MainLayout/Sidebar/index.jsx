@@ -104,8 +104,9 @@ function Sidebar() {
   return (
     <Box component="nav" sx={{ flexShrink: { md: 0 }, width: { xs: 'auto', md: drawerWidth } }} aria-label="mailbox folders">
       <MiniDrawerStyled variant="permanent" open={drawerOpen}>
-        {drawer}
-      {<div className='h-ful'>{getHomeBtn(pathname)}</div>}
+       
+        {<div className='h-ful'>{getHomeBtn(pathname)}</div>}
+         {drawer}
       </MiniDrawerStyled>
     </Box>
   );

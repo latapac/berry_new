@@ -62,17 +62,23 @@ const OEEGraph = ({ oeeData, isLoading, serialNumber, navigate }) => {
     // Update dimensions on resize
     useEffect(() => {
         const handleResize = () => {
-            if (containerRef.current) {
-                setDimensions({
-                    width: containerRef.current.clientWidth,
-                    height: 400
-                });
-            }
+          if (containerRef.current) {
+            // Calculate 5vw in pixels
+            const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+            const vwInPixels = vw * 0.05; // 5vw
+    
+            setDimensions({
+              width: containerRef.current.clientWidth - vwInPixels,
+              height: 400
+            });
+          }
         };
+    
+    
         handleResize();
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
-    }, []);
+      }, []);
 
     useEffect(() => {
         if (!isLoading && oeeData?.length > 0) {
