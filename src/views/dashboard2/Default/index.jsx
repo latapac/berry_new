@@ -5,6 +5,8 @@ import TotalIncomeDarkCard from '../../../ui-component/cards/TotalIncomeDarkCard
 import { getMachineData, getSpeedHistory, getOeeHistory } from "../../../backservice";
 import { gridSpacing } from 'store/constant';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
 
 import { mstatus, getMstatusBGColor } from '../../../constants';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
