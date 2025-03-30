@@ -39,17 +39,17 @@ function MenuList() {
   function getSubItemIcon(subItem){
     switch (subItem) {
       case "Analytics":
-        return (<IconAnalyze/>)
+        return (<IconAnalyze className='h-5'/>)
       case "Batch Details":
-        return (<IconRosetteDiscountCheck/>)
+        return (<IconRosetteDiscountCheck  className='h-5'/>)
       case "Production Details":
-        return (<IconBrandAdobePremier/>)
+        return (<IconBrandAdobePremier  className='h-4.5'/>)
       case "OEE Details":
-        return (<IconPercentage10/>)
+        return (<IconPercentage10  className='h-4.5'/>)
       case "Active Alarm":
-        return (<IconAlarm/>)
+        return (<IconAlarm  className='h-5'/>)
       case "Report":
-        return (<IconFileDescription/>)
+        return (<IconFileDescription  className='h-5'/>)
       default:
         break;
     }
@@ -119,9 +119,10 @@ function MenuList() {
         <ListItem 
           button 
           key={subItem.id}  
+          className='ml-[-5vh]'
           onClick={() => { navigate(`/${subItem.id}?serial_number=${machineName}`) }}
         >
-         <div className='text-gray-600 w-0.1 mr-6 '>{getSubItemIcon(subItem.name)}</div> <ListItemText primary={subItem.name} sx={{marginLeft:-2}} />
+         <div className='text-gray-600  mr-6 '>{getSubItemIcon(subItem.name)}</div> <ListItemText primary={subItem.name} sx={{marginLeft:-2}} />
         </ListItem>
       );
     });
