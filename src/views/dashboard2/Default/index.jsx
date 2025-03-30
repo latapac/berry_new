@@ -6,9 +6,10 @@ import { getMachineData, getSpeedHistory, getOeeHistory } from "../../../backser
 import { gridSpacing } from 'store/constant';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { mstatus, getMstatusBGColor } from '../../../constants';
 
+const SpeedBox = ({ speed, isLoading, status, mstatus }) => {
 
-const SpeedBox = ({ speed, isLoading, status }) => {
   const [animatedSpeed, setAnimatedSpeed] = useState(0);
   const MAX_SPEED = 300;
 
@@ -42,7 +43,8 @@ const SpeedBox = ({ speed, isLoading, status }) => {
     <div className="bg-white rounded-lg shadow-sm p-4 h-full min-h-[150px] flex flex-col justify-between">
       <div className="flex justify-between items-center mb-2">
         <h3 className="text-sm font-semibold text-gray-600">Speed</h3>
-        <div className="flex items-center text-xs">
+        <div className="flex  items-center text-xs">
+
           <span
             className={`w-2 h-2 rounded-full mr-1 ${machineStatus.active ? '' : 'opacity-50'}`}
             style={{ backgroundColor: machineStatus.color }}
@@ -55,7 +57,7 @@ const SpeedBox = ({ speed, isLoading, status }) => {
           </span>
         </div>
       </div>
-      <div className="flex items-center justify-left">
+      <div className="flex gap-32 items-center justify-left">
         <div className="relative w-16 h-16 sm:w-20 sm:h-20 mr-4">
           <svg className="w-full h-full" viewBox="0 0 36 36">
             <circle cx="18" cy="18" r="16" fill="none" stroke="#e5e7eb" strokeWidth="4" />
@@ -77,6 +79,9 @@ const SpeedBox = ({ speed, isLoading, status }) => {
               ppm
             </text>
           </svg>
+        </div>
+        <div className={`${getMstatusBGColor(mstatus)} text-[1.1rem] font-extrabold`}>
+          {mstatus}
         </div>
       </div>
     </div>
@@ -419,34 +424,15 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange, seri
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 mb-6 w-full" ref={containerRef} onClick={() => navigate("/machineGraph?serial_number=" + serialNumber)}>
+    <div className="bg-white rounded-lg shadow-sm p-4 mb-6 w-full" ref={containerRef}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
         <h3 className="text-sm font-semibold text-gray-600">Machine Speed</h3>
         <div className="flex items-center flex-wrap gap-2">
-          <button onClick={() => handleZoom(0.9)} className="p-1 text-gray-600 hover:text-gray-800">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-            </svg>
-          </button>
-          <button onClick={() => handleZoom(1.1)} className="p-1 text-gray-600 hover:text-gray-800">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-          </button>
-          <button onClick={() => resetZoom()} className="p-1 text-gray-600 hover:text-gray-800 text-xs sm:text-sm">
-            Reset
-          </button>
-          <label className="text-xs sm:text-sm text-gray-600">Time Range:</label>
-          <select
-            value={timeRange}
-            onChange={(e) => setTimeRange(Number(e.target.value))}
-            className="text-xs sm:text-sm text-gray-700 bg-white border border-gray-200 rounded-md px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
-          >
-            <option value={1}>1 Hour</option>
-            <option value={4}>4 Hours</option>
-            <option value={8}>8 Hours</option>
-            <option value={12}>12 Hours</option>
-          </select>
+          <div>
+            <button className='text-blue-600 underline hover:cursor-pointer' onClick={() => navigate("/machineGraph?serial_number=" + serialNumber)}>
+              More Details  {'>>'}
+            </button>
+          </div>
         </div>
       </div>
       <svg
@@ -460,36 +446,36 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange, seri
       >
         {/* Horizontal Grid lines */}
         {[0, 100, 200, 300].map((level) => {
-                    const yPos = height - padding - (level / maxSpeed) * (height - 2 * padding);
-                    return (
-                        <line
-                            key={`h-line-${level}`}
-                            x1={padding + zoomState.offset}
-                            y1={yPos}
-                            x2={width - padding + zoomState.offset}
-                            y2={yPos}
-                            stroke="#e5e7eb"
-                            strokeWidth="1"
-                        />
-                    );
-                })}
+          const yPos = height - padding - (level / maxSpeed) * (height - 2 * padding);
+          return (
+            <line
+              key={`h-line-${level}`}
+              x1={padding + zoomState.offset}
+              y1={yPos}
+              x2={width - padding + zoomState.offset}
+              y2={yPos}
+              stroke="#e5e7eb"
+              strokeWidth="1"
+            />
+          );
+        })}
 
-                {/* Y-axis labels */}
-                {[0, 100, 200, 300].map((level) => {
-                    const yPos = height - padding - (level / maxSpeed) * (height - 2 * padding);
-                    return (
-                        <text
-                            key={`y-label-${level}`}
-                            x={padding - 10 + zoomState.offset}
-                            y={yPos + 5}  // +5 to center the text vertically on the line
-                            textAnchor="end"
-                            fontSize="10"
-                            fill="#6b7280"
-                        >
-                            {level}
-                        </text>
-                    );
-                })}
+        {/* Y-axis labels */}
+        {[0, 100, 200, 300].map((level) => {
+          const yPos = height - padding - (level / maxSpeed) * (height - 2 * padding);
+          return (
+            <text
+              key={`y-label-${level}`}
+              x={padding - 10 + zoomState.offset}
+              y={yPos + 5}  // +5 to center the text vertically on the line
+              textAnchor="end"
+              fontSize="10"
+              fill="#6b7280"
+            >
+              {level}
+            </text>
+          );
+        })}
 
 
         {/* Line Path */}
@@ -597,16 +583,16 @@ const OEEGraph = ({ oeeData, isLoading, serialNumber }) => {
   useEffect(() => {
     const handleResize = () => {
       if (containerRef.current) {
-          // Calculate 5vw in pixels
-          const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
-          const vwInPixels = vw * 0.05; // 5vw
-          
-          setDimensions({
-              width: containerRef.current.clientWidth - vwInPixels,
-              height: 200
-          });
+        // Calculate 5vw in pixels
+        const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+        const vwInPixels = vw * 0.05; // 5vw
+
+        setDimensions({
+          width: containerRef.current.clientWidth - vwInPixels,
+          height: 200
+        });
       }
-  };
+    };
 
     handleResize();
     window.addEventListener('resize', handleResize);
@@ -693,23 +679,15 @@ const OEEGraph = ({ oeeData, isLoading, serialNumber }) => {
   const verticalLines = dataPoints.filter((_, index) => index % hourInterval === 0);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 mb-6 w-full" ref={containerRef} onClick={() => navigate("/oeeGraph?serial_number=" + serialNumber)}>
+    <div className="bg-white rounded-lg shadow-sm p-4 mb-6 w-full" ref={containerRef}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
         <h3 className="text-sm font-semibold text-gray-600">OEE</h3>
         <div className="flex items-center flex-wrap gap-2">
-          <button onClick={() => handleZoom(0.9)} className="p-1 text-gray-600 hover:text-gray-800">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-            </svg>
-          </button>
-          <button onClick={() => handleZoom(1.1)} className="p-1 text-gray-600 hover:text-gray-800">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-          </button>
-          <button onClick={() => resetZoom()} className="p-1 text-gray-600 hover:text-gray-800 text-xs sm:text-sm">
-            Reset
-          </button>
+          <div>
+            <button className='text-blue-600 underline hover:cursor-pointer'  onClick={() => navigate("/oeeGraph?serial_number=" + serialNumber)}>
+              More Details  {'>>'}
+            </button>
+          </div>
         </div>
       </div>
       <svg
@@ -791,6 +769,13 @@ export default function Dashboard() {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
+  const dataChange = (tp) => {
+    if (!tp) return false;
+    const date = new Date(tp);
+    const currentTime = new Date();
+    return (currentTime - date) <= 60000;
+  };
+
   useEffect(() => {
     setLoading(true);
     getMachineData(serialNumber)
@@ -826,7 +811,9 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, [serialNumber]);
 
+  const isOnline = dataChange(machineData?.ts);
   const status = machineData?.d?.current_speed[0] > 0 ? 'running' : 'not running';
+  const statusText = !isOnline ? 'Offline' : (mstatus[machineData?.d?.status[0]] || 'Unknown');
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
@@ -932,6 +919,7 @@ export default function Dashboard() {
           speed={machineData?.d?.current_speed[0]}
           isLoading={isLoading}
           status={status}
+          mstatus={statusText}
         />
         <GoodProductionBox
           goodValue={machineData?.d?.Good_Count[0]}
@@ -972,6 +960,7 @@ export default function Dashboard() {
           speed={machineData?.d?.current_speed[0]}
           isLoading={isLoading}
           status={status}
+          mstatus={statusText}
         />
         <GoodProductionBox
           goodValue={machineData?.d?.Good_Count[0]}

@@ -27,7 +27,7 @@ export default function Dashboard() {
        })
     }
   
-  }, [])
+  }, [userData])
   return (
 
     <Grid container spacing={gridSpacing}>
