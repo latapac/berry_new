@@ -1,6 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
-
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Avatar from '@mui/material/Avatar';
@@ -8,12 +6,10 @@ import Button from '@mui/material/Button';
 import CardActions from '@mui/material/CardActions';
 import Chip from '@mui/material/Chip';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
-import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid2';
 import Paper from '@mui/material/Paper';
 import Popper from '@mui/material/Popper';
 import Stack from '@mui/material/Stack';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
@@ -25,26 +21,6 @@ import NotificationList from './NotificationList';
 // assets
 import { IconBell } from '@tabler/icons-react';
 
-// notification status options
-const status = [
-  {
-    value: 'all',
-    label: 'All Notification'
-  },
-  {
-    value: 'new',
-    label: 'New'
-  },
-  {
-    value: 'unread',
-    label: 'Unread'
-  },
-  {
-    value: 'other',
-    label: 'Other'
-  }
-];
-
 // ==============================|| NOTIFICATION ||============================== //
 
 export default function NotificationSection() {
@@ -52,11 +28,7 @@ export default function NotificationSection() {
   const downMD = useMediaQuery(theme.breakpoints.down('md'));
 
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState('');
-
-  /**
-   * anchorRef is used on different componets and specifying one type leads to other components throwing an error
-   * */
+ 
   const anchorRef = useRef(null);
 
   const handleToggle = () => {
@@ -78,9 +50,7 @@ export default function NotificationSection() {
     prevOpen.current = open;
   }, [open]);
 
-  const handleChange = (event) => {
-    event?.target.value && setValue(event?.target.value);
-  };
+ 
 
   return (
     <>
@@ -138,11 +108,6 @@ export default function NotificationSection() {
                               <Chip size="small" label="01" sx={{ color: 'background.default', bgcolor: 'warning.dark' }} />
                             </Stack>
                           </Grid>
-                          <Grid>
-                            <Typography component={Link} to="#" variant="subtitle2" color="primary">
-                              Mark as all read
-                            </Typography>
-                          </Grid>
                         </Grid>
                       </Grid>
                       <Grid size={12}>
@@ -154,29 +119,7 @@ export default function NotificationSection() {
                             '&::-webkit-scrollbar': { width: 5 }
                           }}
                         >
-                          <Grid container direction="column" spacing={2}>
-                            <Grid size={12}>
-                              <Box sx={{ px: 2, pt: 0.25 }}>
-                                <TextField
-                                  id="outlined-select-currency-native"
-                                  select
-                                  fullWidth
-                                  value={value}
-                                  onChange={handleChange}
-                                  slotProps={{ select: { native: true } }}
-                                >
-                                  {status.map((option) => (
-                                    <option key={option.value} value={option.value}>
-                                      {option.label}
-                                    </option>
-                                  ))}
-                                </TextField>
-                              </Box>
-                            </Grid>
-                            <Grid size={12} sx={{ p: 0 }}>
-                              <Divider sx={{ my: 0 }} />
-                            </Grid>
-                          </Grid>
+                         
                           <NotificationList />
                         </Box>
                       </Grid>
