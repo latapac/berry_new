@@ -347,7 +347,3 @@ EarningCard.propTypes = {
   }),
 };
 
-EarningCard.defaultProps = {
-  isLoading: false,
-  data: { serial_number: 'N/A' },
-};

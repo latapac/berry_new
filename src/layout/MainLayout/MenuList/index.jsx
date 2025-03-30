@@ -15,7 +15,7 @@ import { IconAssembly } from '@tabler/icons-react';
 import { IconAnalyze } from '@tabler/icons-react';
 import { IconRosetteDiscountCheck } from '@tabler/icons-react';
 import { IconBrandAdobePremier } from '@tabler/icons-react';
-import { IconPercentage10} from '@tabler/icons-react';
+import { IconPercentage10 } from '@tabler/icons-react';
 import { IconAlarm } from '@tabler/icons-react';
 import { IconFileDescription } from '@tabler/icons-react';
 
@@ -25,7 +25,7 @@ function MenuList() {
   const [reportExpanded, setReportExpanded] = useState(null);
   const [machines, setMachines] = useState([]);
   const navigate = useNavigate();
-  
+
   const userData = useSelector((state) => state.authSlice.userData);
 
   const handleChange = (panel) => (event, isExpanded) => {
@@ -36,20 +36,20 @@ function MenuList() {
     setReportExpanded(isExpanded ? panel : null);
   };
 
-  function getSubItemIcon(subItem){
+  function getSubItemIcon(subItem) {
     switch (subItem) {
       case "Analytics":
-        return (<IconAnalyze/>)
+        return (<IconAnalyze />)
       case "Batch Details":
-        return (<IconRosetteDiscountCheck/>)
+        return (<IconRosetteDiscountCheck />)
       case "Production Details":
-        return (<IconBrandAdobePremier/>)
+        return (<IconBrandAdobePremier />)
       case "OEE Details":
-        return (<IconPercentage10/>)
+        return (<IconPercentage10 />)
       case "Active Alarm":
-        return (<IconAlarm/>)
+        return (<IconAlarm />)
       case "Report":
-        return (<IconFileDescription/>)
+        return (<IconFileDescription />)
       default:
         break;
     }
@@ -57,28 +57,31 @@ function MenuList() {
 
   useEffect(() => {
     getMachines(userData?.c_id).then((data) => {
-      const machinelist = data?.map((machine) => {
-        return {
-          id: machine._id,
-          name: machine.serial_number,
-          subItems: [
-            { id: 'dash', name: 'Analytics'},
-            { id: 'batch', name: 'Batch Details'},
-            { id: 'production', name: 'Production Details'},
-            { id: 'oee', name: 'OEE Details'},
-            { id: 'Active_alarm', name: 'Active Alarm' },
-            { 
-              id: 'report', 
-              name: 'Report',
-              subItems: [
-                { id: 'audit', name: 'Audit Report' },
-                { id: 'alarm', name: 'Alarm Report' }
-              ]
-            },
-          ],
-        }
-      })
-      setMachines(machinelist)
+      if (data) {
+        const machinelist = data.map((machine) => {
+          return {
+            id: machine._id,
+            name: machine.serial_number,
+            subItems: [
+              { id: 'dash', name: 'Analytics' },
+              { id: 'batch', name: 'Batch Details' },
+              { id: 'production', name: 'Production Details' },
+              { id: 'oee', name: 'OEE Details' },
+              { id: 'Active_alarm', name: 'Active Alarm' },
+              {
+                id: 'report',
+                name: 'Report',
+                subItems: [
+                  { id: 'audit', name: 'Audit Report' },
+                  { id: 'alarm', name: 'Alarm Report' }
+                ]
+              },
+            ],
+          }
+        })
+        setMachines(machinelist)
+      }
+
     })
   }, [userData])
 
@@ -99,13 +102,13 @@ function MenuList() {
             <AccordionDetails sx={{ padding: 0 }}>
               <List sx={{ padding: 0 }}>
                 {subItem.subItems.map((nestedItem) => (
-                  <ListItem 
-                    button 
-                    key={nestedItem.id}  
+                  <ListItem
+                    button
+                    key={nestedItem.id}
                     onClick={() => { navigate(`/${nestedItem.id}?serial_number=${machineName}`) }}
                     sx={{ pl: 4 }}
                   >
-                  <ListItemText primary={nestedItem.name} />
+                    <ListItemText primary={nestedItem.name} />
                   </ListItem>
                 ))}
               </List>
@@ -113,25 +116,25 @@ function MenuList() {
           </Accordion>
         );
       }
-      
+
       // Regular subitem
       return (
-        <ListItem 
-          button 
-          key={subItem.id}  
+        <ListItem
+          button
+          key={subItem.id}
           onClick={() => { navigate(`/${subItem.id}?serial_number=${machineName}`) }}
         >
-         <div className='text-gray-600 w-0.1 mr-6 '>{getSubItemIcon(subItem.name)}</div> <ListItemText primary={subItem.name} sx={{marginLeft:-2}} />
+          <div className='text-gray-600 w-0.1 mr-6 '>{getSubItemIcon(subItem.name)}</div> <ListItemText primary={subItem.name} sx={{ marginLeft: -2 }} />
         </ListItem>
       );
     });
   };
 
   return (
-    <Box sx={{ }}>
+    <Box sx={{}}>
       <Accordion sx={{ boxShadow: 'none' }}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />} >
-          <Typography variant="h6" sx={{display: 'flex',alignItems:'center',gap:1}}><IconAssembly/>Machines</Typography>
+          <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><IconAssembly />Machines</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <List>
