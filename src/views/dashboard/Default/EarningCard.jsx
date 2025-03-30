@@ -72,6 +72,7 @@ export default function EarningCard({ isLoading, data }) {
     const fetchData = async () => {
       const newData = await getMachineData(data.serial_number);
       setMachineData(newData);
+      
     };
     fetchData();
     const interval = setInterval(fetchData, 5000);
@@ -79,7 +80,7 @@ export default function EarningCard({ isLoading, data }) {
   }, [data?.serial_number]);
 
   const isOnline = dataChange(machineData?.ts);
-  const modelType = data?.serial_number?.startsWith("PAC") ? "PAC300" : "MAC300";
+  const modelType = data?.model.toUpperCase()
   const lineNumber = data?.line_number || machineData?.line_number || 'N/A';
   const currentSpeed = Number(machineData?.d?.current_speed[0]) || 0;
   const maxSpeed = 300;
@@ -89,7 +90,7 @@ export default function EarningCard({ isLoading, data }) {
   const circumference = 2 * Math.PI * radius;
   const speedProgress = (currentSpeed / maxSpeed) * circumference;
   const oeeProgress = (oee / 100) * circumference;
-  const statusText = !isOnline ? 'Offline' : (mstatus[machineData?.d?.status[0]] || 'Unknown');
+  const statusText = !isOnline ? 'Offline' : "Online";
 
   return (
     <>

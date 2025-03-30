@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import {  useMemo } from 'react';
 
 import useMediaQuery from '@mui/material/useMediaQuery';
 
@@ -9,7 +9,7 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 
 import MenuList from '../MenuList';
 import MiniDrawerStyled from './MiniDrawerStyled';
-
+import { IconArrowBackUp } from '@tabler/icons-react';
 import useConfig from 'hooks/useConfig';
 import { drawerWidth } from 'store/constant';
 import { useNavigate,useLocation } from 'react-router';
@@ -34,36 +34,42 @@ function Sidebar() {
     } else if (pathname == "/dash" || pathname=="/usermangement") {
       return (<div className='p-2 
     rounded-xl 
-    bg-blue-800 
-    text-slate-50 
+    text-gray-600
     cursor-pointer 
     hover:bg-blue-700 
+    hover:text-slate-50
     focus:outline-none 
     focus:ring-2 
     focus:ring-blue-500 
     focus:ring-offset-2 
     transition-colors 
     duration-300 
+    flex
+    items-center
+    gap-1
     text-sm
     font-semibold' onClick={() => { navigate("/") }}>
-        back to home
+       <IconArrowBackUp /> <span>Back To Home</span>
       </div>)
     } else {
       return (<div className='p-2 
     rounded-xl 
-    bg-blue-800 
-    text-slate-50 
+    text-gray-600
     cursor-pointer 
     hover:bg-blue-700 
+    hover:text-slate-50
     focus:outline-none 
     focus:ring-2 
     focus:ring-blue-500 
     focus:ring-offset-2 
     transition-colors 
     duration-300 
+    flex
+    items-center
+    gap-1
     text-sm
     font-semibold' onClick={() => { navigate("/dash?serial_number=" + serialNumber) }}>
-        back to dashboard
+         <IconArrowBackUp /> <span>Back To Dashboard</span>
       </div>)
     }
   }
@@ -86,9 +92,11 @@ function Sidebar() {
           <Box sx={drawerSX}>
             <MenuList />
             {drawerOpen && drawerContent}
+           
           </Box>
         ) : (
           <PerfectScrollbar style={{ height: 'calc(100vh - 88px)', ...drawerSX }}>
+             {<div className='h-ful pt-6'>{getHomeBtn(pathname)}</div>}
             <MenuList />
             {drawerOpen && drawerContent}
           </PerfectScrollbar>
@@ -96,7 +104,7 @@ function Sidebar() {
       </>
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [downMD, drawerOpen, mode]);
+  }, [downMD, drawerOpen, mode,pathname]);
 
   if (!drawerOpen) {
     return (<Box component="nav" sx={{ flexShrink: { md: 0 }, width: { xs: 'auto', md: 130 } }} aria-label="mailbox folders"></Box>)
@@ -104,12 +112,10 @@ function Sidebar() {
   return (
     <Box component="nav" sx={{ flexShrink: { md: 0 }, width: { xs: 'auto', md: drawerWidth } }} aria-label="mailbox folders">
       <MiniDrawerStyled variant="permanent" open={drawerOpen}>
-       
-        {<div className='h-ful'>{getHomeBtn(pathname)}</div>}
-         {drawer}
+        {drawer}
       </MiniDrawerStyled>
     </Box>
   );
 }
 
-export default memo(Sidebar);
+export default Sidebar;
