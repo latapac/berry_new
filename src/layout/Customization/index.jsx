@@ -22,10 +22,6 @@ export default function Customization() {
 
   return (
     <>
-      {/* toggle button */}
-      <Tooltip title="Live Customize">
-       
-      </Tooltip>
       <Drawer anchor="right" onClose={handleToggle} open={open} PaperProps={{ sx: { width: 280 } }}>
         <PerfectScrollbar>
           <Grid container spacing={2}>
