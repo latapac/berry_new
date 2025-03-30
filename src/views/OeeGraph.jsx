@@ -272,7 +272,7 @@ const OEEGraph = ({ oeeData, isLoading, serialNumber, navigate }) => {
                 style={{ cursor: panState.isPanning ? 'grabbing' : zoomState.scale > 1 ? 'grab' : 'default' }}
             >
                 {/* Grid Lines */}
-                {[0, 100, 200, 300].map((level) => {
+                {[0,50, 100,150, 200,250, 300].map((level) => {
                     const yPos = height - padding - (level / maxOEE) * (height - 2 * padding);
                     return (
                         <g key={`grid-${level}`}>
