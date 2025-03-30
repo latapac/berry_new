@@ -6,10 +6,8 @@ import { getMachineData, getSpeedHistory, getOeeHistory } from "../../../backser
 import { gridSpacing } from 'store/constant';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-
-
 import { mstatus, getMstatusBGColor } from '../../../constants';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
 const SpeedBox = ({ speed, isLoading, status, mstatus }) => {
 
   const [animatedSpeed, setAnimatedSpeed] = useState(0);
