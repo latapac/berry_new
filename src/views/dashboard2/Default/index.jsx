@@ -430,7 +430,7 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange, seri
         <div className="flex items-center flex-wrap gap-2">
           <div>
             <button className='text-blue-600 underline hover:cursor-pointer' onClick={() => navigate("/machineGraph?serial_number=" + serialNumber)}>
-              More Details  {'>>'}
+              More Details
             </button>
           </div>
         </div>
@@ -685,7 +685,7 @@ const OEEGraph = ({ oeeData, isLoading, serialNumber }) => {
         <div className="flex items-center flex-wrap gap-2">
           <div>
             <button className='text-blue-600 underline hover:cursor-pointer'  onClick={() => navigate("/oeeGraph?serial_number=" + serialNumber)}>
-              More Details  {'>>'}
+              More Details
             </button>
           </div>
         </div>
