@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   Box, 
   Typography, 
@@ -16,16 +16,15 @@ import {
   Toolbar,
   IconButton
 } from '@mui/material';
-import { Edit, Delete, Add } from '@mui/icons-material';
+import {  Add } from '@mui/icons-material';
+import { getAllCompanies } from '../backservice';
+import { useNavigate } from 'react-router';
 
 const AdminIndex = () => {
 
+  const navigate = useNavigate()
 
-  // Company state
-  const [companies, setCompanies] = useState([
-    { id: 1, name: 'Tech Corp', email: 'info@techcorp.com', phone: '123-456-7890', address: '123 Tech St' },
-    { id: 2, name: 'Innovate LLC', email: 'contact@innovate.com', phone: '987-654-3210', address: '456 Innovate Ave' },
-  ]);
+  const [companies, setCompanies] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [currentCompany, setCurrentCompany] = useState({
     id: null,
@@ -88,11 +87,17 @@ const AdminIndex = () => {
     setCompanies(companies.filter(company => company.id !== id));
   };
 
+  useEffect(()=>{
+    getAllCompanies().then((data)=>{
+      setCompanies(data.data)
+    })
+  },[])
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1,color:"white" }}>
             Company Management
           </Typography>
           <Button color="inherit" onClick={handleLogout}>
@@ -118,34 +123,17 @@ const AdminIndex = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Phone</TableCell>
-                <TableCell>Address</TableCell>
-                <TableCell>Actions</TableCell>
+                <TableCell>Company ID</TableCell>
+                <TableCell>Company Name</TableCell>
+                <TableCell></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {companies.map((company) => (
-                <TableRow key={company.id}>
+                <TableRow key={company.company_id}>
+                  <TableCell>{company.company_id}</TableCell>
                   <TableCell>{company.name}</TableCell>
-                  <TableCell>{company.email}</TableCell>
-                  <TableCell>{company.phone}</TableCell>
-                  <TableCell>{company.address}</TableCell>
-                  <TableCell>
-                    <IconButton 
-                      color="primary" 
-                      onClick={() => handleOpenModal(company)}
-                    >
-                      <Edit />
-                    </IconButton>
-                    <IconButton 
-                      color="error" 
-                      onClick={() => handleDeleteCompany(company.id)}
-                    >
-                      <Delete />
-                    </IconButton>
-                  </TableCell>
+                  <TableCell><button onClick={()=>{navigate("/adminMachine")}}>VIEW MACHINES</button></TableCell>
                 </TableRow>
               ))}
             </TableBody>
