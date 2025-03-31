@@ -23,8 +23,12 @@ function AuditTrail() {
     useEffect(() => {
         const fetchData = () => {
             getAuditTrailData(serialNumber).then((data) => {
+                
                 const currentTime = new Date().toISOString();
                 
+
+                
+
                 const newItems = data.filter(item => {
                     const itemTime = new Date(item.ts);
                     const lastTime = new Date(lastFetchTime.current);
@@ -131,6 +135,22 @@ function AuditTrail() {
         setSortOrder(prev => prev === 'desc' ? 'asc' : 'desc');
     };
 
+    const getStatusText = (data)=>{
+            if (data.topic==="alarm") {
+                return data?.d?.message
+            }else{
+                return Object.keys(data?.d || {})[0];
+            }
+    }
+
+    const getIdentificationText = (data,firstKey)=>{
+        if (data.topic==="alarm") {
+            return data?.d?.status
+        }else{
+            return LogText(firstKey, data.d[firstKey]?.[0])
+        }
+    }
+
     return (
         <div className="min-h-screen flex flex-col items-center p-2 sm:p-4 bg-gray-100">
             <div className="w-full max-w-6xl mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 no-print">
@@ -214,7 +234,8 @@ function AuditTrail() {
                     <tbody className="divide-y divide-gray-200">
                         {dataToPrint.length > 0 ? (
                             dataToPrint.map((data) => {
-                                const firstKey = Object.keys(data?.d || {})[0];
+                                
+                                const firstKey = getStatusText(data)
                                 const isHighlighted = highlightedRows.has(data._id) && !isPrinting;
                                 return (
                                     <tr 
@@ -223,7 +244,7 @@ function AuditTrail() {
                                     >
                                         <td className="px-2 py-1 text-xs border-b whitespace-nowrap">{formatTimestamp(data?.ts)}</td>
                                         <td className="px-2 py-1 text-xs border-b whitespace-nowrap">{firstKey || '--'}</td>
-                                        <td className="px-2 py-1 text-xs border-b">{LogText(firstKey, data.d[firstKey]?.[0])}</td>
+                                        <td className="px-2 py-1 text-xs border-b">{getIdentificationText(data,firstKey)}</td>
                                         <td className="px-2 py-1 text-xs border-b whitespace-nowrap">{data?.d?.User?.[0] || "System"}</td>
                                     </tr>
                                 );

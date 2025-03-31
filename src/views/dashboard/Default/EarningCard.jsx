@@ -93,6 +93,8 @@ export default function EarningCard({ isLoading, data }) {
   const oeeProgress = (oee / 100) * circumference;
   const statusText = !isOnline ? 'Offline' : (mstatus[machineData?.d?.status[0]] || 'Unknown');
 
+  
+
   return (
     <>
       {isLoading ? (

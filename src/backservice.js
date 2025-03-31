@@ -205,10 +205,8 @@ export async function getoee(mid,date,RunningShift) {
     }
 }
 
-
 export async function getBatch(mid,date){ 
-    try {
-       
+    try { 
         const response = await fetch('http://'+server+':3000/getbatch/'+mid, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
