@@ -10,9 +10,8 @@ import BatchDetails from '../views/Batchdetails';
 import OeeGraph from '../views/OeeGraph';
 import MachineGraph from '../views/MachineGraph';
 import UserManagement from '../views/UserManagement';
-
 import DashboardDefault from 'views/dashboard/Default'
-
+import OeeLive from '../views/OeeLive';
 const MainRoutes = {
   path: '/',
   element: <Protected><MainLayout /></Protected>,
@@ -41,6 +40,10 @@ const MainRoutes = {
     {
       path: 'oeeGraph',
       element: <OeeGraph />
+    },
+    {
+      path: 'oeeLive',
+      element: <OeeLive />
     },
     {
       path: 'OEE',

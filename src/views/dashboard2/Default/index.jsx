@@ -58,7 +58,7 @@ const SpeedBox = ({ speed, isLoading, status, mstatus }) => {
         </div>
       </div>
       <div className="flex gap-32 items-center justify-left">
-        <div className="relative w-16 h-16 sm:w-20 sm:h-20 mr-4">
+        <div className="relative w-16 h-16 grow sm:w-20 sm:h-20 mr-4">
           <svg className="w-full h-full" viewBox="0 0 36 36">
             <circle cx="18" cy="18" r="16" fill="none" stroke="#e5e7eb" strokeWidth="4" />
             <circle
@@ -80,7 +80,7 @@ const SpeedBox = ({ speed, isLoading, status, mstatus }) => {
             </text>
           </svg>
         </div>
-        <div className={`${getMstatusBGColor(mstatus)} text-[1.1rem] font-extrabold`}>
+        <div className={`${getMstatusBGColor(mstatus)} grow text-[1em] font-extrabold`}>
           {mstatus}
         </div>
       </div>
@@ -685,7 +685,7 @@ const OEEGraph = ({ oeeData, isLoading, serialNumber }) => {
         <div className="flex items-center flex-wrap gap-2">
           <div>
             <button className='text-blue-600 underline hover:cursor-pointer'  onClick={() => navigate("/oeeGraph?serial_number=" + serialNumber)}>
-              More Details
+              More Details 
             </button>
           </div>
         </div>
@@ -829,9 +829,9 @@ export default function Dashboard() {
         <div className="flex flex-wrap gap-2">
           <button
             className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
-            onClick={() => navigate("/oee?serial_number=" + serialNumber)}
+            onClick={() => navigate("/oeelive?serial_number=" + serialNumber)}
           >
-            OEE
+            OEE Details
           </button>
           <button
             className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
