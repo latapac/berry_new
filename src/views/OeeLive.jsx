@@ -1,15 +1,36 @@
 import React from 'react';
+import { getMachineData } from "../backservice";
 import { Pie } from 'react-chartjs-2';
+import { useState, useEffect } from 'react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const OeeLive = () => {
+  const queryParams = new URLSearchParams(location.search);
+  const serialNumber = queryParams.get('serial_number');
+  const [machineData, setMachineData] = useState({});
+  const [isLoading,setLoading] = useState(true);
+  
+  useEffect(() => {
+    setLoading(true);
+    getMachineData(serialNumber)
+      .then((data) => {
+        setMachineData(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching machine data:", error);
+        setLoading(false);
+      });
+  }, [serialNumber]);
+
   // Data
-  const availability = 87.5;
-  const performance = 92.3;
-  const quality = 95.1;
-  const oee = ((availability * performance * quality) / 10000).toFixed(1);
+  let availability =  machineData?.d?.Availability[0];
+  let performance =  machineData?.d?.Performance[0];
+  let quality = machineData?.d?.Quality[0];
+
+  const oee = 99;
   const lastUpdated = new Date().toLocaleString();
 
   // Chart configurations (exactly 4 charts)
@@ -85,8 +106,8 @@ const OeeLive = () => {
         marginBottom: '30px'
       }}>
         <h1 style={{ marginBottom: '5px', color: '#333' }}>OEE Dashboard</h1>
-        <div style={{ 
-          display: 'flex', 
+        <div style={{
+          display: 'flex',
           justifyContent: 'center',
           gap: '20px',
           alignItems: 'center'
@@ -115,7 +136,7 @@ const OeeLive = () => {
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
           }}>
             <h3 style={{ textAlign: 'center', marginTop: '0' }}>{chart.title}</h3>
-            <div style={{ height: '300px' , width: '400px'}}>
+            <div style={{ height: '300px', width: '400px' }}>
               <Pie data={chart.data} options={chartOptions} />
             </div>
           </div>
@@ -142,7 +163,10 @@ const OeeLive = () => {
           </div>
         ))}
       </div>
+
+
     </div>
+
   );
 };
 
