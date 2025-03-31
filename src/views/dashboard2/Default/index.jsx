@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import Grid from '@mui/material/Grid';
 import TotalOrderLineChartCard from './TotalOrderLineChartCard';
 import TotalIncomeDarkCard from '../../../ui-component/cards/TotalIncomeDarkCard';
-import { getMachineData, getSpeedHistory, getOeeHistory } from "../../../backservice";
+import { getMachineData, getSpeedHistory, getOeeHistory, getoee } from "../../../backservice";
 import { gridSpacing } from 'store/constant';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -213,15 +213,9 @@ const OEEBox = ({ availability, performance, quality, isLoading }) => {
 
 
 
-const TotalProductionBox = ({ value, isLoading }) => {
-  // Sample data - replace with your actual data
-  const data = [
-    { name: ' Shift 1', value: 20 },
-    { name: 'Shift 2', value: 45 },
-    { name: 'Shift 3', value: 28 },
+const TotalProductionBox = ({  isLoading , prodData}) => {
   
-  ];
-
+  const data =prodData
   return (
     <div className="bg-white rounded-lg shadow-sm p-4 h-full min-h-[150px] flex flex-col justify-between">
       <div className='flex flex-row'>
@@ -613,22 +607,6 @@ const OEEGraph = ({ oeeData, isLoading, serialNumber }) => {
     }
   }, [oeeData, isLoading, dimensions.width]);
 
-  const handleZoom = (factor) => {
-    const newScale = Math.max(0.5, Math.min(5, zoomState.scale * factor));
-    setZoomState(prev => ({
-      ...prev,
-      scale: newScale,
-      offset: Math.min(0, Math.max(prev.maxOffset * (1 - newScale), prev.offset))
-    }));
-  };
-
-  const resetZoom = () => {
-    setZoomState({
-      scale: 1,
-      offset: 0,
-      maxOffset: zoomState.maxOffset
-    });
-  };
 
   const formatTime = (date) => {
     if (zoomState.scale > 3) {
@@ -763,6 +741,7 @@ export default function Dashboard() {
   const [timeRange, setTimeRange] = useState(8);
   const [speedHistory, setSpeedHistory] = useState([])
   const [OeeHistory, setOeeHistory] = useState([])
+  const [prod,setProd] = useState([])
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const serialNumber = queryParams.get('serial_number');
@@ -789,13 +768,32 @@ export default function Dashboard() {
       });
     getSpeedHistory(serialNumber)
       .then((data) => {
-        console.log(data);
         setSpeedHistory(data)
       })
     getOeeHistory(serialNumber)
       .then((data) => {
         setOeeHistory(data)
       })
+    let today = new Date()
+    let previous =  today.getFullYear() + "-" +
+    (today.getMonth() + 1).toString().padStart(2, '0') + "-" +
+    (today.getDate() - 1).toString().padStart(2, '0');
+    console.log(previous);
+    
+    getoee(serialNumber,previous).then((data)=>{
+      if (typeof data === "object") {
+        const prodData = data?.map((prodution)=>{
+          if(prodution.d.runningshift[0]==0){
+            return {name: "Shift 1", value: prodution.d.totalProducts[0]}
+          }else if (prodution.d.runningshift[0]==1){
+            return {name: "Shift 2", value: prodution.d.totalProducts[0]}
+          }else{
+            return {name: "Shift 3", value: prodution.d.totalProducts[0]}
+          }
+       })
+       setProd(prodData)
+      }
+    })
   }, [serialNumber]);
 
   useEffect(() => {
@@ -936,6 +934,7 @@ export default function Dashboard() {
         <TotalProductionBox
           value={machineData?.d?.Total_Production[0]}
           isLoading={isLoading}
+          prodData={prod}
         />
       </div>
 

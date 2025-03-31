@@ -175,9 +175,8 @@ export async function getAuditTrailData(mid) {
 
 
 export async function getoee(mid,date,RunningShift) { 
-    try {
-        console.log('http://'+server+':3000/getoee/'+mid);
-        
+  
+    try {    
         const response = await fetch('http://'+server+':3000/getoee/'+mid, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -258,7 +257,7 @@ export async function getMachineUser(mid) {
 
 export async function getSpeedHistory(mid) { 
     const date = new Date()
-    const tarik = `${date.getFullYear()}-0${date.getMonth()+1}-${date.getDate()}`
+    const tarik = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, '0')}-${(date.getDate().toString().padStart(2, '0'))}`
     try {
         const response = await fetch('http://'+server+':3000/getSpeedHistory/'+mid+'?date='+tarik)
         console.log('http://'+server+':3000/getSpeedHistory/'+mid+'?date='+tarik);
