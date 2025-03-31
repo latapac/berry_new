@@ -7,11 +7,13 @@ import AlarmReport from './Alarm';
 import Protected from './AuthLayout';
 import Active_alarm from '../views/Active_alarm/Default';
 import BatchDetails from '../views/Batchdetails';
-import OeeGraph from '../views/OeeGraph';
+// import OeeGraph from '../views/OeeGraph';
 import MachineGraph from '../views/MachineGraph';
 import UserManagement from '../views/UserManagement';
 import DashboardDefault from 'views/dashboard/Default'
 import OeeLive from '../views/OeeLive';
+import AdminIndex from '../admin/AdminIndex';
+
 const MainRoutes = {
   path: '/',
   element: <Protected><MainLayout /></Protected>,
@@ -38,8 +40,8 @@ const MainRoutes = {
       element: <UserManagement />
     },
     {
-      path: 'oeeGraph',
-      element: <OeeGraph />
+      path: 'AdminIndex',
+      element: <AdminIndex />//i had changed oeegraph to admin
     },
     {
       path: 'oeeLive',

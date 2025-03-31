@@ -888,12 +888,12 @@ export default function Dashboard() {
                   </button>
                   <button
                     onClick={() => {
-                      navigate("/OEE_graph?serial_number=" + serialNumber);
+                      navigate("/AdminIndex?serial_number=" + serialNumber);
                       setIsOpen(false);
                     }}
                     className="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-400 w-full text-left"
                   >
-                    OEE Graph
+                    admin
                   </button>
                 </div>
               </div>
