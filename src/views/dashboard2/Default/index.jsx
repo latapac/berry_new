@@ -886,12 +886,12 @@ export default function Dashboard() {
                   </button>
                   <button
                     onClick={() => {
-                      navigate("/OEE_graph?serial_number=" + serialNumber);
+                      navigate("/OEE?serial_number=" + serialNumber);
                       setIsOpen(false);
                     }}
                     className="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-400 w-full text-left"
                   >
-                    OEE Graph
+                    OEE Report
                   </button>
                 </div>
               </div>
