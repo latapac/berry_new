@@ -27,10 +27,6 @@ const AlarmTable = ({ alarms, currentPage, itemsPerPage, onPageChange, isMobile 
           {paginatedAlarms.map((alarm) => (
             <div key={alarm._id} className={`${getAlarmColor(alarm.d?.severity)} p-3 border rounded`}>
               <div className="grid grid-cols-2 gap-1">
-                {/* <div>
-                  <span className="font-medium">ID: </span>
-                  <span className="truncate block">{alarm._id}</span>
-                </div> */}
                 <div>
                   <span className="font-medium">Line: </span>
                   <span>{alarm.d?.machineLine || 'N/A'}</span>
@@ -302,14 +298,15 @@ function App() {
         if (!data) {
           throw new Error('No data returned from the API');
         }
-
+          
         const alarmItems = data.filter(item => 
           item.topic === "alarm" && item.d && item.d.trigger_time
         );
 
-        const unrecoveredAlarms = alarmItems.filter(alarm => alarm.d?.status !== 'recovered');
+        const unrecoveredAlarms = alarmItems.filter(alarm => alarm?.d?.status !== 'recovered');
         const historicalAlarms = alarmItems;
 
+        
         const sortedActiveAlarms = [...unrecoveredAlarms].sort((a, b) => {
           const dateA = new Date(a.d.trigger_time);
           const dateB = new Date(b.d.trigger_time);

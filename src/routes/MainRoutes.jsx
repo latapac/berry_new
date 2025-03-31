@@ -12,7 +12,6 @@ import MachineGraph from '../views/MachineGraph';
 import UserManagement from '../views/UserManagement';
 import DashboardDefault from 'views/dashboard/Default'
 import OeeLive from '../views/OeeLive';
-import AdminIndex from '../admin/AdminIndex';
 
 const MainRoutes = {
   path: '/',
@@ -22,6 +21,7 @@ const MainRoutes = {
       path: '/',
       element: <DashboardDefault />
     },
+    
     {
       path: 'dashboard',
       children: [
@@ -38,10 +38,6 @@ const MainRoutes = {
     {
       path: 'alluser',
       element: <UserManagement />
-    },
-    {
-      path: 'AdminIndex',
-      element: <AdminIndex />//i had changed oeegraph to admin
     },
     {
       path: 'oeeLive',
