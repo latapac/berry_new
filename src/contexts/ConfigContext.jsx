@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { createContext } from 'react';
+import { createContext, useCallback } from 'react';
 
 // project imports
 import defaultConfig from 'config';
@@ -18,28 +18,25 @@ const initialState = {
 const ConfigContext = createContext(initialState);
 
 function ConfigProvider({ children }) {
-  const [config, setConfig] = useLocalStorage('berry-config-vite-ts', {
-    fontFamily: initialState.fontFamily,
-    borderRadius: initialState.borderRadius
-  });
+  const [config, setConfig] = useLocalStorage('berry-config-vite-ts', defaultConfig);
 
-  const onChangeFontFamily = (fontFamily) => {
-    setConfig({
-      ...config,
+  const onChangeFontFamily = useCallback((fontFamily) => {
+    setConfig((prevConfig) => ({
+      ...prevConfig,
       fontFamily
-    });
-  };
+    }));
+  }, [setConfig]);
 
-  const onChangeBorderRadius = (event, newValue) => {
-    setConfig({
-      ...config,
+  const onChangeBorderRadius = useCallback((event, newValue) => {
+    setConfig((prevConfig) => ({
+      ...prevConfig,
       borderRadius: newValue
-    });
-  };
+    }));
+  }, [setConfig]);
 
-  const onReset = () => {
-    setConfig({ ...defaultConfig });
-  };
+  const onReset = useCallback(() => {
+    setConfig(defaultConfig);
+  }, [setConfig]);
 
   return (
     <ConfigContext.Provider
@@ -55,6 +52,8 @@ function ConfigProvider({ children }) {
   );
 }
 
-export { ConfigProvider, ConfigContext };
+ConfigProvider.propTypes = {
+  children: PropTypes.node.isRequired // Added isRequired if children is mandatory
+};
 
-ConfigProvider.propTypes = { children: PropTypes.node };
+export { ConfigProvider, ConfigContext };
