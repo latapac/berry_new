@@ -30,6 +30,36 @@ export async function loginService(username, password) {
     }
 }
 
+
+export async function loginAdminService(username, password) {
+    try {
+        const data = await fetch("http://"+server+":3000/adminLogin", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json", // specify the content type
+            },
+            body: JSON.stringify({
+                username,
+                password
+            }),
+        })
+        const jsonData = await data.json()
+        
+        if (jsonData?.status === 200) {
+            return jsonData
+        } else if (jsonData?.status === 400) {
+            alert("incorrect password");
+        } else if (jsonData?.status === 404) {
+            alert("no user found");
+        } else {
+            alert("invalid serer response");
+        }
+    } catch (error) {
+        alert(error);
+
+    }
+}
+
 export function checkLoginService(){
     const username = localStorage.getItem("username")
     const password = localStorage.getItem("secret")
@@ -78,7 +108,7 @@ export async function deleteUser(username) {
     const response = await fetch("http://64.227.139.217:3000/deleteUser", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json", // specify the content type
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           username
@@ -171,6 +201,8 @@ export async function getAuditTrailData(mid) {
         return false
     }
 }
+
+
 
 
 

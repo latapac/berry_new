@@ -7,7 +7,7 @@ import adminRoutes from './AdminRoutes';
 
 // ==============================|| ROUTING RENDER ||============================== //
 
-const router = createHashRouter([MainRoutes, AuthenticationRoutes,adminRoutes], {
+const router = createHashRouter([MainRoutes, AuthenticationRoutes,...adminRoutes], {
   basename: import.meta.env.VITE_APP_BASE_NAME
 });
 

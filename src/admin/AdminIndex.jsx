@@ -19,10 +19,7 @@ import {
 import { Edit, Delete, Add } from '@mui/icons-material';
 
 const AdminIndex = () => {
-  // Authentication state
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+
 
   // Company state
   const [companies, setCompanies] = useState([
@@ -38,14 +35,7 @@ const AdminIndex = () => {
     address: ''
   });
 
-  // Authentication handlers
-  const handleLogin = (e) => {
-    e.preventDefault();
-    // Simple validation - in real app, verify with backend
-    if (email && password) {
-      setIsAuthenticated(true);
-    }
-  };
+  
 
   const handleLogout = () => {
     setIsAuthenticated(false);
@@ -97,56 +87,6 @@ const AdminIndex = () => {
   const handleDeleteCompany = (id) => {
     setCompanies(companies.filter(company => company.id !== id));
   };
-
-  if (!isAuthenticated) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '100vh',
-          bgcolor: 'background.default',
-        }}
-      >
-        <Paper sx={{ p: 4, width: 400 }}>
-          <Typography variant="h4" gutterBottom align="center">
-            Admin Login
-          </Typography>
-          <form onSubmit={handleLogin}>
-            <TextField
-              fullWidth
-              margin="normal"
-              label="Email"
-              variant="outlined"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <TextField
-              fullWidth
-              margin="normal"
-              label="Password"
-              type="password"
-              variant="outlined"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <Button
-              fullWidth
-              type="submit"
-              variant="contained"
-              color="primary"
-              sx={{ mt: 3 }}
-            >
-              Login
-            </Button>
-          </form>
-        </Paper>
-      </Box>
-    );
-  }
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
