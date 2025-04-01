@@ -215,6 +215,27 @@ export async function getAllCompanies() {
 }
 
 
+export async function addCompany(data) {
+    console.log(data);
+    
+    const response = await fetch("http://64.227.139.217:3000/addcompany", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json", // specify the content type
+        },
+        body: JSON.stringify({
+           ...data
+        })
+    })
+    const res = await response.json()
+    if (res.status) {
+        return true
+    } else {
+        return false
+    }
+}
+
+
 
 export async function getoee(mid, date, RunningShift) {
 

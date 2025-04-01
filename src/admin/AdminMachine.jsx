@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  Box, 
-  Typography, 
-  Button, 
-  Paper, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
+import {
+  Box,
+  Typography,
+  Button,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
   TableRow,
   TextField,
   Modal,
@@ -16,7 +16,7 @@ import {
   Toolbar,
 } from '@mui/material';
 import { Add } from '@mui/icons-material';
-import { useNavigate,useLocation } from 'react-router';
+import { useNavigate, useLocation } from 'react-router';
 import { getMachines } from '../backservice';
 
 const AdminMachine = () => {
@@ -66,7 +66,7 @@ const AdminMachine = () => {
     e.preventDefault();
     if (currentMachine.id) {
       // Update existing machine
-      setMachines(machines.map(machine => 
+      setMachines(machines.map(machine =>
         machine.id === currentMachine.id ? currentMachine : machine
       ));
     } else {
@@ -84,16 +84,9 @@ const AdminMachine = () => {
   };
 
   useEffect(() => {
-    // Fetch machines data - replace with your actual API call
-    // For now, using mock data
-    setMachines([
-      { id: 1, machineId: 'CO-001', machineNumber: 'PAC240025', modelNumber: 'MAC300', lineNumber: 'Line-1' },
-      { id: 2, machineId: 'CO-002', machineNumber: 'PAC240026', modelNumber: 'MAC301', lineNumber: 'Line-2' }
-    ]);
-    
-   getMachines(companyId).then((data)=>{
-    setMachines(data)
-   })
+    getMachines(companyId).then((data) => {
+      setMachines(data)
+    })
   }, []);
 
   return (
@@ -112,9 +105,9 @@ const AdminMachine = () => {
       <Box sx={{ p: 3 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Typography variant="h4">Machines</Typography>
-          <Button 
-            variant="contained" 
-            color="primary" 
+          <Button
+            variant="contained"
+            color="primary"
             startIcon={<Add />}
             onClick={() => handleOpenModal()}
           >
@@ -139,8 +132,8 @@ const AdminMachine = () => {
                   <TableCell>{machine.model?.toUpperCase()}</TableCell>
                   <TableCell>{machine.lineNo}</TableCell>
                   <TableCell>
-                    <Button 
-                      variant="contained" 
+                    <Button
+                      variant="contained"
                       color="primary"
                       size="small"
                       onClick={() => handleOpenModal(machine)}
@@ -148,8 +141,8 @@ const AdminMachine = () => {
                     >
                       Edit
                     </Button>
-                    <Button 
-                      variant="contained" 
+                    <Button
+                      variant="contained"
                       color="error"
                       size="small"
                       onClick={() => handleDeleteMachine(machine.id)}

@@ -23,7 +23,7 @@ import {
   styled
 } from '@mui/material';
 import { Add, Business, ExitToApp } from '@mui/icons-material';
-import { getAllCompanies } from '../backservice';
+import { addCompany, getAllCompanies } from '../backservice';
 import { useNavigate } from 'react-router';
 
 // Styled components for corporate look
@@ -105,26 +105,23 @@ const AdminIndex = () => {
     setOpenModal(false);
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setCurrentCompany(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
 
   const handleSubmitCompany = (e) => {
     e.preventDefault();
-    if (currentCompany.id) {
-      setCompanies(companies.map(company => 
-        company.id === currentCompany.id ? currentCompany : company
-      ));
-    } else {
-      setCompanies([...companies, {
-        ...currentCompany,
-        id: Math.max(...companies.map(c => c.id), 0) + 1
-      }]);
-    }
+    const formdata = new FormData(e.target)
+    const name = formdata.get("name")
+    const address = formdata.get("address")
+    const unit = formdata.get("unit")
+    addCompany({name,address,unit}).then((result)=>{
+        if (result) {
+          alert("company added!")
+          getAllCompanies().then((data) => {
+            setCompanies(data.data);
+          });
+        }else{
+          alert("company add failed!")
+        }
+    })
     handleCloseModal();
   };
 
@@ -235,7 +232,7 @@ const AdminIndex = () => {
             <Table>
               <CorporateTableHead>
                 <TableRow>
-                  <TableCell>Entity ID</TableCell>
+                  <TableCell>SR NO.</TableCell>
                   <TableCell>Company Name</TableCell>
                   <TableCell>Address</TableCell>
                   <TableCell>Unit</TableCell>
@@ -243,7 +240,7 @@ const AdminIndex = () => {
                 </TableRow>
               </CorporateTableHead>
               <TableBody>
-                {companies.map((company) => (
+                {companies.map((company,index) => (
                   <TableRow 
                     key={company.company_id}
                     hover
@@ -251,7 +248,7 @@ const AdminIndex = () => {
                   >
                     <TableCell>
                       <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                        {company.company_id}
+                        {index+1}
                       </Typography>
                     </TableCell>
                     <TableCell>
@@ -275,7 +272,7 @@ const AdminIndex = () => {
                           variant="outlined"
                           color="primary"
                           size="small"
-                          onClick={() => { navigate("/adminMachine") }}
+                          onClick={() => { navigate("/adminMachine?c_id="+company.company_id) }}
                         >
                           View Machines
                         </ActionButton>
@@ -321,26 +318,11 @@ const AdminIndex = () => {
             }} />
           </Typography>
           <form onSubmit={handleSubmitCompany}>
-            {!currentCompany.id && (
-              <TextField
-                fullWidth
-                margin="normal"
-                label="Entity ID"
-                name="company_id"
-                value={currentCompany.company_id}
-                InputProps={{
-                  readOnly: true,
-                }}
-                sx={{ mb: 2 }}
-              />
-            )}
             <TextField
               fullWidth
               margin="normal"
               label="Company Name"
               name="name"
-              value={currentCompany.name}
-              onChange={handleInputChange}
               required
               sx={{ mb: 2 }}
             />
@@ -348,9 +330,7 @@ const AdminIndex = () => {
               fullWidth
               margin="normal"
               label="Address"
-              name="name"
-              value={currentCompany.name}
-              onChange={handleInputChange}
+              name="address"
               required
               sx={{ mb: 2 }}
             />
@@ -358,9 +338,7 @@ const AdminIndex = () => {
               fullWidth
               margin="normal"
               label="Unit"
-              name="name"
-              value={currentCompany.name}
-              onChange={handleInputChange}
+              name="unit"
               required
               sx={{ mb: 2 }}
             />
