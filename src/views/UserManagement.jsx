@@ -16,10 +16,23 @@ import {
 } from '@mui/material';
 import { Delete, LockReset } from '@mui/icons-material';
 import MainCard from 'ui-component/cards/MainCard';
+import { useLocation } from 'react-router';
 import { getUsers, addUser, deleteUser, updateUserPass } from '../backservice';
 
 export default function UserManagement() {
   const userData = useSelector((state) => state.authSlice?.userData || {});
+  const {search} = useLocation()
+  const queryParams = new URLSearchParams(search)
+  const fetchedId = queryParams.get("c_id")
+  let cid;
+  if (fetchedId) {
+   cid=fetchedId
+   console.log("chala logic");
+   
+  }else{
+    console.log("nahi chala logic");
+    cid=userData?.c_id
+  }
   const [users, setUsers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -31,7 +44,7 @@ export default function UserManagement() {
   }, []);
 
   const refreshUsers = () => {
-    getUsers(userData?.c_id).then((data) => {
+    getUsers(cid).then((data) => {
       setUsers(data);
     });
   };
@@ -52,7 +65,7 @@ export default function UserManagement() {
       createdAt: Date.now(),
       username,
       password: pass,
-      company_id: userData?.c_id,
+      company_id: cid,
       email: "xyz@gmail.com",
       status: true,
       role,
