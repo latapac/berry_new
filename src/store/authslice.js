@@ -2,7 +2,12 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     userStatus:false,
-    userData:null
+    userData:null,
+}
+
+const adminIntialState = {
+    adminData:null,
+    adminStatus:false,
 }
 
 const authSlice = createSlice({
@@ -20,6 +25,24 @@ const authSlice = createSlice({
     }
 })
 
+const adminAuthSice = createSlice({
+    name:"authSlice",
+    initialState:adminIntialState,
+    reducers:{
+        adminLogin:(state,action)=>{
+            state.adminStatus = true;
+            state.adminData = action.payload;
+        },
+        adminLogout:(state,action)=>{
+            state.adminStatus = false;
+            state.adminData = null;
+        }
+    }
+})
+
 export const {login,logout} = authSlice.actions;
 
+export const {adminLogin,adminLogout} = adminAuthSice.actions;
+
 export const authReducer = authSlice.reducer;
+export const authAdminReducer = adminAuthSice.reducer;
