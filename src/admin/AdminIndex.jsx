@@ -273,7 +273,7 @@ const AdminIndex = () => {
                           variant="outlined"
                           color="secondary"
                           size="small"
-                          onClick={() => handleDeleteClick(company)}
+                          onClick={() => navigate("/usermangement?c_id="+company.company_id)}
                         >
                           User Management
                         </ActionButton>

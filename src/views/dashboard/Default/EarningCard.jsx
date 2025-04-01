@@ -81,7 +81,7 @@ export default function EarningCard({ isLoading, data }) {
   
 
   const isOnline = dataChange(machineData?.ts);
-  const modelType = data?.model.toUpperCase()
+  const modelType = data?.model?.toUpperCase()
   const lineNumber =  data?.lineNo || 'N/A';
   const currentSpeed = Number(machineData?.d?.current_speed[0]) || 0;
   const maxSpeed = 300;
