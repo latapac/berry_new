@@ -168,8 +168,10 @@ const AdminIndex = () => {
               flexGrow: 1,
               fontWeight: 600,
               letterSpacing: '0.5px',
+              color: 'white',
+              fontSize: '3vh'
             }}
-            className='text-white'
+            
           >
             PACMAC
           </Typography>
@@ -209,7 +211,7 @@ const AdminIndex = () => {
               letterSpacing: '-0.5px'
             }}
           >
-            Corporate Entities
+            Companies
           </Typography>
           <ActionButton 
             variant="contained" 
@@ -283,6 +285,14 @@ const AdminIndex = () => {
                           onClick={() => handleDeleteClick(company)}
                         >
                           Delete Company
+                        </ActionButton>
+                        <ActionButton
+                          variant="outlined"
+                          color="secondary"
+                          size="small"
+                          onClick={() => handleDeleteClick(company)}
+                        >
+                          User Management
                         </ActionButton>
                       </Box>
                     </TableCell>
