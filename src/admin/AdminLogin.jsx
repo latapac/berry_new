@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { loginAdminService } from '../backservice'
+import { useDispatch } from 'react-redux'
+import { adminLogin } from '../store/authslice'
 
 
 function Login() {
   const [loading, setLoading] = useState(false)
+
+  const dispatch = useDispatch()
 
   const navigate = useNavigate()
 
@@ -16,6 +20,9 @@ function Login() {
     const pass = formdata.get("password")
     loginAdminService(username,pass).then((data)=>{
       if (data?.status===200) {
+        console.log(adminLogin);
+        
+        dispatch(adminLogin(data))
         navigate("/adminIndex")
       }
     }).finally(()=>{
