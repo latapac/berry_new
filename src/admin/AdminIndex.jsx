@@ -133,7 +133,7 @@ const AdminIndex = () => {
                 <TableRow key={company.company_id}>
                   <TableCell>{company.company_id}</TableCell>
                   <TableCell>{company.name}</TableCell>
-                  <TableCell><button onClick={()=>{navigate("/adminMachine")}}>VIEW MACHINES</button></TableCell>
+                  <TableCell><button className='bg-blue-500 p-2 text-white rounded-[1vh]' onClick={()=>{navigate("/adminMachine")}}>VIEW MACHINES</button></TableCell>
                 </TableRow>
               ))}
             </TableBody>
