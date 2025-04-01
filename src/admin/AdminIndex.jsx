@@ -14,93 +14,137 @@ import {
   Modal,
   AppBar,
   Toolbar,
-  IconButton
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Snackbar,
+  Alert
 } from '@mui/material';
-import {  Add } from '@mui/icons-material';
+import { Add } from '@mui/icons-material';
 import { getAllCompanies } from '../backservice';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 const AdminIndex = () => {
-
-  const navigate = useNavigate()
-
+  const navigate = useNavigate();
   const [companies, setCompanies] = useState([]);
   const [openModal, setOpenModal] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [companyToDelete, setCompanyToDelete] = useState(null);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
   const [currentCompany, setCurrentCompany] = useState({
     id: null,
+    company_id: '',
     name: '',
     email: '',
-    phone: '',
-    address: ''
+    
   });
 
-  
-
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setEmail('');
-    setPassword('');
+  // Generate next company ID
+  const generateNextCompanyId = () => {
+    if (companies.length === 0) return 'Cmp-001';
+    
+    const ids = companies.map(company => {
+      const match = company.company_id?.match(/Cmp-(\d+)/);
+      return match ? parseInt(match[1], 10) : 0;
+    });
+    
+    const maxId = Math.max(...ids);
+    const nextId = maxId + 1;
+    return `Cmp-${nextId.toString().padStart(3, '0')}`;
   };
 
-  // Company handlers
+  // Modal handlers
   const handleOpenModal = (company = null) => {
-    setCurrentCompany(company || {
-      id: null,
-      name: '',
-      email: '',
-      phone: '',
-      address: ''
-    });
+    if (company) {
+      setCurrentCompany(company);
+    } else {
+      setCurrentCompany({
+        id: null,
+        company_id: generateNextCompanyId(),
+        name: '',
+        email: '',
+      
+      });
+    }
     setOpenModal(true);
   };
 
-  const handleCloseModal = () => {
-    setOpenModal(false);
-  };
+  const handleCloseModal = () => setOpenModal(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setCurrentCompany(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setCurrentCompany(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmitCompany = (e) => {
     e.preventDefault();
     if (currentCompany.id) {
-      // Update existing company
       setCompanies(companies.map(company => 
         company.id === currentCompany.id ? currentCompany : company
       ));
+      showSnackbar('Company updated successfully');
     } else {
-      // Add new company
       setCompanies([...companies, {
         ...currentCompany,
-        id: Math.max(...companies.map(c => c.id), 0) + 1
+        id: Date.now() // Using timestamp as temporary ID
       }]);
+      showSnackbar('Company added successfully');
     }
     handleCloseModal();
   };
 
-  const handleDeleteCompany = (id) => {
-    setCompanies(companies.filter(company => company.id !== id));
+  // Delete handlers
+  const handleDeleteClick = (company) => {
+    setCompanyToDelete(company);
+    setDeleteConfirmOpen(true);
   };
 
-  useEffect(()=>{
-    getAllCompanies().then((data)=>{
-      setCompanies(data.data)
-    })
-  },[])
+  const handleConfirmDelete = () => {
+    setCompanies(companies.filter(company => company.company_id !== companyToDelete.company_id));
+    setDeleteConfirmOpen(false);
+    showSnackbar('Company deleted successfully');
+    setCompanyToDelete(null);
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteConfirmOpen(false);
+    setCompanyToDelete(null);
+  };
+
+  // Snackbar handlers
+  const showSnackbar = (message, severity = 'success') => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar(prev => ({ ...prev, open: false }));
+  };
+
+  // Initial data load
+  useEffect(() => {
+    // This would normally come from your API
+    // getAllCompanies().then((data) => {
+    //   setCompanies(data.data);
+    // });
+    
+    // For demo purposes, we'll use some mock data
+    
+  }, []);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1,color:"white" }}>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: "white" }}>
             Company Management
           </Typography>
-          <Button color="inherit" onClick={handleLogout}>
+          <Button color="inherit" onClick={() => {}}>
             Logout
           </Button>
         </Toolbar>
@@ -125,7 +169,7 @@ const AdminIndex = () => {
               <TableRow>
                 <TableCell>Company ID</TableCell>
                 <TableCell>Company Name</TableCell>
-                <TableCell></TableCell>
+                <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -133,7 +177,26 @@ const AdminIndex = () => {
                 <TableRow key={company.company_id}>
                   <TableCell>{company.company_id}</TableCell>
                   <TableCell>{company.name}</TableCell>
-                  <TableCell><button className='bg-blue-500 p-2 text-white rounded-[1vh]' onClick={()=>{navigate("/adminMachine")}}>VIEW MACHINES</button></TableCell>
+                  <TableCell>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      <Button 
+                        variant="contained" 
+                        color="primary"
+                        size="small"
+                        onClick={() => navigate("/adminMachine")}
+                      >
+                        View Machines
+                      </Button>
+                      <Button 
+                        variant="contained" 
+                        color="error"
+                        size="small"
+                        onClick={() => handleDeleteClick(company)}
+                      >
+                        Delete
+                      </Button>
+                    </Box>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -158,6 +221,16 @@ const AdminIndex = () => {
             {currentCompany.id ? 'Edit Company' : 'Add New Company'}
           </Typography>
           <form onSubmit={handleSubmitCompany}>
+            {!currentCompany.id && (
+              <TextField
+                fullWidth
+                margin="normal"
+                label="Company ID"
+                name="company_id"
+                value={currentCompany.company_id}
+                InputProps={{ readOnly: true }}
+              />
+            )}
             <TextField
               fullWidth
               margin="normal"
@@ -167,34 +240,8 @@ const AdminIndex = () => {
               onChange={handleInputChange}
               required
             />
-            <TextField
-              fullWidth
-              margin="normal"
-              label="Email"
-              name="email"
-              type="email"
-              value={currentCompany.email}
-              onChange={handleInputChange}
-              required
-            />
-            <TextField
-              fullWidth
-              margin="normal"
-              label="Phone"
-              name="phone"
-              value={currentCompany.phone}
-              onChange={handleInputChange}
-              required
-            />
-            <TextField
-              fullWidth
-              margin="normal"
-              label="Address"
-              name="address"
-              value={currentCompany.address}
-              onChange={handleInputChange}
-              required
-            />
+            
+            
             <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
               <Button onClick={handleCloseModal}>Cancel</Button>
               <Button type="submit" variant="contained" color="primary">
@@ -204,6 +251,36 @@ const AdminIndex = () => {
           </form>
         </Box>
       </Modal>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteConfirmOpen}
+        onClose={handleCancelDelete}
+      >
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete {companyToDelete?.name}? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete}>Cancel</Button>
+          <Button onClick={handleConfirmDelete} color="error" autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
