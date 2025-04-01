@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import { Add } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router';
-import { getMachines } from '../backservice';
+import { addMachine, getMachines } from '../backservice';
 
 const AdminMachine = () => {
   const navigate = useNavigate();
@@ -55,6 +55,28 @@ const AdminMachine = () => {
   const handleSubmitMachine = (e) => {
     e.preventDefault();
     const formdata = new FormData(e.target)
+    const serial_number = formdata.get("serialnumber")
+    const model = formdata.get("modelNumber")
+    const lineNo = formdata.get("lineNumber")
+
+    const data = {
+      company_id:companyId
+      , serial_number, model, lineNo
+    }
+
+    addMachine(data).then((data)=>{
+      if (data) {
+        alert("machine added")
+        getMachines(companyId).then((data) => {
+          if (typeof data == "object") {
+            setMachines(data)
+          }
+        })
+      }else{
+        alert("machine add failed!")
+      }
+    })
+    
    
     handleCloseModal();
   };
