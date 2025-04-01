@@ -14,16 +14,18 @@ import {
   Modal,
   AppBar,
   Toolbar,
-  IconButton
 } from '@mui/material';
 import { Add } from '@mui/icons-material';
-import { getAllCompanies } from '../backservice';
-import { useNavigate } from 'react-router';
+import { useNavigate,useLocation } from 'react-router';
+import { getMachines } from '../backservice';
 
 const AdminMachine = () => {
   const navigate = useNavigate();
   const [machines, setMachines] = useState([]);
   const [openModal, setOpenModal] = useState(false);
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const companyId = queryParams.get('c_id');
   const [currentMachine, setCurrentMachine] = useState({
     id: null,
     machineId: '',
@@ -89,10 +91,9 @@ const AdminMachine = () => {
       { id: 2, machineId: 'CO-002', machineNumber: 'PAC240026', modelNumber: 'MAC301', lineNumber: 'Line-2' }
     ]);
     
-    // If you have an API endpoint for machines:
-    // getAllMachines().then((data) => {
-    //   setMachines(data.data);
-    // });
+   getMachines(companyId).then((data)=>{
+    setMachines(data)
+   })
   }, []);
 
   return (
@@ -125,8 +126,7 @@ const AdminMachine = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Machine ID</TableCell>
-                <TableCell>Machine Number</TableCell>
+                <TableCell>Machine Serial</TableCell>
                 <TableCell>Model Number</TableCell>
                 <TableCell>Line Number</TableCell>
                 <TableCell>Actions</TableCell>
@@ -134,11 +134,10 @@ const AdminMachine = () => {
             </TableHead>
             <TableBody>
               {machines.map((machine) => (
-                <TableRow key={machine.id}>
-                  <TableCell>{machine.machineId}</TableCell>
-                  <TableCell>{machine.machineNumber}</TableCell>
-                  <TableCell>{machine.modelNumber}</TableCell>
-                  <TableCell>{machine.lineNumber}</TableCell>
+                <TableRow key={machine._id}>
+                  <TableCell>{machine.serial_number}</TableCell>
+                  <TableCell>{machine.model?.toUpperCase()}</TableCell>
+                  <TableCell>{machine.lineNo}</TableCell>
                   <TableCell>
                     <Button 
                       variant="contained" 

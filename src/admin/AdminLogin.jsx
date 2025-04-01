@@ -20,8 +20,6 @@ function Login() {
     const pass = formdata.get("password")
     loginAdminService(username,pass).then((data)=>{
       if (data?.status===200) {
-        console.log(adminLogin);
-        
         dispatch(adminLogin(data))
         navigate("/adminIndex")
       }
