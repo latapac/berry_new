@@ -14,41 +14,36 @@ import {
   Modal,
   AppBar,
   Toolbar,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Snackbar,
-  Alert
+  IconButton
 } from '@mui/material';
-import { Add } from '@mui/icons-material';
+import {  Add } from '@mui/icons-material';
 import { getAllCompanies } from '../backservice';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 const AdminIndex = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   const [companies, setCompanies] = useState([]);
   const [openModal, setOpenModal] = useState(false);
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [companyToDelete, setCompanyToDelete] = useState(null);
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: '',
-    severity: 'success'
-  });
   const [currentCompany, setCurrentCompany] = useState({
     id: null,
     company_id: '',
     name: '',
     email: '',
-    
+    phone: '',
+    address: ''
   });
 
-  // Generate next company ID
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setEmail('');
+    setPassword('');
+  };
+
+  // Function to generate the next company ID
   const generateNextCompanyId = () => {
     if (companies.length === 0) return 'Cmp-001';
     
+    // Extract all numeric parts from existing company IDs
     const ids = companies.map(company => {
       const match = company.company_id?.match(/Cmp-(\d+)/);
       return match ? parseInt(match[1], 10) : 0;
@@ -59,7 +54,7 @@ const AdminIndex = () => {
     return `Cmp-${nextId.toString().padStart(3, '0')}`;
   };
 
-  // Modal handlers
+  // Company handlers
   const handleOpenModal = (company = null) => {
     if (company) {
       setCurrentCompany(company);
@@ -69,82 +64,60 @@ const AdminIndex = () => {
         company_id: generateNextCompanyId(),
         name: '',
         email: '',
-      
+        phone: '',
+        address: ''
       });
     }
     setOpenModal(true);
   };
 
-  const handleCloseModal = () => setOpenModal(false);
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setCurrentCompany(prev => ({ ...prev, [name]: value }));
+    setCurrentCompany(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleSubmitCompany = (e) => {
     e.preventDefault();
     if (currentCompany.id) {
+      // Update existing company
       setCompanies(companies.map(company => 
         company.id === currentCompany.id ? currentCompany : company
       ));
-      showSnackbar('Company updated successfully');
     } else {
+      // Add new company
       setCompanies([...companies, {
         ...currentCompany,
-        id: Date.now() // Using timestamp as temporary ID
+        id: Math.max(...companies.map(c => c.id), 0) + 1
       }]);
-      showSnackbar('Company added successfully');
     }
     handleCloseModal();
   };
 
-  // Delete handlers
-  const handleDeleteClick = (company) => {
-    setCompanyToDelete(company);
-    setDeleteConfirmOpen(true);
+  const handleDeleteCompany = (id) => {
+    setCompanies(companies.filter(company => company.id !== id));
   };
 
-  const handleConfirmDelete = () => {
-    setCompanies(companies.filter(company => company.company_id !== companyToDelete.company_id));
-    setDeleteConfirmOpen(false);
-    showSnackbar('Company deleted successfully');
-    setCompanyToDelete(null);
-  };
-
-  const handleCancelDelete = () => {
-    setDeleteConfirmOpen(false);
-    setCompanyToDelete(null);
-  };
-
-  // Snackbar handlers
-  const showSnackbar = (message, severity = 'success') => {
-    setSnackbar({ open: true, message, severity });
-  };
-
-  const handleCloseSnackbar = () => {
-    setSnackbar(prev => ({ ...prev, open: false }));
-  };
-
-  // Initial data load
-  useEffect(() => {
-    // This would normally come from your API
-    // getAllCompanies().then((data) => {
-    //   setCompanies(data.data);
-    // });
-    
-    // For demo purposes, we'll use some mock data
-    
-  }, []);
+  useEffect(()=>{
+    getAllCompanies().then((data)=>{
+      setCompanies(data.data)
+    })
+  },[])
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: "white" }}>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1,color:"white" }}>
             Company Management
           </Typography>
-          <Button color="inherit" onClick={() => {}}>
+          <Button color="inherit" onClick={handleLogout}>
             Logout
           </Button>
         </Toolbar>
@@ -169,7 +142,7 @@ const AdminIndex = () => {
               <TableRow>
                 <TableCell>Company ID</TableCell>
                 <TableCell>Company Name</TableCell>
-                <TableCell>Actions</TableCell>
+                <TableCell></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -178,24 +151,10 @@ const AdminIndex = () => {
                   <TableCell>{company.company_id}</TableCell>
                   <TableCell>{company.name}</TableCell>
                   <TableCell>
-                    <Box sx={{ display: 'flex', gap: 1 }}>
-                      <Button 
-                        variant="contained" 
-                        color="primary"
-                        size="small"
-                        onClick={() => navigate("/adminMachine")}
-                      >
-                        View Machines
-                      </Button>
-                      <Button 
-                        variant="contained" 
-                        color="error"
-                        size="small"
-                        onClick={() => handleDeleteClick(company)}
-                      >
-                        Delete
-                      </Button>
-                    </Box>
+                    <div className='flex flex-row gap-4'>
+                      <button className='bg-blue-500 p-2 text-white rounded-[1vh]' onClick={()=>{navigate("/adminMachine")}}>VIEW MACHINES</button>
+                      <button className='bg-red-500 p-2 text-white rounded-[1vh]' onClick={()=>{navigate("/adminMachine")}}>DELETE COMPANY</button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -228,7 +187,9 @@ const AdminIndex = () => {
                 label="Company ID"
                 name="company_id"
                 value={currentCompany.company_id}
-                InputProps={{ readOnly: true }}
+                InputProps={{
+                  readOnly: true,
+                }}
               />
             )}
             <TextField
@@ -240,8 +201,6 @@ const AdminIndex = () => {
               onChange={handleInputChange}
               required
             />
-            
-            
             <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
               <Button onClick={handleCloseModal}>Cancel</Button>
               <Button type="submit" variant="contained" color="primary">
@@ -251,36 +210,6 @@ const AdminIndex = () => {
           </form>
         </Box>
       </Modal>
-
-      {/* Delete Confirmation Dialog */}
-      <Dialog
-        open={deleteConfirmOpen}
-        onClose={handleCancelDelete}
-      >
-        <DialogTitle>Confirm Delete</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to delete {companyToDelete?.name}? This action cannot be undone.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCancelDelete}>Cancel</Button>
-          <Button onClick={handleConfirmDelete} color="error" autoFocus>
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Snackbar for notifications */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-      >
-        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
     </Box>
   );
 };
