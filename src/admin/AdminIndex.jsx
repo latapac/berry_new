@@ -67,22 +67,7 @@ const AdminIndex = () => {
 
   // Your original functions remain unchanged
   const handleLogout = () => {
-    setIsAuthenticated(false);
-    setEmail('');
-    setPassword('');
-  };
-
-  const generateNextCompanyId = () => {
-    if (companies.length === 0) return 'Cmp-001';
-    
-    const ids = companies.map(company => {
-      const match = company.company_id?.match(/Cmp-(\d+)/);
-      return match ? parseInt(match[1], 10) : 0;
-    });
-    
-    const maxId = Math.max(...ids);
-    const nextId = maxId + 1;
-    return `Cmp-${nextId.toString().padStart(3, '0')}`;
+  
   };
 
   const handleOpenModal = (company = null) => {
@@ -90,8 +75,6 @@ const AdminIndex = () => {
       setCurrentCompany(company);
     } else {
       setCurrentCompany({
-        id: null,
-        company_id: generateNextCompanyId(),
         name: '',
         email: '',
         phone: '',

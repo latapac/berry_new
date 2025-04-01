@@ -29,7 +29,6 @@ const AdminMachine = () => {
   const [currentMachine, setCurrentMachine] = useState({
     id: null,
     machineId: '',
-    machineNumber: '',
     modelNumber: '',
     lineNumber: ''
   });
@@ -43,7 +42,6 @@ const AdminMachine = () => {
     setCurrentMachine(machine || {
       id: null,
       machineId: '',
-      machineNumber: '',
       modelNumber: '',
       lineNumber: ''
     });
@@ -54,28 +52,10 @@ const AdminMachine = () => {
     setOpenModal(false);
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setCurrentMachine(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
   const handleSubmitMachine = (e) => {
     e.preventDefault();
-    if (currentMachine.id) {
-      // Update existing machine
-      setMachines(machines.map(machine =>
-        machine.id === currentMachine.id ? currentMachine : machine
-      ));
-    } else {
-      // Add new machine
-      setMachines([...machines, {
-        ...currentMachine,
-        id: Math.max(...machines.map(m => m.id), 0) + 1
-      }]);
-    }
+    const formdata = new FormData(e.target)
+   
     handleCloseModal();
   };
 
@@ -85,7 +65,9 @@ const AdminMachine = () => {
 
   useEffect(() => {
     getMachines(companyId).then((data) => {
-      setMachines(data)
+      if (typeof data == "object") {
+        setMachines(data)
+      }
     })
   }, []);
 
@@ -177,19 +159,8 @@ const AdminMachine = () => {
             <TextField
               fullWidth
               margin="normal"
-              label="Machine ID"
-              name="machineId"
-              value={currentMachine.machineId}
-              onChange={handleInputChange}
-              required
-            />
-            <TextField
-              fullWidth
-              margin="normal"
-              label="Machine Number"
-              name="machineNumber"
-              value={currentMachine.machineNumber}
-              onChange={handleInputChange}
+              label="Serial Number"
+              name="serialnumber"
               required
             />
             <TextField
@@ -197,8 +168,6 @@ const AdminMachine = () => {
               margin="normal"
               label="Model Number"
               name="modelNumber"
-              value={currentMachine.modelNumber}
-              onChange={handleInputChange}
               required
             />
             <TextField
@@ -206,8 +175,6 @@ const AdminMachine = () => {
               margin="normal"
               label="Line Number"
               name="lineNumber"
-              value={currentMachine.lineNumber}
-              onChange={handleInputChange}
               required
             />
             <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
