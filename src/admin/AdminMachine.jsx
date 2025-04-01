@@ -137,7 +137,7 @@ const AdminMachine = () => {
                       color="primary"
                       size="small"
                       onClick={() => handleOpenModal(machine)}
-                      sx={{ mr: 1 }}
+                      sx={{ mr: 2 }}
                     >
                       Edit
                     </Button>
@@ -146,8 +146,17 @@ const AdminMachine = () => {
                       color="error"
                       size="small"
                       onClick={() => handleDeleteMachine(machine.id)}
+                      sx={{ mr: 2 }}
                     >
                       Delete
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="warning"
+                      size="small"
+                      onClick={() => navigate("/dash?serial_number=" + machine.serial_number)}
+                    >
+                      View Dashboard
                     </Button>
                   </TableCell>
                 </TableRow>
