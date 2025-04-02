@@ -148,9 +148,7 @@ const AdminIndex = () => {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 600, letterSpacing: '0.5px', color: 'white', fontSize: '3vh' }}>
             PACMAC
           </Typography>
-          <Button color="inherit" startIcon={<ExitToApp />} onClick={handleLogout} sx={{ fontWeight: 500 }}>
-            Logout
-          </Button>
+         
         </Toolbar>
       </AppBar>
 
