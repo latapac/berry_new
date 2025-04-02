@@ -19,17 +19,13 @@ import MainCard from 'ui-component/cards/MainCard';
 import { useLocation } from 'react-router';
 import { getUsers, addUser, deleteUser, updateUserPass } from '../backservice';
 
-export default function UserManagement() {
+export default function UserManagementAdmin() {
   const userData = useSelector((state) => state.authSlice?.userData || {});
   const {search} = useLocation()
   const queryParams = new URLSearchParams(search)
   const fetchedId = queryParams.get("c_id")
-  let cid;
-  if (fetchedId) {
-   cid=fetchedId
-  }else{
-    cid=userData?.c_id
-  }
+  let cid=fetchedId
+  
   const [users, setUsers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -204,6 +200,7 @@ export default function UserManagement() {
                     <option value="Admin">Admin</option>
                     <option value="Operator">Operator</option>
                     <option value="Manager">Manager</option>
+                    <option value="company admin">Company Admin</option>
                   </select>
                 </div>
 

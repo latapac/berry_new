@@ -199,7 +199,7 @@ const AdminIndex = () => {
                         <ActionButton variant="outlined" color={!company.status ? 'success' : 'error'} size="small" onClick={() => handleCompanyStatus(company)}>
                           {company.status ? 'DEACTIVATE COMPANY' : 'ACTIVATE COMPANY'}
                         </ActionButton>
-                        <ActionButton variant="outlined" color="secondary" size="small" onClick={() => navigate("/usermangement?c_id=" + company.company_id)}>
+                        <ActionButton variant="outlined" color="secondary" size="small" onClick={() => navigate("/userManagementAdmin?c_id=" + company.company_id)}>
                           User Management
                         </ActionButton>
                       </Box>

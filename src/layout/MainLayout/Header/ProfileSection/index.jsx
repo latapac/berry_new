@@ -230,7 +230,7 @@ export default function ProfileSection() {
 
                       <Divider sx={{ my: 1 }} />
 
-                      {userData?.role.toLowerCase() == "admin" ? (<List disablePadding>
+                      {(userData?.role.toLowerCase() == "admin" || userData.role.toLowerCase()==="company admin")? (<List disablePadding>
                         {/* User Management Dropdown */}
                         <ListItemButton
                           onClick={() =>{

@@ -10,6 +10,7 @@ function AdminProtected({children}) {
 
   const authStatus = useSelector((state)=>state.adminAuth.adminStatus);
 
+  
   useEffect(()=>{
 
     if (!authStatus) {

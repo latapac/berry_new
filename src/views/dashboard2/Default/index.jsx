@@ -777,8 +777,7 @@ export default function Dashboard() {
     let today = new Date()
     let previous =  today.getFullYear() + "-" +
     (today.getMonth() + 1).toString().padStart(2, '0') + "-" +
-    (today.getDate() - 1).toString().padStart(2, '0');
-    console.log(previous);
+    (today.getDate() - 1).toString().padStart(2, '0');  
     
     getoee(serialNumber,previous).then((data)=>{
       if (typeof data === "object") {

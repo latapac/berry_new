@@ -9,10 +9,11 @@ function Protected({children}) {
   const [loading,setLoading] = useState(true);
 
   const authStatus = useSelector((state)=>state.authSlice.userStatus);
+  const adminAuthStatus = useSelector((state)=>state.adminAuth.adminStatus);
 
   useEffect(()=>{
 
-    if (!authStatus) {
+    if (!authStatus && !adminAuthStatus) {
         navigate("/pages/login");
     } 
     setLoading(false)
