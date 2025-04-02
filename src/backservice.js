@@ -233,6 +233,18 @@ export async function addCompany(data) {
     }
 }
 
+export async function toggleStatus(_cid) {
+    const response = await fetch("http://64.227.139.217:3000/changeCompanyStatus/"+_cid)
+    console.log(response,"sj");
+    const res = await response.json()
+    
+    if (res.status==200) {
+        return true
+    } else {
+        return false
+    }
+}
+
 export async function addMachine(data) { 
     const response = await fetch("http://64.227.139.217:3000/addMachine", {
         method: "POST",

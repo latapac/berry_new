@@ -23,7 +23,7 @@ import {
   styled
 } from '@mui/material';
 import { Add, Business, ExitToApp } from '@mui/icons-material';
-import { addCompany, getAllCompanies } from '../backservice';
+import { addCompany, getAllCompanies, toggleStatus } from '../backservice';
 import { useNavigate } from 'react-router';
 
 // Styled components for corporate look
@@ -55,7 +55,7 @@ const AdminIndex = () => {
   const [companies, setCompanies] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [statusModal, setStatusModal] = useState(false);
-  const [companyToDeactivate, setCompanyToDeactivate] = useState(null);
+  const [companyToDeactivate, setCompanyToDeactivate] = useState({});
   const [currentCompany, setCurrentCompany] = useState({
     id: null,
     company_id: '',
@@ -107,32 +107,25 @@ const AdminIndex = () => {
     handleCloseModal();
   };
 
-  // Handle company status (activation/deactivation)
-  const handleCompanyStatus = (company, currentStatus) => {
-    if (currentStatus) {
+
+  const handleCompanyStatus = (company) => {
       setCompanyToDeactivate(company);
       setStatusModal(true);
-    } else {
-      toggleCompanyStatus(company.company_id, true); // Activate
+  };
+
+  const toggleCompanyStatus = (companyId) => {
+   toggleStatus(companyId).then((data)=>{
+    console.log(data);
+    
+    if (data) {
+      alert("company status")
+      getAllCompanies().then((data) => {
+        setCompanies(data.data);
+      });
+    }else{
+      alert("failed to load")
     }
-  };
-
-  // Function to toggle company status
-  const toggleCompanyStatus = (companyId, status) => {
-    updateCompanyStatus(companyId, status).then((result) => {
-      if (result) {
-        getAllCompanies().then((data) => {
-          setCompanies(data.data);
-        });
-      } else {
-        alert("Status update failed!");
-      }
-    });
-  };
-
-  // API call to update company status (replace with actual API logic)
-  const updateCompanyStatus = (companyId, status) => {
-    return Promise.resolve(true); // Example: Replace with actual API call
+   })
   };
 
   // Fetch companies on initial load
@@ -203,7 +196,7 @@ const AdminIndex = () => {
                         <ActionButton variant="outlined" color="primary" size="small" onClick={() => navigate("/adminMachine?c_id=" + company.company_id)}>
                           View Machines
                         </ActionButton>
-                        <ActionButton variant="outlined" color={!company.status ? 'success' : 'error'} size="small" onClick={() => handleCompanyStatus(company, company.status)}>
+                        <ActionButton variant="outlined" color={!company.status ? 'success' : 'error'} size="small" onClick={() => handleCompanyStatus(company)}>
                           {company.status ? 'DEACTIVATE COMPANY' : 'ACTIVATE COMPANY'}
                         </ActionButton>
                         <ActionButton variant="outlined" color="secondary" size="small" onClick={() => navigate("/usermangement?c_id=" + company.company_id)}>
@@ -250,25 +243,22 @@ const AdminIndex = () => {
         <DialogTitle sx={{ fontWeight: 600, pb: 1 }}>Deactivate Company?</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            You are about to deactivate <strong>{companyToDeactivate?.name}</strong>.
-            This action will remove all associated records.
-          </DialogContentText>
-          <DialogContentText sx={{ mt: 2, color: theme.palette.error.main }}>
-            Warning: This action cannot be undone.
+            You are about to {companyToDeactivate.status?"deactivate":"activate"} <strong>{companyToDeactivate?.name}</strong>.
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ p: 3, pt: 1 }}>
           <ActionButton onClick={() => setStatusModal(false)}>Cancel</ActionButton>
           <ActionButton
             onClick={() => {
-              toggleCompanyStatus(companyToDeactivate.company_id, false); // Deactivate company
+  
+              toggleCompanyStatus(companyToDeactivate.company_id);
               setStatusModal(false);
             }}
             variant="contained"
-            color="error"
-            sx={{ background: theme.palette.error.main, '&:hover': { backgroundColor: theme.palette.error.dark } }}
+            color={companyToDeactivate.status?"error":"success"}
+            sx={{ background: companyToDeactivate.status?theme.palette.error.main:theme.palette.success.main }}
           >
-            Confirm Deactivation
+            {companyToDeactivate.status?"Confirm Deactivation":"Confirm Activate"}
           </ActionButton>
         </DialogActions>
       </Dialog>
