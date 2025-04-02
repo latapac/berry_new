@@ -17,12 +17,15 @@ import {
 } from '@mui/material';
 import { Add } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router';
+import { useDispatch } from 'react-redux';
+import { adminLogout } from '../store/authslice';
 import { addMachine, getMachines } from '../backservice';
 
 const AdminMachine = () => {
   const navigate = useNavigate();
   const [machines, setMachines] = useState([]);
   const [openModal, setOpenModal] = useState(false);
+  const dispatch = useDispatch()
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const companyId = queryParams.get('c_id');
@@ -35,7 +38,8 @@ const AdminMachine = () => {
   });
 
   const handleLogout = () => {
-    // Implement logout logic
+    dispatch(adminLogout())
+    navigate("/dash")
   };
 
   // Machine handlers

@@ -649,12 +649,6 @@ const OEEGraph = ({ oeeData, isLoading, serialNumber }) => {
     }
   }
 
-  // Calculate vertical grid lines based on time interval
-  const hourInterval = dataPoints.length > 1
-    ? Math.floor(60 / ((new Date(dataPoints[1].time) - new Date(dataPoints[0].time)) / (1000 * 60)))
-    : 0;
-
-  const verticalLines = dataPoints.filter((_, index) => index % hourInterval === 0);
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-4 mb-6 w-full" ref={containerRef}>
@@ -885,12 +879,12 @@ export default function Dashboard() {
                   </button>
                   <button
                     onClick={() => {
-                      navigate("/AdminIndex?serial_number=" + serialNumber);
+                      navigate("/OEE?serial_number=" + serialNumber);
                       setIsOpen(false);
                     }}
                     className="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-400 w-full text-left"
                   >
-                    admin
+                    OEE REPORT
                   </button>
                 </div>
               </div>

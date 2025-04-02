@@ -10,7 +10,7 @@ const OeeLive = () => {
   const queryParams = new URLSearchParams(location.search);
   const serialNumber = queryParams.get('serial_number');
   const [machineData, setMachineData] = useState({});
-  const [isLoading,setLoading] = useState(true);
+  const [isLoading, setLoading] = useState(true);
   
   useEffect(() => {
     setLoading(true);
@@ -26,14 +26,14 @@ const OeeLive = () => {
   }, [serialNumber]);
 
   // Data
-  let availability =  machineData?.d?.Availability[0];
-  let performance =  machineData?.d?.Performance[0];
+  let availability = machineData?.d?.Availability[0];
+  let performance = machineData?.d?.Performance[0];
   let quality = machineData?.d?.Quality[0];
 
   const oee = 99;
   const lastUpdated = new Date().toLocaleString();
 
-  // Chart configurations (exactly 4 charts)
+  // Chart configurations
   const charts = [
     {
       title: "OEE Components",
@@ -83,8 +83,18 @@ const OeeLive = () => {
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
-      legend: { position: 'right' },
+      legend: { 
+        position: 'right',
+        labels: {
+          boxWidth: 12,
+          padding: 10,
+          font: {
+            size: window.innerWidth < 768 ? 10 : 12
+          }
+        }
+      },
       tooltip: {
         callbacks: {
           label: (context) => `${context.label}: ${context.raw}%`
@@ -96,77 +106,88 @@ const OeeLive = () => {
   return (
     <div style={{
       fontFamily: 'Arial, sans-serif',
+      width: '100%',
       maxWidth: '1200px',
       margin: '0 auto',
-      padding: '20px',
-      minHeight: '100vh'
+      padding: '20px 15px',
+      minHeight: '100vh',
+      boxSizing: 'border-box'
     }}>
       <header style={{
         textAlign: 'center',
-        marginBottom: '30px'
+        marginBottom: '25px',
+        padding: '0 10px'
       }}>
-        <h1 style={{ marginBottom: '5px', color: '#333' }}>OEE Dashboard</h1>
+        <h1 style={{ 
+          marginBottom: '10px', 
+          color: '#333', 
+          fontSize: 'calc(16px + 1vw)',
+          fontWeight: '600'
+        }}>
+          OEE Dashboard
+        </h1>
         <div style={{
           display: 'flex',
+          flexDirection: window.innerWidth < 600 ? 'column' : 'row',
           justifyContent: 'center',
-          gap: '20px',
+          gap: '15px',
           alignItems: 'center'
         }}>
-          <div style={{ fontSize: '18px', fontWeight: 'bold' }}>
+          <div style={{ 
+            fontSize: 'calc(14px + 0.3vw)', 
+            fontWeight: 'bold' 
+          }}>
             Overall OEE: <span style={{ color: '#4285F4' }}>{oee}%</span>
           </div>
-          <div style={{ color: '#666' }}>
+          <div style={{ 
+            color: '#666', 
+            fontSize: 'calc(12px + 0.3vw)' 
+          }}>
             Last updated: {lastUpdated}
           </div>
         </div>
       </header>
 
-      {/* First row with 2 charts */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(2, 1fr)',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 400px), 1fr)',
         gap: '20px',
-        marginBottom: '20px'
+        width: '100%',
+        padding: '0 10px',
+        boxSizing: 'border-box'
       }}>
-        {charts.slice(0, 2).map((chart, index) => (
+        {charts.map((chart, index) => (
           <div key={index} style={{
             backgroundColor: 'white',
             borderRadius: '8px',
-            padding: '20px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+            padding: '15px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            width: '100%',
+            minWidth: '0', // Fixes flexbox overflow issues
+            display: 'flex',
+            flexDirection: 'column'
           }}>
-            <h3 style={{ textAlign: 'center', marginTop: '0' }}>{chart.title}</h3>
-            <div style={{ height: '300px', width: '400px' }}>
+            <h3 style={{ 
+              textAlign: 'center', 
+              margin: '0 0 15px 0',
+              fontSize: 'calc(14px + 0.3vw)',
+              fontWeight: '500'
+            }}>
+              {chart.title}
+            </h3>
+            <div style={{ 
+              flex: '1',
+              minHeight: '250px',
+              width: '100%',
+              position: 'relative',
+              margin: '0 auto'
+            }}>
               <Pie data={chart.data} options={chartOptions} />
             </div>
           </div>
         ))}
       </div>
-
-      {/* Second row with 2 charts */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(2, 1fr)',
-        gap: '20px'
-      }}>
-        {charts.slice(2, 4).map((chart, index) => (
-          <div key={index} style={{
-            backgroundColor: 'white',
-            borderRadius: '8px',
-            padding: '20px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-          }}>
-            <h3 style={{ textAlign: 'center', marginTop: '0' }}>{chart.title}</h3>
-            <div style={{ height: '300px' }}>
-              <Pie data={chart.data} options={chartOptions} />
-            </div>
-          </div>
-        ))}
-      </div>
-
-
     </div>
-
   );
 };
 
