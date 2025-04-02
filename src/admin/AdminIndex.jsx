@@ -54,6 +54,8 @@ const AdminIndex = () => {
   const navigate = useNavigate();
   const [companies, setCompanies] = useState([]);
   const [openModal, setOpenModal] = useState(false);
+  const [statusModal, setStatusModal] = useState(false);
+  const [companyToDeactivate, setCompanyToDeactivate] = useState(null);
   const [currentCompany, setCurrentCompany] = useState({
     id: null,
     company_id: '',
@@ -62,12 +64,10 @@ const AdminIndex = () => {
     phone: '',
     address: ''
   });
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [companyToDelete, setCompanyToDelete] = useState(null);
 
-  // Your original functions remain unchanged
+  // Handle logout (to be implemented)
   const handleLogout = () => {
-  
+    // Implement logout functionality
   };
 
   const handleOpenModal = (company = null) => {
@@ -88,40 +88,54 @@ const AdminIndex = () => {
     setOpenModal(false);
   };
 
-
   const handleSubmitCompany = (e) => {
     e.preventDefault();
     const formdata = new FormData(e.target)
     const name = formdata.get("name")
     const address = formdata.get("address")
     const unit = formdata.get("unit")
-    addCompany({name,address,unit}).then((result)=>{
-        if (result) {
-          alert("company added!")
-          getAllCompanies().then((data) => {
-            setCompanies(data.data);
-          });
-        }else{
-          alert("company add failed!")
-        }
+    addCompany({name,address,unit}).then((result) => {
+      if (result) {
+        alert("company added!")
+        getAllCompanies().then((data) => {
+          setCompanies(data.data);
+        });
+      } else {
+        alert("company add failed!")
+      }
     })
     handleCloseModal();
   };
 
-  const handleDeleteClick = (company) => {
-    setCompanyToDelete(company);
-    setDeleteConfirmOpen(true);
+  // Handle company status (activation/deactivation)
+  const handleCompanyStatus = (company, currentStatus) => {
+    if (currentStatus) {
+      setCompanyToDeactivate(company);
+      setStatusModal(true);
+    } else {
+      toggleCompanyStatus(company.company_id, true); // Activate
+    }
   };
 
-  const handleConfirmDelete = () => {
-    setCompanies(companies.filter(company => company.company_id !== companyToDelete.company_id));
-    setDeleteConfirmOpen(false);
+  // Function to toggle company status
+  const toggleCompanyStatus = (companyId, status) => {
+    updateCompanyStatus(companyId, status).then((result) => {
+      if (result) {
+        getAllCompanies().then((data) => {
+          setCompanies(data.data);
+        });
+      } else {
+        alert("Status update failed!");
+      }
+    });
   };
 
-  const handleCancelDelete = () => {
-    setDeleteConfirmOpen(false);
+  // API call to update company status (replace with actual API logic)
+  const updateCompanyStatus = (companyId, status) => {
+    return Promise.resolve(true); // Example: Replace with actual API call
   };
 
+  // Fetch companies on initial load
   useEffect(() => {
     getAllCompanies().then((data) => {
       setCompanies(data.data);
@@ -135,79 +149,24 @@ const AdminIndex = () => {
       minHeight: '100vh',
       backgroundColor: theme.palette.grey[50]
     }}>
-      <AppBar 
-        position="static"
-        sx={{ 
-          background: 'linear-gradient(135deg, #2c3e50 0%, #3498db 100%)',
-          boxShadow: 'none'
-        }}
-      >
+      <AppBar position="static" sx={{ background: 'linear-gradient(135deg, #2c3e50 0%, #3498db 100%)', boxShadow: 'none' }}>
         <Toolbar>
           <Business sx={{ mr: 2, fontSize: '32px' }} />
-          <Typography 
-            variant="h6" 
-            component="div" 
-            sx={{ 
-              flexGrow: 1,
-              fontWeight: 600,
-              letterSpacing: '0.5px',
-              color: 'white',
-              fontSize: '3vh'
-            }}
-            
-          >
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 600, letterSpacing: '0.5px', color: 'white', fontSize: '3vh' }}>
             PACMAC
           </Typography>
-          <Button 
-            color="inherit" 
-            startIcon={<ExitToApp />}
-            onClick={handleLogout}
-            sx={{ 
-              fontWeight: 500,
-              '&:hover': {
-                backgroundColor: 'rgba(255,255,255,0.1)'
-              }
-            }}
-          >
+          <Button color="inherit" startIcon={<ExitToApp />} onClick={handleLogout} sx={{ fontWeight: 500 }}>
             Logout
           </Button>
         </Toolbar>
       </AppBar>
 
-      <Box sx={{ 
-        p: 4,
-        maxWidth: '1600px',
-        margin: '0 auto',
-        width: '100%'
-      }}>
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center', 
-          mb: 4 
-        }}>
-          <Typography 
-            variant="h4"
-            sx={{
-              fontWeight: 600,
-              color: theme.palette.grey[800],
-              letterSpacing: '-0.5px'
-            }}
-          >
+      <Box sx={{ p: 4, maxWidth: '1600px', margin: '0 auto', width: '100%' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+          <Typography variant="h4" sx={{ fontWeight: 600, color: theme.palette.grey[800], letterSpacing: '-0.5px' }}>
             Companies
           </Typography>
-          <ActionButton 
-            variant="contained" 
-            color="primary" 
-            startIcon={<Add />}
-            onClick={() => handleOpenModal()}
-            sx={{
-              background: 'linear-gradient(135deg, #3498db 0%, #2c3e50 100%)',
-              '&:hover': {
-                opacity: 0.9
-              }
-            }}
-          >
+          <ActionButton variant="contained" color="primary" startIcon={<Add />} onClick={() => handleOpenModal()} sx={{ background: 'linear-gradient(135deg, #3498db 0%, #2c3e50 100%)' }}>
             New Company
           </ActionButton>
         </Box>
@@ -225,56 +184,29 @@ const AdminIndex = () => {
                 </TableRow>
               </CorporateTableHead>
               <TableBody>
-                {companies.map((company,index) => (
-                  <TableRow 
-                    key={company.company_id}
-                    hover
-                    sx={{ '&:last-child td': { borderBottom: 0 } }}
-                  >
+                {companies.map((company, index) => (
+                  <TableRow key={company.company_id} hover>
                     <TableCell>
-                      <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                        {index+1}
-                      </Typography>
+                      <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{index + 1}</Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography fontWeight={500}>
-                        {company.name}
-                      </Typography>
+                      <Typography fontWeight={500}>{company.name}</Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography fontWeight={500}>
-                        {company.address}
-                      </Typography>
+                      <Typography fontWeight={500}>{company.address}</Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography fontWeight={500}>
-                        {company.unit}
-                      </Typography>
+                      <Typography fontWeight={500}>{company.unit}</Typography>
                     </TableCell>
                     <TableCell>
-                      <Box sx={{ display: 'flex', gap: 1 ,width:['25vw']}}>
-                        <ActionButton
-                          variant="outlined"
-                          color="primary"
-                          size="small"
-                          onClick={() => { navigate("/adminMachine?c_id="+company.company_id) }}
-                        >
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <ActionButton variant="outlined" color="primary" size="small" onClick={() => navigate("/adminMachine?c_id=" + company.company_id)}>
                           View Machines
                         </ActionButton>
-                        <ActionButton
-                          variant="outlined"
-                          color="error"
-                          size="small"
-                          onClick={() => handleDeleteClick(company)}
-                        >
-                          Delete Company
+                        <ActionButton variant="outlined" color={!company.status ? 'success' : 'error'} size="small" onClick={() => handleCompanyStatus(company, company.status)}>
+                          {company.status ? 'DEACTIVATE COMPANY' : 'ACTIVATE COMPANY'}
                         </ActionButton>
-                        <ActionButton
-                          variant="outlined"
-                          color="secondary"
-                          size="small"
-                          onClick={() => navigate("/usermangement?c_id="+company.company_id)}
-                        >
+                        <ActionButton variant="outlined" color="secondary" size="small" onClick={() => navigate("/usermangement?c_id=" + company.company_id)}>
                           User Management
                         </ActionButton>
                       </Box>
@@ -287,77 +219,25 @@ const AdminIndex = () => {
         </CorporatePaper>
       </Box>
 
-      {/* Add/Edit Company Modal - Corporate Style */}
+      {/* Add/Edit Company Modal */}
       <Modal open={openModal} onClose={handleCloseModal}>
         <Box sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: 500,
-          bgcolor: 'background.paper',
-          boxShadow: 24,
-          p: 4,
-          borderRadius: '12px',
-          border: `1px solid ${theme.palette.divider}`
+          position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+          width: 500, bgcolor: 'background.paper', boxShadow: 24, p: 4, borderRadius: '12px', border: `1px solid ${theme.palette.divider}`
         }}>
           <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
             {currentCompany.id ? 'Edit Corporate Entity' : 'Register New Entity'}
-            <Box sx={{ 
-              width: '40px', 
-              height: '4px', 
-              background: 'linear-gradient(135deg, #3498db 0%, #2c3e50 100%)',
-              mt: 1
-            }} />
+            <Box sx={{ width: '40px', height: '4px', background: 'linear-gradient(135deg, #3498db 0%, #2c3e50 100%)', mt: 1 }} />
           </Typography>
           <form onSubmit={handleSubmitCompany}>
-            <TextField
-              fullWidth
-              margin="normal"
-              label="Company Name"
-              name="name"
-              required
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              fullWidth
-              margin="normal"
-              label="Address"
-              name="address"
-              required
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              fullWidth
-              margin="normal"
-              label="Unit"
-              name="unit"
-              required
-              sx={{ mb: 2 }}
-            />
-            <Box sx={{ 
-              mt: 4, 
-              display: 'flex', 
-              justifyContent: 'flex-end', 
-              gap: 2 
-            }}>
-              <ActionButton 
-                onClick={handleCloseModal}
-                sx={{
-                  border: `1px solid ${theme.palette.divider}`,
-                  color: theme.palette.text.primary
-                }}
-              >
+            <TextField fullWidth margin="normal" label="Company Name" name="name" required sx={{ mb: 2 }} />
+            <TextField fullWidth margin="normal" label="Address" name="address" required sx={{ mb: 2 }} />
+            <TextField fullWidth margin="normal" label="Unit" name="unit" required sx={{ mb: 2 }} />
+            <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+              <ActionButton onClick={handleCloseModal} sx={{ border: `1px solid ${theme.palette.divider}`, color: theme.palette.text.primary }}>
                 Cancel
               </ActionButton>
-              <ActionButton 
-                type="submit" 
-                variant="contained" 
-                color="primary"
-                sx={{
-                  background: 'linear-gradient(135deg, #3498db 0%, #2c3e50 100%)'
-                }}
-              >
+              <ActionButton type="submit" variant="contained" color="primary" sx={{ background: 'linear-gradient(135deg, #3498db 0%, #2c3e50 100%)' }}>
                 {currentCompany.id ? 'Update' : 'Register'} Entity
               </ActionButton>
             </Box>
@@ -365,24 +245,12 @@ const AdminIndex = () => {
         </Box>
       </Modal>
 
-      {/* Corporate-style Delete Confirmation */}
-      <Dialog
-        open={deleteConfirmOpen}
-        onClose={handleCancelDelete}
-        PaperProps={{
-          sx: {
-            borderRadius: '12px',
-            padding: '16px',
-            minWidth: '500px'
-          }
-        }}
-      >
-        <DialogTitle sx={{ fontWeight: 600, pb: 1 }}>
-          Confirm Deactivation
-        </DialogTitle>
+      {/* Deactivation Confirmation Dialog */}
+      <Dialog open={statusModal} onClose={() => setStatusModal(false)} PaperProps={{ sx: { borderRadius: '12px', padding: '16px', minWidth: '500px' } }}>
+        <DialogTitle sx={{ fontWeight: 600, pb: 1 }}>Deactivate Company?</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            You are about to deactivate <strong>{companyToDelete?.name}</strong>. 
+            You are about to deactivate <strong>{companyToDeactivate?.name}</strong>.
             This action will remove all associated records.
           </DialogContentText>
           <DialogContentText sx={{ mt: 2, color: theme.palette.error.main }}>
@@ -390,19 +258,15 @@ const AdminIndex = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ p: 3, pt: 1 }}>
-          <ActionButton onClick={handleCancelDelete}>
-            Cancel
-          </ActionButton>
-          <ActionButton 
-            onClick={handleConfirmDelete} 
+          <ActionButton onClick={() => setStatusModal(false)}>Cancel</ActionButton>
+          <ActionButton
+            onClick={() => {
+              toggleCompanyStatus(companyToDeactivate.company_id, false); // Deactivate company
+              setStatusModal(false);
+            }}
             variant="contained"
             color="error"
-            sx={{
-              background: theme.palette.error.main,
-              '&:hover': {
-                backgroundColor: theme.palette.error.dark
-              }
-            }}
+            sx={{ background: theme.palette.error.main, '&:hover': { backgroundColor: theme.palette.error.dark } }}
           >
             Confirm Deactivation
           </ActionButton>
