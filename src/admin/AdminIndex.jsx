@@ -176,7 +176,7 @@ const AdminIndex = () => {
               </CorporateTableHead>
               <TableBody>
                 {companies.map((company, index) => (
-                  <TableRow key={company.company_id} hover>
+                  <TableRow key={company.company_id}  className={company.status?"opacity-100":"opacity-70"} hover>
                     <TableCell>
                       <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{index + 1}</Typography>
                     </TableCell>

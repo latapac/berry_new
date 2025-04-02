@@ -57,7 +57,7 @@ export default function Header({show}) {
       </>
     );
   }else{
-    return <><button onClick={()=>{navigate("/AdminIndex")}}>back to admin</button></>
+    return <><button onClick={()=>{navigate("/AdminIndex")}} className='p-2 bg-gradient-to-t from-blue-500 to-blue-800 text-white rounded-md'>Back To Admin</button></>
   }
 
  
