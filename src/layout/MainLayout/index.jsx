@@ -14,7 +14,7 @@ import MainContentStyled from './MainContentStyled';
 import Customization from '../Customization';
 import Loader from 'ui-component/Loader';
 import Breadcrumbs from 'ui-component/extended/Breadcrumbs';
-
+import { useSelector } from 'react-redux';
 import useConfig from 'hooks/useConfig';
 import { handlerDrawerOpen, useGetMenuMaster } from 'api/menu';
 
@@ -23,6 +23,8 @@ import { handlerDrawerOpen, useGetMenuMaster } from 'api/menu';
 export default function MainLayout() {
   const theme = useTheme();
   const downMD = useMediaQuery(theme.breakpoints.down('md'));
+  const authStatus = useSelector((state)=>state.adminAuth.adminStatus);
+
 
   const { borderRadius, miniDrawer } = useConfig();
   const { menuMaster, menuMasterLoading } = useGetMenuMaster();
@@ -45,12 +47,12 @@ export default function MainLayout() {
       {/* header */}
       <AppBar enableColorOnDark position="fixed" color="inherit" elevation={0} sx={{ bgcolor: 'background.default' }}>
         <Toolbar sx={{ p: 2 }}>
-          <Header />
+          <Header show={authStatus} />
         </Toolbar>
       </AppBar>
 
       {/* menu / drawer */}
-      <Sidebar />
+      {authStatus?<></>:<Sidebar />}
 
       {/* main content */}
       <MainContentStyled {...{ borderRadius, open: drawerOpen }}>
