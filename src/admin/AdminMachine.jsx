@@ -228,21 +228,8 @@ const AdminMachine = () => {
             <TextField
               fullWidth
               margin="normal"
-              label="Asset Identification Code"
-              name="machineId"
-              value={currentMachine.machineId}
-              onChange={handleInputChange}
-              required
-              sx={{ mb: 2 }}
-              size="small"
-            />
-            <TextField
-              fullWidth
-              margin="normal"
               label="Equipment Serial Number"
-              name="machineNumber"
-              value={currentMachine.machineNumber}
-              onChange={handleInputChange}
+              name="serialnumber"
               required
               sx={{ mb: 2 }}
               size="small"
@@ -250,10 +237,8 @@ const AdminMachine = () => {
             <TextField
               fullWidth
               margin="normal"
-              label="Model Specification"
+              label="Model Number"
               name="modelNumber"
-              value={currentMachine.modelNumber}
-              onChange={handleInputChange}
               required
               sx={{ mb: 2 }}
               size="small"
@@ -263,8 +248,6 @@ const AdminMachine = () => {
               margin="normal"
               label="Production Line Assignment"
               name="lineNumber"
-              value={currentMachine.lineNumber}
-              onChange={handleInputChange}
               required
               sx={{ mb: 3 }}
               size="small"
