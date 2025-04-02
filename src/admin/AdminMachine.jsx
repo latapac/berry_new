@@ -29,6 +29,7 @@ const AdminMachine = () => {
   const [currentMachine, setCurrentMachine] = useState({
     id: null,
     machineId: '',
+    machineNumber: '',
     modelNumber: '',
     lineNumber: ''
   });
@@ -42,6 +43,7 @@ const AdminMachine = () => {
     setCurrentMachine(machine || {
       id: null,
       machineId: '',
+      machineNumber: '',
       modelNumber: '',
       lineNumber: ''
     });
@@ -50,6 +52,14 @@ const AdminMachine = () => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setCurrentMachine(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleSubmitMachine = (e) => {
@@ -87,31 +97,38 @@ const AdminMachine = () => {
 
   useEffect(() => {
     getMachines(companyId).then((data) => {
-      if (typeof data == "object") {
-        setMachines(data)
-      }
+      setMachines(data)
     })
   }, []);
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <AppBar position="static">
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#f5f7fa' }}>
+      <AppBar position="static" sx={{ backgroundColor: '#1e3a9c', boxShadow: 'none' }}>
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: "white" }}>
-            Machine Management
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: "white", fontWeight: 600, fontSize: '3vh' }}>
+            PACMAC
           </Typography>
-          <Button color="inherit" onClick={handleLogout}>
-            Logout
+          <Button color="inherit" onClick={handleLogout} sx={{ textTransform: 'none', fontWeight: 500 }}>
+            Sign Out
           </Button>
         </Toolbar>
       </AppBar>
 
-      <Box sx={{ p: 3 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-          <Typography variant="h4">Machines</Typography>
+      <Box sx={{ p: 4, maxWidth: '1600px', margin: '0 auto', width: '100%' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+          <Typography variant="h4" sx={{ color: '#1e3a8a', fontWeight: 600 }}>
+            Machines
+          </Typography>
           <Button
             variant="contained"
-            color="primary"
+            sx={{
+              backgroundColor: '#1e3a8a',
+              '&:hover': { backgroundColor: '#172554' },
+              textTransform: 'none',
+              fontWeight: 500,
+              borderRadius: '8px',
+              padding: '8px 16px'
+            }}
             startIcon={<Add />}
             onClick={() => handleOpenModal()}
           >
@@ -119,49 +136,65 @@ const AdminMachine = () => {
           </Button>
         </Box>
 
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
+        <TableContainer component={Paper} sx={{ borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+          <Table sx={{ minWidth: 650 }}>
+            <TableHead sx={{ backgroundColor: '#f1f5f9' }}>
               <TableRow>
-                <TableCell>Machine Serial</TableCell>
-                <TableCell>Model Number</TableCell>
-                <TableCell>Line Number</TableCell>
-                <TableCell>Actions</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: '#1e3a8a' }}>Equipment Serial</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: '#1e3a8a' }}>Model Specification</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: '#1e3a8a' }}>Production Line</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: '#1e3a8a' }}>Management</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {machines.map((machine) => (
-                <TableRow key={machine._id}>
-                  <TableCell>{machine.serial_number}</TableCell>
-                  <TableCell>{machine.model?.toUpperCase()}</TableCell>
-                  <TableCell>{machine.lineNo}</TableCell>
+                <TableRow key={machine._id} hover sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                  <TableCell sx={{ fontWeight: 500 }}>{machine.serial_number}</TableCell>
+                  <TableCell sx={{ color: '#64748b' }}>{machine.model?.toUpperCase()}</TableCell>
+                  <TableCell sx={{ color: '#64748b' }}>{machine.lineNo}</TableCell>
                   <TableCell>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      size="small"
-                      onClick={() => handleOpenModal(machine)}
-                      sx={{ mr: 2 }}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="error"
-                      size="small"
-                      onClick={() => handleDeleteMachine(machine.id)}
-                      sx={{ mr: 2 }}
-                    >
-                      Delete
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="warning"
-                      size="small"
-                      onClick={() => navigate("/dash?serial_number=" + machine.serial_number)}
-                    >
-                      View Dashboard
-                    </Button>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => handleOpenModal(machine)}
+                        sx={{
+                          textTransform: 'none',
+                          borderColor: '#1e3a8a',
+                          color: '#1e3a8a',
+                          '&:hover': { borderColor: '#172554' },
+                          borderRadius: '6px'
+                        }}
+                      >
+                        Edit 
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => handleDeleteMachine(machine.id)}
+                        sx={{
+                          textTransform: 'none',
+                          borderColor: '#dc2626',
+                          color: '#dc2626',
+                          '&:hover': { borderColor: '#991b1b' },
+                          borderRadius: '6px'
+                        }}
+                      >
+                        Delete
+                      </Button>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={() => navigate("/dash?serial_number=" + machine.serial_number)}
+                        sx={{
+                        
+                          textTransform: 'none',
+                          borderRadius: '6px'
+                        }}
+                      >
+                        View Dashboard
+                      </Button>
+                    </Box>
                   </TableCell>
                 </TableRow>
               ))}
@@ -170,48 +203,92 @@ const AdminMachine = () => {
         </TableContainer>
       </Box>
 
-      {/* Add/Edit Machine Modal */}
+      {/* Asset Management Modal */}
       <Modal open={openModal} onClose={handleCloseModal}>
         <Box sx={{
           position: 'absolute',
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          width: 400,
+          width: 500,
           bgcolor: 'background.paper',
-          boxShadow: 24,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
           p: 4,
-          borderRadius: 2,
+          borderRadius: '12px',
+          border: '1px solid #e2e8f0'
         }}>
-          <Typography variant="h6" gutterBottom>
-            {currentMachine.id ? 'Edit Machine' : 'Add New Machine'}
+          <Typography variant="h6" gutterBottom sx={{ color: '#1e3a8a', fontWeight: 600, mb: 3 }}>
+            {currentMachine.id ? 'Update Asset Record' : 'Register New Production Asset'}
           </Typography>
           <form onSubmit={handleSubmitMachine}>
             <TextField
               fullWidth
               margin="normal"
-              label="Serial Number"
-              name="serialnumber"
+              label="Asset Identification Code"
+              name="machineId"
+              value={currentMachine.machineId}
+              onChange={handleInputChange}
               required
+              sx={{ mb: 2 }}
+              size="small"
             />
             <TextField
               fullWidth
               margin="normal"
-              label="Model Number"
+              label="Equipment Serial Number"
+              name="machineNumber"
+              value={currentMachine.machineNumber}
+              onChange={handleInputChange}
+              required
+              sx={{ mb: 2 }}
+              size="small"
+            />
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Model Specification"
               name="modelNumber"
+              value={currentMachine.modelNumber}
+              onChange={handleInputChange}
               required
+              sx={{ mb: 2 }}
+              size="small"
             />
             <TextField
               fullWidth
               margin="normal"
-              label="Line Number"
+              label="Production Line Assignment"
               name="lineNumber"
+              value={currentMachine.lineNumber}
+              onChange={handleInputChange}
               required
+              sx={{ mb: 3 }}
+              size="small"
             />
-            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-              <Button onClick={handleCloseModal}>Cancel</Button>
-              <Button type="submit" variant="contained" color="primary">
-                {currentMachine.id ? 'Update' : 'Add'} Machine
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+              <Button 
+                onClick={handleCloseModal}
+                sx={{
+                  color: '#64748b',
+                  textTransform: 'none',
+                  borderRadius: '6px',
+                  padding: '6px 12px'
+                }}
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit" 
+                variant="contained"
+                sx={{
+                  backgroundColor: '#1e3a8a',
+                  '&:hover': { backgroundColor: '#172554' },
+                  textTransform: 'none',
+                  borderRadius: '6px',
+                  padding: '6px 16px'
+                }}
+              >
+                {currentMachine.id ? 'Update Asset' : 'Register Asset'}
               </Button>
             </Box>
           </form>
