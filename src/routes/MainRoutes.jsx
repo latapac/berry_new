@@ -12,6 +12,11 @@ import MachineGraph from '../views/MachineGraph';
 import UserManagement from '../views/UserManagement';
 import DashboardDefault from 'views/dashboard/Default'
 import OeeLive from '../views/OeeLive';
+import AdminMachine from "../admin/AdminMachine"
+import AuthProtected from "./AdminAuth"
+import UserManagementAdmin from "../admin/UserManagementAdmin"
+import AdminIndex from "../admin/AdminIndex"
+
 
 const MainRoutes = {
   path: '/',
@@ -82,6 +87,17 @@ const MainRoutes = {
     {
       path: '/batchDetails ',
       element: <BatchDetails />
+    }
+    ,{
+      path:"adminIndex",
+      element:<AuthProtected><AdminIndex /></AuthProtected> 
+    },{
+      path:"adminMachine",
+      element:<AuthProtected> <AdminMachine /> </AuthProtected>
+    },
+    {
+      path:"userManagementAdmin",
+      element:<AuthProtected> <UserManagementAdmin /> </AuthProtected>
     }
   ]
 };
