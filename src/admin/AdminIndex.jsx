@@ -22,7 +22,7 @@ import {
   useTheme,
   styled
 } from '@mui/material';
-import { Add, Business, ExitToApp } from '@mui/icons-material';
+import { Add } from '@mui/icons-material';
 import { addCompany, deleteCompany, getAllCompanies, toggleStatus } from '../backservice';
 import { useNavigate } from 'react-router';
 
@@ -215,7 +215,7 @@ const AdminIndex = () => {
                         <ActionButton variant="outlined" color="secondary" size="small" onClick={() => navigate("/userManagementAdmin?c_id=" + company.company_id)}>
                           User Management
                         </ActionButton>
-                        <ActionButton variant="outlined" color="secondary" size="small" onClick={() => handleDeleteCompany(company)}>
+                        <ActionButton variant="outlined" color="inherit" size="small" onClick={() => handleDeleteCompany(company)}>
                           Delete Company
                         </ActionButton>
                       </Box>

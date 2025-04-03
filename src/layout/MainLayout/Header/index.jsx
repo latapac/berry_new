@@ -50,6 +50,7 @@ export default function Header({show}) {
   
         <Box sx={{ flexGrow: 1 }} />
   
+        
         <NotificationSection />
   
         <ProfileSection />

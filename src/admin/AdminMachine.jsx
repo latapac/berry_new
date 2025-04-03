@@ -129,14 +129,7 @@ const AdminMachine = () => {
           </Typography>
           <Button
             variant="contained"
-            sx={{
-              backgroundColor: '#1e3a8a',
-              '&:hover': { backgroundColor: '#172554' },
-              textTransform: 'none',
-              fontWeight: 500,
-              borderRadius: '8px',
-              padding: '8px 16px'
-            }}
+            sx={{ background: 'linear-gradient(135deg, #3498db 0%, #2c3e50 100%)' }}
             startIcon={<Add />}
             onClick={() => handleOpenModal()}
           >
@@ -174,7 +167,7 @@ const AdminMachine = () => {
                           borderRadius: '6px'
                         }}
                       >
-                        Edit 
+                        Edit Line No.
                       </Button>
                       <Button
                         variant="outlined"
@@ -211,7 +204,7 @@ const AdminMachine = () => {
         </TableContainer>
       </Box>
 
-      {/* Asset Management Modal */}
+      {/* Line Number*/}
       <Modal open={openModal} onClose={handleCloseModal}>
         <Box sx={{
           position: 'absolute',
@@ -226,31 +219,14 @@ const AdminMachine = () => {
           border: '1px solid #e2e8f0'
         }}>
           <Typography variant="h6" gutterBottom sx={{ color: '#1e3a8a', fontWeight: 600, mb: 3 }}>
-            {currentMachine.id ? 'Update Asset Record' : 'Register New Production Asset'}
+            Enter Line Number: 
           </Typography>
           <form onSubmit={handleSubmitMachine}>
+           
             <TextField
               fullWidth
               margin="normal"
-              label="Equipment Serial Number"
-              name="serialnumber"
-              required
-              sx={{ mb: 2 }}
-              size="small"
-            />
-            <TextField
-              fullWidth
-              margin="normal"
-              label="Model Number"
-              name="modelNumber"
-              required
-              sx={{ mb: 2 }}
-              size="small"
-            />
-            <TextField
-              fullWidth
-              margin="normal"
-              label="Production Line Assignment"
+              label="Line Number : "
               name="lineNumber"
               required
               sx={{ mb: 3 }}
@@ -279,7 +255,7 @@ const AdminMachine = () => {
                   padding: '6px 16px'
                 }}
               >
-                {currentMachine.id ? 'Update Asset' : 'Register Asset'}
+                Confirm
               </Button>
             </Box>
           </form>
