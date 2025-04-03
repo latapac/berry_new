@@ -121,16 +121,6 @@ const AdminMachine = () => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#f5f7fa' }}>
-      <AppBar position="static" sx={{ backgroundColor: '#1e3a9c', boxShadow: 'none' }}>
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: "white", fontWeight: 600, fontSize: '3vh' }}>
-            PACMAC
-          </Typography>
-          <Button color="inherit" onClick={handleLogout} sx={{ textTransform: 'none', fontWeight: 500 }}>
-            Sign Out
-          </Button>
-        </Toolbar>
-      </AppBar>
 
       <Box sx={{ p: 4, maxWidth: '1600px', margin: '0 auto', width: '100%' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>

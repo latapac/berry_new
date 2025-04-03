@@ -20,16 +20,15 @@ export default function Header({show}) {
 
   const { menuMaster } = useGetMenuMaster();
   const drawerOpen = menuMaster.isDashboardDrawerOpened;
-  if (!show) {
+  
     
     return (
       <>
         {/* logo & toggler button */}
         <Box sx={{ width: downMD ? 'auto' : 228, display: 'flex' }}>
   
-          <Avatar
-            variant="rounded"
-            sx={{
+       
+           {show?(<></>):(<IconMenu2  sx={{
               ...theme.typography.commonAvatar,
               ...theme.typography.mediumAvatar,
               overflow: 'hidden',
@@ -40,12 +39,12 @@ export default function Header({show}) {
                 bgcolor: 'secondary.dark',
                 color: 'secondary.light'
               }
-            }}
+            }} stroke={1.5} size="20px" 
+            variant="rounded"
+           
             onClick={() => handlerDrawerOpen(!drawerOpen)}
-            color="inherit"
-          >
-            <IconMenu2 stroke={1.5} size="20px" />
-          </Avatar>
+           />)}
+  
   
         </Box>
   
@@ -56,9 +55,7 @@ export default function Header({show}) {
         <ProfileSection />
       </>
     );
-  }else{
-    return <><button onClick={()=>{navigate("/AdminIndex")}} className='p-2 bg-gradient-to-t from-blue-500 to-blue-800 text-white rounded-md'>Back To Admin</button></>
-  }
+ 
 
  
 }
