@@ -309,22 +309,6 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange, seri
     }
   }, [speedData, isLoading, dimensions.width]);
 
-  const handleZoom = (factor) => {
-    const newScale = Math.max(0.5, Math.min(5, zoomState.scale * factor));
-    setZoomState(prev => ({
-      ...prev,
-      scale: newScale,
-      offset: Math.min(0, Math.max(prev.maxOffset * (1 - newScale), prev.offset))
-    }));
-  };
-
-  const resetZoom = () => {
-    setZoomState({
-      scale: 1,
-      offset: 0,
-      maxOffset: zoomState.maxOffset
-    });
-  };
 
   const handleMouseMove = (e) => {
     if (!svgRef.current) return;
@@ -741,6 +725,7 @@ export default function Dashboard() {
   const serialNumber = queryParams.get('serial_number');
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const anchorRef = useRef(null);
 
   const dataChange = (tp) => {
     if (!tp) return false;

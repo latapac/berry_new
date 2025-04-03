@@ -19,13 +19,13 @@ import {
   Typography,
   Box
 } from '@mui/material';
-import { getUsers, logoutService , addUser} from '../../../../backservice';
+import {  logoutService } from '../../../../backservice';
 import MainCard from 'ui-component/cards/MainCard';
 import Transitions from 'ui-component/extended/Transitions';
 import useConfig from 'hooks/useConfig';
 import { useDispatch, useSelector } from 'react-redux';
 import User1 from 'assets/images/users/blue.webp';
-import {  IconLogout, IconSettings, IconUsers  } from '@tabler/icons-react';
+import {  IconLogout, IconSettings  } from '@tabler/icons-react';
 import { logout } from '../../../../store/authslice';
 import { useNavigate } from 'react-router';
 
