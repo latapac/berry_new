@@ -143,6 +143,28 @@ export async function updateUserPass(username, password) {
     }
 }
 
+
+export async function updateMachineLine(sid, line){
+    const response = await fetch("http://64.227.139.217:3000/updateMachineLine", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json", // specify the content type
+        },
+        body: JSON.stringify({
+            sid,
+            line
+        })
+    })
+    const res = await response.json()
+    if (res.status == 200) {
+        return true
+    } else {
+        console.log(res);
+        return false
+    }
+}
+
+
 export async function getMachines(cid) {
     try {
         const data = await fetch("http://" + server + ":3000/getMachine/" + cid)

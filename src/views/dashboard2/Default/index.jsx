@@ -309,22 +309,6 @@ const MachineSpeedGraph = ({ speedData, isLoading, timeRange, setTimeRange, seri
     }
   }, [speedData, isLoading, dimensions.width]);
 
-  const handleZoom = (factor) => {
-    const newScale = Math.max(0.5, Math.min(5, zoomState.scale * factor));
-    setZoomState(prev => ({
-      ...prev,
-      scale: newScale,
-      offset: Math.min(0, Math.max(prev.maxOffset * (1 - newScale), prev.offset))
-    }));
-  };
-
-  const resetZoom = () => {
-    setZoomState({
-      scale: 1,
-      offset: 0,
-      maxOffset: zoomState.maxOffset
-    });
-  };
 
   const handleMouseMove = (e) => {
     if (!svgRef.current) return;
@@ -741,6 +725,7 @@ export default function Dashboard() {
   const serialNumber = queryParams.get('serial_number');
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const anchorRef = useRef(null);
 
   const dataChange = (tp) => {
     if (!tp) return false;
@@ -817,92 +802,96 @@ export default function Dashboard() {
             </span>
           )}
         </h1>
-        <div className="flex flex-wrap gap-2">
-          <button
-            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
-            onClick={() => navigate("/oeelive?serial_number=" + serialNumber)}
-          >
-            OEE Details
-          </button>
-          <button
-            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
-            onClick={() => navigate("/production?serial_number=" + serialNumber)}
-          >
-            Production
-          </button>
-          <button
-            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
-            onClick={() => navigate("/batch?serial_number=" + serialNumber)}
-          >
-            Batch
-          </button>
-          <div className="relative inline-block text-left">
-            <button
-              className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
-              onClick={() => setIsOpen(!isOpen)}
-            >
-              Report
-            </button>
+       <div className="flex flex-wrap gap-2">
+  {/* Standard buttons */}
+  <button
+    className="p-1 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6 sm:w-24 sm:h-8"
+    onClick={() => navigate("/oeelive?serial_number=" + serialNumber)}
+  >
+    OEE Details
+  </button>
+  <button
+    className="p-1 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6 sm:w-24 sm:h-8"
+    onClick={() => navigate("/production?serial_number=" + serialNumber)}
+  >
+    Production
+  </button>
+  <button
+    className="p-1 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6 sm:w-24 sm:h-8"
+    onClick={() => navigate("/batch?serial_number=" + serialNumber)}
+  >
+    Batch
+  </button>
 
-            {isOpen && (
-              <div
-                className="origin-top-right absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10"
-                onMouseLeave={() => setIsOpen(false)}
-              >
-                <div className="py-1">
-                  <button
-                    onClick={() => {
-                      navigate("/alarm?serial_number=" + serialNumber);
-                      setIsOpen(false);
-                    }}
-                    className="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-400 w-full text-left"
-                  >
-                    Alarm Report
-                  </button>
-                  <button
-                    onClick={() => {
-                      navigate("/audit?serial_number=" + serialNumber);
-                      setIsOpen(false);
-                    }}
-                    className="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-400 w-full text-left"
-                  >
-                    Audit Report
-                  </button>
-                  <button
-                    onClick={() => {
-                      navigate("/batch?serial_number=" + serialNumber);
-                      setIsOpen(false);
-                    }}
-                    className="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-400 w-full text-left"
-                  >
-                    Batch Report
-                  </button>
-                  <button
-                    onClick={() => {
-                      navigate("/OEE?serial_number=" + serialNumber);
-                      setIsOpen(false);
-                    }}
-                    className="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-400 w-full text-left"
-                  >
-                    OEE REPORT
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-          <button
-            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
-            onClick={() => navigate("/audit?serial_number=" + serialNumber)}
-          >
-            Audit
-          </button>
-          <button
-            className="p-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6"
-            onClick={() => navigate("/Active_alarm?serial_number=" + serialNumber)}
-          >
-            Active Alarm
-          </button>
-        </div>
+  {/* Dropdown button */}
+  <div className="relative inline-block text-left">
+  <button
+    className="p-1 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6 sm:w-24 sm:h-8"
+    onClick={() => setIsOpen(!isOpen)}
+  >
+    Report
+  </button>
+
+  {isOpen && (
+    <div
+      className="origin-top-right absolute left-0 mt-1 w-full min-w-[160px] rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10"
+      onMouseLeave={() => setIsOpen(false)}
+    >
+      <div className="py-1">
+        <button
+          onClick={() => {
+            navigate("/alarm?serial_number=" + serialNumber);
+            setIsOpen(false);
+          }}
+          className="block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100 w-full text-left whitespace-nowrap"
+        >
+          Alarm Report
+        </button>
+        <button
+          onClick={() => {
+            navigate("/audit?serial_number=" + serialNumber);
+            setIsOpen(false);
+          }}
+          className="block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100 w-full text-left whitespace-nowrap"
+        >
+          Audit Report
+        </button>
+        <button
+          onClick={() => {
+            navigate("/batch?serial_number=" + serialNumber);
+            setIsOpen(false);
+          }}
+          className="block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100 w-full text-left whitespace-nowrap"
+        >
+          Batch Report
+        </button>
+        <button
+          onClick={() => {
+            navigate("/OEE?serial_number=" + serialNumber);
+            setIsOpen(false);
+          }}
+          className="block px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100 w-full text-left whitespace-nowrap"
+        >
+          OEE Report
+        </button>
+      </div>
+    </div>
+  )}
+</div>
+  {/* More standard buttons */}
+  <button
+    className="p-1 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6 sm:w-24 sm:h-8"
+    onClick={() => navigate("/audit?serial_number=" + serialNumber)}
+  >
+    Audit
+  </button>
+  <button
+    className="p-1 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 w-20 h-6 sm:w-24 sm:h-8"
+    onClick={() => navigate("/Active_alarm?serial_number=" + serialNumber)}
+  >
+    Active Alarm
+  </button>
+</div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
