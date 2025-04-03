@@ -146,6 +146,8 @@ function AuditTrail() {
     const getIdentificationText = (data,firstKey)=>{
         if (data.topic==="alarm") {
             return data?.d?.status
+        }else if(data.topic==="control"){
+            return data.d[firstKey][0]?"On":"Off"
         }else{
             return LogText(firstKey, data.d[firstKey]?.[0])
         }
