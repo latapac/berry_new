@@ -23,7 +23,7 @@ import {
   styled
 } from '@mui/material';
 import { Add, Business, ExitToApp } from '@mui/icons-material';
-import { addCompany, getAllCompanies, toggleStatus } from '../backservice';
+import { addCompany, deleteCompany, getAllCompanies, toggleStatus } from '../backservice';
 import { useNavigate } from 'react-router';
 
 // Styled components for corporate look
@@ -56,6 +56,7 @@ const AdminIndex = () => {
   const [openModal, setOpenModal] = useState(false);
   const [statusModal, setStatusModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [companyNameDelete,setCompanyNameDelete] = useState("")
   const [companyToDeactivate, setCompanyToDeactivate] = useState({});
   const [companyToDelete, setCompanyToDelete] = useState({});
   const [currentCompany, setCurrentCompany] = useState({
@@ -66,6 +67,9 @@ const AdminIndex = () => {
     phone: '',
     address: ''
   });
+
+
+  
 
   // Handle logout (to be implemented)
   const handleLogout = () => {
@@ -122,8 +126,6 @@ const AdminIndex = () => {
 
   const toggleCompanyStatus = (companyId) => {
    toggleStatus(companyId).then((data)=>{
-    console.log(data);
-    
     if (data) {
       alert("Company Status Changed !!")
       getAllCompanies().then((data) => {
@@ -134,6 +136,20 @@ const AdminIndex = () => {
     }
    })
   };
+
+  function deleteCompanyHandle(id) {
+    setDeleteModal(false)
+    deleteCompany(id).then((res)=>{
+      if (res) {
+        alert("company deleted")
+        getAllCompanies().then((data) => {
+          setCompanies(data.data);
+        });
+      }else{
+        alert("failed")
+      }
+    })
+  }
 
   // Fetch companies on initial load
   useEffect(() => {
@@ -278,18 +294,16 @@ const AdminIndex = () => {
           <DialogContentText>
             You are about to Delete <strong>{companyToDelete?.name}</strong><br />
             <strong>Please enter Company Name to confirm deletion.</strong><br /><br />
-            <input  className='border-2 rounded-md border-gray-700 w-[30vw]'></input>
+            <input value={companyNameDelete} onChange={(e)=>setCompanyNameDelete(e.target.value)} className='border-2 rounded-md border-gray-700 w-[30vw]'></input>
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ p: 3, pt: 1 }}>
           <ActionButton onClick={() => setDeleteModal(false)}>Cancel</ActionButton>
           <ActionButton
-            onClick={() => {
-              setDeleteModal(false);
-              alert(`Company ${companyToDelete?.name} deleted  !!`);
-            }}
+            onClick={()=>deleteCompanyHandle(companyToDelete.company_id)}
             variant="contained"
             color="danger"
+            disabled={companyToDelete.name!==companyNameDelete}
           >
             Delete
           </ActionButton>
