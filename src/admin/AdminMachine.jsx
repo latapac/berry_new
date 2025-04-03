@@ -19,7 +19,7 @@ import { Add } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router';
 import { useDispatch } from 'react-redux';
 import { adminLogout } from '../store/authslice';
-import { addMachine, getMachines } from '../backservice';
+import { addMachine, deleteMachine, getMachines } from '../backservice';
 
 const AdminMachine = () => {
   const navigate = useNavigate();
@@ -96,7 +96,21 @@ const AdminMachine = () => {
   };
 
   const handleDeleteMachine = (id) => {
-    setMachines(machines.filter(machine => machine.id !== id));
+    let res = window.confirm("do you wanna delete machine?")
+    if (res) {
+      deleteMachine(id).then((res)=>{
+        if (res) {
+          alert("deleted")
+          getMachines(companyId).then((data) => {
+            setMachines(data)
+          })
+        }else{
+          alert("deletion failed!")
+        }
+      })
+    }else{
+
+    }
   };
 
   useEffect(() => {
@@ -175,7 +189,7 @@ const AdminMachine = () => {
                       <Button
                         variant="outlined"
                         size="small"
-                        onClick={() => handleDeleteMachine(machine.id)}
+                        onClick={() => handleDeleteMachine(machine.serial_number)}
                         sx={{
                           textTransform: 'none',
                           borderColor: '#dc2626',

@@ -158,6 +158,24 @@ export async function getMachines(cid) {
     }
 }
 
+
+export async function deleteMachine(sid) {
+    try {
+        const data = await fetch("http://" + server + ":3000/deleteMachine/" + sid)
+        const res = await data.json()
+        console.log(res);
+        if (res.status) {
+            return true
+        } else {
+            return false
+        }
+    } catch (error) {
+        console.log(error);
+        return false
+    }
+}
+
+
 export async function getMachineData(mid) {
     try {
         const response = await fetch("http://" + server + ":3000/getMachineData/" + mid);
@@ -232,6 +250,24 @@ export async function addCompany(data) {
         return false
     }
 }
+
+export async function deleteCompany(cid) {
+    try {
+        const data = await fetch("http://" + server + ":3000/deleteCompany/" + cid)
+        const res = await data.json()
+        
+        if (res.status == 200) {
+            return true
+        } else {
+            return false
+        }
+    } catch (error) {
+        console.log(error);
+        return false
+    }
+}
+
+
 
 export async function toggleStatus(_cid) {
     const response = await fetch("http://64.227.139.217:3000/changeCompanyStatus/"+_cid)
