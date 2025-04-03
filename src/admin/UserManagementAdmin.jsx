@@ -126,7 +126,7 @@ export default function UserManagementAdmin() {
                 <LockReset />
               </IconButton>
 
-              {(userData._id===user._id || user?.role?.toLowerCase()==="company admin")?(<></>):( <IconButton 
+           <IconButton 
                 onClick={() => {
                   setSelectedUser(user);
                   setActionType('delete');
@@ -134,7 +134,7 @@ export default function UserManagementAdmin() {
                 color="error"
               >
                 <Delete />
-              </IconButton>)}
+              </IconButton>)
              
             </Box>
           </ListItemButton>
