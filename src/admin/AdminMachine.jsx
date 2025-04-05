@@ -14,8 +14,15 @@ import {
   Modal,
   AppBar,
   Toolbar,
+  IconButton,
+  Tooltip
 } from '@mui/material';
-import { Add } from '@mui/icons-material';
+import { 
+  Add,
+  Edit,
+  Delete,
+  Dashboard
+} from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router';
 import { useDispatch } from 'react-redux';
 import { adminLogout } from '../store/authslice';
@@ -108,8 +115,6 @@ const AdminMachine = () => {
           alert("deletion failed!")
         }
       })
-    }else{
-
     }
   };
 
@@ -155,46 +160,42 @@ const AdminMachine = () => {
                   <TableCell sx={{ color: '#64748b' }}>{machine.lineNo}</TableCell>
                   <TableCell>
                     <Box sx={{ display: 'flex', gap: 1 }}>
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        onClick={() => handleOpenModal(machine)}
-                        sx={{
-                          textTransform: 'none',
-                          borderColor: '#1e3a8a',
-                          color: '#1e3a8a',
-                          '&:hover': { borderColor: '#172554' },
-                          borderRadius: '6px'
-                        }}
-                      >
-                        Edit Line No.
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        onClick={() => handleDeleteMachine(machine.serial_number)}
-                        sx={{
-                          textTransform: 'none',
-                          borderColor: '#dc2626',
-                          color: '#dc2626',
-                          '&:hover': { borderColor: '#991b1b' },
-                          borderRadius: '6px'
-                        }}
-                      >
-                        Delete
-                      </Button>
-                      <Button
-                        variant="contained"
-                        size="small"
-                        onClick={() => navigate("/dash?serial_number=" + machine.serial_number)}
-                        sx={{
-                        
-                          textTransform: 'none',
-                          borderRadius: '6px'
-                        }}
-                      >
-                        View Dashboard
-                      </Button>
+                      <Tooltip title="Edit Line Number">
+                        <IconButton
+                          onClick={() => handleOpenModal(machine)}
+                          sx={{
+                            color: '#1e3a8a',
+                            '&:hover': { backgroundColor: '#e0e7ff' }
+                          }}
+                        >
+                          <Edit />
+                        </IconButton>
+                      </Tooltip>
+                      
+                      <Tooltip title="Delete Machine">
+                        <IconButton
+                          onClick={() => handleDeleteMachine(machine.serial_number)}
+                          sx={{
+                            color: '#dc2626',
+                            '&:hover': { backgroundColor: '#fee2e2' }
+                          }}
+                        >
+                          <Delete />
+                        </IconButton>
+                      </Tooltip>
+                      
+                      <Tooltip title="View Dashboard">
+                        <IconButton
+                          onClick={() => navigate("/dash?serial_number=" + machine.serial_number)}
+                          sx={{
+                            color: '#1e3a8a',
+                            backgroundColor: '#e0e7ff',
+                            '&:hover': { backgroundColor: '#c7d2fe' }
+                          }}
+                        >
+                          <Dashboard />
+                        </IconButton>
+                      </Tooltip>
                     </Box>
                   </TableCell>
                 </TableRow>
