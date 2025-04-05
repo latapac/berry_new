@@ -182,82 +182,112 @@ const AdminIndex = () => {
         </Box>
 
         <CorporatePaper>
-          <TableContainer>
-            <Table>
-              <CorporateTableHead>
-                <TableRow>
-                  <TableCell>SR NO.</TableCell>
-                  <TableCell>Company Name</TableCell>
-                  <TableCell>Address</TableCell>
-                  <TableCell>Unit</TableCell>
-                  <TableCell sx={{ width: '180px' }}>Actions</TableCell>
-                </TableRow>
-              </CorporateTableHead>
-              <TableBody>
-                {companies.map((company, index) => (
-                  <TableRow key={company.company_id}  className={company.status?"opacity-100":"opacity-70"} hover>
-                    <TableCell>
-                      <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{index + 1}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography fontWeight={500}>{company.name}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography fontWeight={500}>{company.address}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography fontWeight={500}>{company.unit}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', gap: 1 }}>
-                        <Tooltip title="View Machines">
-                          <IconButton 
-                            color="primary" 
-                            onClick={() => navigate("/adminMachine?c_id=" + company.company_id)}
-                            sx={{ '&:hover': { backgroundColor: theme.palette.primary.light } }}
-                          >
-                            <Visibility />
-                          </IconButton>
-                        </Tooltip>
-                        
-                        <Tooltip title={company.status ? 'Deactivate Company' : 'Activate Company'}>
-                          <IconButton 
-                            color={company.status ? 'error' : 'success'} 
-                            onClick={() => handleCompanyStatus(company)}
-                            sx={{ '&:hover': { 
-                              backgroundColor: company.status ? theme.palette.error.light : theme.palette.success.light 
-                            }}}
-                          >
-                            {company.status ? <PowerSettingsNew /> : <CheckCircle />}
-                          </IconButton>
-                        </Tooltip>
-                        
-                        <Tooltip title="User Management">
-                          <IconButton 
-                            color="secondary" 
-                            onClick={() => navigate("/userManagementAdmin?c_id=" + company.company_id)}
-                            sx={{ '&:hover': { backgroundColor: theme.palette.secondary.light } }}
-                          >
-                            <People />
-                          </IconButton>
-                        </Tooltip>
-                        
-                        <Tooltip title="Delete Company">
-                          <IconButton 
-                            color="inherit" 
-                            onClick={() => handleDeleteCompany(company)}
-                            sx={{ '&:hover': { backgroundColor: theme.palette.grey[300] } }}
-                          >
-                            <Delete />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+        <TableContainer>
+  <Table sx={{ 
+    '& .MuiTableCell-root': {
+      padding: '8px 4px', // Reduced padding
+      borderBottom: 'none' // Optional: remove border if desired
+    }
+  }}>
+    <CorporateTableHead>
+      <TableRow sx={{ display: 'flex', width: '100%' }}>
+        <TableCell sx={{ width: '80px', textAlign: 'center' }}>SR NO.</TableCell>
+        <TableCell sx={{ flex: 2, minWidth: '200px' }}>Company Name</TableCell>
+        <TableCell sx={{ flex: 3, minWidth: '300px' }}>Address</TableCell>
+        <TableCell sx={{ flex: 1, minWidth: '100px' }}>Unit</TableCell>
+        <TableCell sx={{ width: '180px', textAlign: 'center' }}>Actions</TableCell>
+      </TableRow>
+    </CorporateTableHead>
+    <TableBody>
+      {companies.map((company, index) => (
+        <TableRow 
+          key={company.company_id}  
+          className={`${company.status?"opacity-100":"opacity-70"}`} 
+          sx={{
+            display: "flex",
+            width: "100%",
+            alignItems: 'center' // This ensures vertical alignment
+          }}
+          hover
+        >
+          <TableCell sx={{ width: '80px', textAlign: 'center' }}>
+            <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+              {index + 1}
+            </Typography>
+          </TableCell>
+          <TableCell sx={{ flex: 2, minWidth: '200px' }}>
+            <Typography fontWeight={500} noWrap>
+              {company.name}
+            </Typography>
+          </TableCell>
+          <TableCell sx={{ flex: 3, minWidth: '300px' }}>
+            <Typography fontWeight={500} noWrap>
+              {company.address}
+            </Typography>
+          </TableCell>
+          <TableCell sx={{ flex: 1, minWidth: '100px' }}>
+            <Typography fontWeight={500}>
+              {company.unit}
+            </Typography>
+          </TableCell>
+          <TableCell sx={{ width: '180px' }}>
+            <Box sx={{ 
+              display: 'flex', 
+              gap: 1,
+              justifyContent: 'center'
+            }}>
+              <Tooltip title="View Machines">
+                <IconButton 
+                  size="small"
+                  color="primary" 
+                  onClick={() => navigate("/adminMachine?c_id=" + company.company_id)}
+                  sx={{ '&:hover': { backgroundColor: theme.palette.primary.light } }}
+                >
+                  <Visibility fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              
+              <Tooltip title={company.status ? 'Deactivate Company' : 'Activate Company'}>
+                <IconButton 
+                  size="small"
+                  color={company.status ? 'error' : 'success'} 
+                  onClick={() => handleCompanyStatus(company)}
+                  sx={{ '&:hover': { 
+                    backgroundColor: company.status ? theme.palette.error.light : theme.palette.success.light 
+                  }}}
+                >
+                  {company.status ? <PowerSettingsNew fontSize="small" /> : <CheckCircle fontSize="small" />}
+                </IconButton>
+              </Tooltip>
+              
+              <Tooltip title="User Management">
+                <IconButton 
+                  size="small"
+                  color="secondary" 
+                  onClick={() => navigate("/userManagementAdmin?c_id=" + company.company_id)}
+                  sx={{ '&:hover': { backgroundColor: theme.palette.secondary.light } }}
+                >
+                  <People fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              
+              <Tooltip title="Delete Company">
+                <IconButton 
+                  size="small"
+                  color="inherit" 
+                  onClick={() => handleDeleteCompany(company)}
+                  sx={{ '&:hover': { backgroundColor: theme.palette.grey[300] } }}
+                >
+                  <Delete fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </TableCell>
+        </TableRow>
+      ))}
+    </TableBody>
+  </Table>
+</TableContainer>
         </CorporatePaper>
       </Box>
 
