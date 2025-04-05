@@ -20,9 +20,19 @@ import {
   DialogContentText,
   DialogActions,
   useTheme,
-  styled
+  styled,
+  IconButton,
+  Tooltip
 } from '@mui/material';
-import { Add } from '@mui/icons-material';
+import { 
+  Add, 
+  Visibility, 
+  PowerSettingsNew, 
+  People, 
+  Delete,
+  CheckCircle,
+  Cancel
+} from '@mui/icons-material';
 import { addCompany, deleteCompany, getAllCompanies, toggleStatus } from '../backservice';
 import { useNavigate } from 'react-router';
 
@@ -68,9 +78,6 @@ const AdminIndex = () => {
     address: ''
   });
 
-
-  
-
   // Handle logout (to be implemented)
   const handleLogout = () => {
     // Implement logout functionality
@@ -113,7 +120,6 @@ const AdminIndex = () => {
     handleCloseModal();
   };
 
-
   const handleCompanyStatus = (company) => {
       setCompanyToDeactivate(company);
       setStatusModal(true);
@@ -122,7 +128,6 @@ const AdminIndex = () => {
     setCompanyToDelete(company);
     setDeleteModal(true);
   };
-
 
   const toggleCompanyStatus = (companyId) => {
    toggleStatus(companyId).then((data)=>{
@@ -166,7 +171,6 @@ const AdminIndex = () => {
       backgroundColor: theme.palette.grey[50]
     }}>
       
-
       <Box sx={{ p: 4, maxWidth: '1600px', margin: '0 auto', width: '100%' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
           <Typography variant="h4" sx={{ fontWeight: 600, color: theme.palette.grey[800], letterSpacing: '-0.5px' }}>
@@ -206,18 +210,47 @@ const AdminIndex = () => {
                     </TableCell>
                     <TableCell>
                       <Box sx={{ display: 'flex', gap: 1 }}>
-                        <ActionButton variant="outlined" color="primary" size="small" onClick={() => navigate("/adminMachine?c_id=" + company.company_id)}>
-                          View Machines
-                        </ActionButton>
-                        <ActionButton variant="outlined" color={!company.status ? 'success' : 'error'} size="small" onClick={() => handleCompanyStatus(company)}>
-                          {company.status ? 'DEACTIVATE COMPANY' : 'ACTIVATE COMPANY'}
-                        </ActionButton>
-                        <ActionButton variant="outlined" color="secondary" size="small" onClick={() => navigate("/userManagementAdmin?c_id=" + company.company_id)}>
-                          User Management
-                        </ActionButton>
-                        <ActionButton variant="outlined" color="inherit" size="small" onClick={() => handleDeleteCompany(company)}>
-                          Delete Company
-                        </ActionButton>
+                        <Tooltip title="View Machines">
+                          <IconButton 
+                            color="primary" 
+                            onClick={() => navigate("/adminMachine?c_id=" + company.company_id)}
+                            sx={{ '&:hover': { backgroundColor: theme.palette.primary.light } }}
+                          >
+                            <Visibility />
+                          </IconButton>
+                        </Tooltip>
+                        
+                        <Tooltip title={company.status ? 'Deactivate Company' : 'Activate Company'}>
+                          <IconButton 
+                            color={company.status ? 'error' : 'success'} 
+                            onClick={() => handleCompanyStatus(company)}
+                            sx={{ '&:hover': { 
+                              backgroundColor: company.status ? theme.palette.error.light : theme.palette.success.light 
+                            }}}
+                          >
+                            {company.status ? <PowerSettingsNew /> : <CheckCircle />}
+                          </IconButton>
+                        </Tooltip>
+                        
+                        <Tooltip title="User Management">
+                          <IconButton 
+                            color="secondary" 
+                            onClick={() => navigate("/userManagementAdmin?c_id=" + company.company_id)}
+                            sx={{ '&:hover': { backgroundColor: theme.palette.secondary.light } }}
+                          >
+                            <People />
+                          </IconButton>
+                        </Tooltip>
+                        
+                        <Tooltip title="Delete Company">
+                          <IconButton 
+                            color="inherit" 
+                            onClick={() => handleDeleteCompany(company)}
+                            sx={{ '&:hover': { backgroundColor: theme.palette.grey[300] } }}
+                          >
+                            <Delete />
+                          </IconButton>
+                        </Tooltip>
                       </Box>
                     </TableCell>
                   </TableRow>
@@ -266,7 +299,6 @@ const AdminIndex = () => {
           <ActionButton onClick={() => setStatusModal(false)}>Cancel</ActionButton>
           <ActionButton
             onClick={() => {
-  
               toggleCompanyStatus(companyToDeactivate.company_id);
               setStatusModal(false);
             }}
@@ -301,7 +333,6 @@ const AdminIndex = () => {
           </ActionButton>
         </DialogActions>
       </Dialog>
-
     </Box>
   );
 };
