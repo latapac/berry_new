@@ -30,8 +30,7 @@ import {
   PowerSettingsNew, 
   People, 
   Delete,
-  CheckCircle,
-  Cancel
+  CheckCircle
 } from '@mui/icons-material';
 import { addCompany, deleteCompany, getAllCompanies, toggleStatus } from '../backservice';
 import { useNavigate } from 'react-router';
